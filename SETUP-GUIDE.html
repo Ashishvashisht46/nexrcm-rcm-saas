@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexRCM — Setup Guide (Zero Coding Required)</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F8FAFC;color:#1E293B;line-height:1.7;padding:40px 20px}
+.container{max-width:800px;margin:0 auto}
+h1{font-size:28px;font-weight:800;margin-bottom:8px;color:#0F172A}
+.subtitle{font-size:16px;color:#64748B;margin-bottom:40px}
+h2{font-size:20px;font-weight:700;color:#0F172A;margin:36px 0 16px;padding-bottom:8px;border-bottom:2px solid #E2E8F0}
+h2 .num{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#1A56FF;color:#fff;font-size:15px;margin-right:10px}
+.step{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:24px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.step-title{font-weight:700;font-size:16px;color:#0F172A;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.step-title .icon{font-size:20px}
+p{margin-bottom:12px;color:#475569}
+.highlight{background:#FFF7ED;border:1px solid #FDBA74;border-radius:8px;padding:16px;margin:12px 0}
+.highlight.blue{background:#EFF6FF;border-color:#93C5FD}
+.highlight.green{background:#F0FDF4;border-color:#86EFAC}
+.highlight.red{background:#FEF2F2;border-color:#FCA5A5}
+.code-block{background:#0F172A;color:#E2E8F0;border-radius:8px;padding:16px 20px;font-family:'Cascadia Code','Fira Code',monospace;font-size:14px;margin:12px 0;overflow-x:auto;line-height:1.6}
+.code-block .comment{color:#64748B}
+.code-block .cmd{color:#86EFAC}
+.code-block .url{color:#93C5FD}
+.inline-code{background:#F1F5F9;padding:2px 8px;border-radius:4px;font-family:monospace;font-size:13px;color:#0F172A;border:1px solid #E2E8F0}
+.login-box{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.login-item{background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 16px}
+.login-label{font-size:12px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.05em}
+.login-value{font-size:15px;font-weight:600;color:#0F172A;font-family:monospace;margin-top:2px}
+.warning{font-weight:700;color:#DC2626}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;text-transform:uppercase}
+.badge.easy{background:#F0FDF4;color:#166534;border:1px solid #86EFAC}
+.badge.medium{background:#FFF7ED;color:#9A3412;border:1px solid #FDBA74}
+a{color:#1A56FF;text-decoration:none;font-weight:600}
+a:hover{text-decoration:underline}
+.faq{margin-top:40px}
+.faq-item{margin-bottom:16px}
+.faq-q{font-weight:700;font-size:15px;color:#0F172A;margin-bottom:4px}
+.faq-a{color:#475569;font-size:14px}
+.footer{margin-top:60px;padding-top:20px;border-top:1px solid #E2E8F0;color:#94A3B8;font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🏥 NexRCM — Setup Guide</h1>
+<p class="subtitle">Get your Revenue Cycle Management platform running in 10 minutes. No coding required.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2><span class="num">1</span> Install Docker Desktop <span class="badge easy">5 min</span></h2>
+
+<div class="step">
+  <div class="step-title"><span class="icon">📥</span> Download & Install</div>
+  <p>Docker is like a "container" that runs everything NexRCM needs (database, server, etc.) without you installing each piece separately.</p>
+  <p><strong>Go to:</strong> <a href="https://www.docker.com/products/docker-desktop/" target="_blank">https://www.docker.com/products/docker-desktop/</a></p>
+  <p>Click <strong>"Download for Windows"</strong> (or Mac), then install it like any normal program — just keep clicking Next.</p>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">🔄</span> Restart Your Computer</div>
+  <p>After installing Docker Desktop, <strong>restart your computer</strong>. This is important.</p>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">✅</span> Open Docker Desktop & Wait</div>
+  <p>After restart, open Docker Desktop. Wait until the bottom-left corner shows a <strong>green icon</strong> and says <strong>"Engine running"</strong>.</p>
+  <p>This might take 1-2 minutes the first time. Don't skip this step.</p>
+</div>
+
+<div class="highlight blue">
+  <strong>💡 What is Docker?</strong> Think of it as a box that contains a mini-computer with everything NexRCM needs pre-installed. You don't need to install databases, servers, or anything else — Docker handles all of it.
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2><span class="num">2</span> Start NexRCM <span class="badge easy">3 min</span></h2>
+
+<div class="step">
+  <div class="step-title"><span class="icon">📂</span> Open the NexRCM Folder</div>
+  <p>Go to where you extracted the <span class="inline-code">NexRCM-full-stack-ai.zip</span> file. You should see these files:</p>
+  <div class="code-block">
+📁 nexrcm/
+├── 📄 START-WINDOWS.bat      ← <span class="cmd">Double-click this on Windows!</span>
+├── 📄 START-MAC-LINUX.sh     ← <span class="cmd">Run this on Mac/Linux</span>
+├── 📄 docker-compose.yml
+├── 📄 README.md
+├── 📁 backend/
+├── 📁 frontend/
+└── 📁 docs/
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">🖱️</span> Windows: Double-click START-WINDOWS.bat</div>
+  <p>That's it. A black command window will open and show the progress. Wait 2-5 minutes the first time (it downloads databases and server components).</p>
+  <p>If Windows asks "Do you want to allow this?" — click <strong>Yes</strong>.</p>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">🍎</span> Mac/Linux: Run the script</div>
+  <p>Open Terminal, navigate to the nexrcm folder, and run:</p>
+  <div class="code-block">
+<span class="comment"># Navigate to the folder</span>
+<span class="cmd">cd</span> ~/Downloads/nexrcm    <span class="comment">(or wherever you extracted it)</span>
+
+<span class="comment"># Make it executable</span>
+<span class="cmd">chmod +x</span> START-MAC-LINUX.sh
+
+<span class="comment"># Run it</span>
+<span class="cmd">./START-MAC-LINUX.sh</span>
+  </div>
+</div>
+
+<div class="highlight green">
+  <strong>🎉 When you see "NexRCM is RUNNING!"</strong> — your browser should open automatically. If not, open your browser and go to <a href="http://localhost:3000">http://localhost:3000</a>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2><span class="num">3</span> Login & Use NexRCM</h2>
+
+<div class="step">
+  <div class="step-title"><span class="icon">🔑</span> Login Credentials</div>
+  <p>Use any of these accounts to explore different roles:</p>
+  <div class="login-box">
+    <div class="login-item"><div class="login-label">Admin (Full Access)</div><div class="login-value">admin@summithealthmg.com</div></div>
+    <div class="login-item"><div class="login-label">Password (all accounts)</div><div class="login-value">NexRCM2024!</div></div>
+    <div class="login-item"><div class="login-label">Billing Manager</div><div class="login-value">sarah@summithealthmg.com</div></div>
+    <div class="login-item"><div class="login-label">Front Desk</div><div class="login-value">jessica@summithealthmg.com</div></div>
+    <div class="login-item"><div class="login-label">AR Specialist</div><div class="login-value">lisa@summithealthmg.com</div></div>
+    <div class="login-item"><div class="login-label">Coder</div><div class="login-value">tom@summithealthmg.com</div></div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">🌐</span> Portal URLs</div>
+  <p>Each department has its own portal:</p>
+  <div class="code-block">
+<span class="url">http://localhost:3000/admin.html</span>              <span class="comment">← Executive Dashboard</span>
+<span class="url">http://localhost:3000/front-desk.html</span>         <span class="comment">← Patient Check-in & Scheduling</span>
+<span class="url">http://localhost:3000/billing.html</span>            <span class="comment">← Claims & Billing</span>
+<span class="url">http://localhost:3000/ar-management.html</span>      <span class="comment">← AR Follow-ups & Collections</span>
+<span class="url">http://localhost:3000/insurance-verification.html</span> <span class="comment">← Eligibility Checks</span>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">🤖</span> Check AI Status</div>
+  <p>Open this URL to verify AI is working:</p>
+  <div class="code-block"><span class="url">http://localhost:4000/api/v1/ai/status</span></div>
+  <p>You should see <span class="inline-code">"ai_enabled": true</span> and the model name.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2><span class="num">4</span> Daily Commands</h2>
+
+<div class="step">
+  <div class="step-title"><span class="icon">⏹️</span> Stop NexRCM</div>
+  <p>Open a command window (search "cmd" in Windows Start menu) and type:</p>
+  <div class="code-block"><span class="cmd">cd</span> path\to\nexrcm
+<span class="cmd">docker-compose down</span></div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">▶️</span> Start NexRCM Again (Fast — No Download)</div>
+  <div class="code-block"><span class="cmd">cd</span> path\to\nexrcm
+<span class="cmd">docker-compose up -d</span></div>
+  <p>After the first setup, starts in ~10 seconds.</p>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">📋</span> See What's Happening (Logs)</div>
+  <div class="code-block"><span class="cmd">docker-compose logs -f</span></div>
+  <p>Press <span class="inline-code">Ctrl + C</span> to stop watching logs.</p>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="icon">🔄</span> Reset Everything (Fresh Start)</div>
+  <div class="code-block"><span class="cmd">docker-compose down -v</span>     <span class="comment">← deletes all data</span>
+<span class="cmd">docker-compose up --build -d</span> <span class="comment">← rebuilds everything fresh</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<h2><span class="num">5</span> Change AI Model (Optional)</h2>
+
+<div class="step">
+  <div class="step-title"><span class="icon">💰</span> Switch to a Cheaper/Better Model</div>
+  <p>Open <span class="inline-code">backend/.env</span> in Notepad and change the <span class="inline-code">AI_MODEL</span> line:</p>
+  <div class="code-block">
+<span class="comment"># CHEAPEST (current default — $0.27 per million words):</span>
+AI_MODEL=deepseek/deepseek-chat-v3-0324
+
+<span class="comment"># EVEN CHEAPER ($0.10 per million words):</span>
+AI_MODEL=google/gemini-2.0-flash-001
+
+<span class="comment"># BEST QUALITY (more expensive):</span>
+AI_MODEL=anthropic/claude-sonnet-4
+  </div>
+  <p>After changing, restart: <span class="inline-code">docker-compose down && docker-compose up -d</span></p>
+</div>
+
+<div class="highlight red">
+  <strong>⚠️ Important:</strong> Before going live, change the API key in <span class="inline-code">backend/.env</span> — the current one is a demo key. Get your own at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<div class="faq">
+<h2>❓ Troubleshooting</h2>
+
+<div class="faq-item">
+  <div class="faq-q">🔴 "Docker is not running" error</div>
+  <div class="faq-a">Open Docker Desktop app and wait for the green "Engine running" status. Then try again.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">🔴 Port 3000 or 4000 already in use</div>
+  <div class="faq-a">Another app is using those ports. Close it, or change the ports in <span class="inline-code">docker-compose.yml</span> (e.g., change <span class="inline-code">"3000:80"</span> to <span class="inline-code">"3001:80"</span>).</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">🔴 "Cannot connect to Docker daemon"</div>
+  <div class="faq-a"><strong>Windows:</strong> Right-click the .bat file → "Run as administrator".<br><strong>Mac/Linux:</strong> Run with <span class="inline-code">sudo docker-compose up --build -d</span></div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">🔴 Browser shows "This site can't be reached"</div>
+  <div class="faq-a">Wait 1-2 more minutes — the database might still be setting up. Run <span class="inline-code">docker-compose logs -f</span> to check progress. Look for "NexRCM server running on port 4000".</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">🔴 AI features show "unavailable"</div>
+  <div class="faq-a">Check that <span class="inline-code">OPENROUTER_API_KEY</span> is set correctly in <span class="inline-code">backend/.env</span>. Verify your key works at <a href="https://openrouter.ai" target="_blank">openrouter.ai</a>.</div>
+</div>
+
+<div class="faq-item">
+  <div class="faq-q">🟢 How do I update NexRCM later?</div>
+  <div class="faq-a">Replace the files, then run: <span class="inline-code">docker-compose down && docker-compose up --build -d</span></div>
+</div>
+</div>
+
+<div class="footer">
+  NexRCM — Revenue Cycle Management SaaS Platform<br>
+  Built with Node.js • PostgreSQL • Redis • AI (OpenRouter)
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NexRCM — AR Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#1A56FF;--brand-dark:#0B3FCC;--brand-light:#EEF3FF;
+  --orange:#F97316;--orange-dark:#EA6C10;--orange-bg:#FFF7ED;--orange-border:#FDBA74;
+  --navy:#0A0E1A;--navy-mid:#0D1630;
+  --success:#10B981;--success-bg:#ECFDF5;--success-border:#A7F3D0;
+  --warning:#F59E0B;--warning-bg:#FFFBEB;--warning-border:#FDE68A;
+  --danger:#EF4444;--danger-bg:#FEF2F2;--danger-border:#FECACA;
+  --info:#3B82F6;--info-bg:#EFF6FF;--info-border:#BFDBFE;
+  --purple:#7C3AED;--purple-bg:#F5F3FF;--purple-border:#DDD6FE;
+  --bg:#F0F3F8;--surface:#FFFFFF;
+  --text:#0F172A;--text2:#475569;--muted:#94A3B8;
+  --border:#E2E8F0;--border-light:#EDF2F7;
+  --r:10px;--r-lg:14px;--r-xl:20px;--r-pill:999px;
+  --shadow-xs:0 1px 2px rgba(15,23,42,0.05),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-sm:0 2px 4px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.07),0 2px 6px rgba(15,23,42,0.04);
+  --shadow-lg:0 20px 40px rgba(15,23,42,0.10),0 8px 16px rgba(15,23,42,0.06);
+  --t:200ms;--sidebar-w:240px;
+}
+html,body{height:100%;font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px}
+#app{display:flex;height:100vh;overflow:hidden}
+/* Sidebar */
+#sidebar{width:var(--sidebar-w);height:100%;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0}
+.sb-header{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-mark{width:34px;height:34px;border-radius:9px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700;color:#fff}.sb-sub{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em}
+.sb-role-badge{margin:10px 16px 0;background:rgba(249,115,22,0.14);border:1px solid rgba(249,115,22,0.28);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px}
+.sb-role-dot{width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0}
+.sb-role-name{font-size:12px;font-weight:600;color:#FCA87A}.sb-role-title{font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px}
+.sb-section{font-size:9.5px;font-weight:700;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.14em;padding:12px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;margin-bottom:1px;color:rgba(255,255,255,0.44);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.12s;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.84)}
+.nav-item.active{background:rgba(249,115,22,0.16);color:#FCA87A}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nav-badge{font-size:9.5px;font-weight:800;min-width:17px;height:17px;padding:0 4px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;background:var(--danger);color:#fff;margin-left:auto}
+.sb-footer{border-top:1px solid rgba(255,255,255,0.06);padding:10px}
+.sb-user{display:flex;align-items:center;gap:9px;padding:8px 10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--orange),#EF4444);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-uname{font-size:12px;font-weight:700;color:rgba(255,255,255,0.82)}.sb-urole{font-size:10.5px;color:rgba(255,255,255,0.28)}
+.portal-switch{display:flex;flex-wrap:wrap;gap:5px;padding:8px 14px;border-top:1px solid rgba(255,255,255,0.06)}
+.ps-link{font-size:10px;padding:3px 7px;border-radius:5px;color:rgba(255,255,255,0.3);cursor:pointer;transition:all 0.1s;white-space:nowrap;text-decoration:none;display:inline-block}
+.ps-link:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
+.ps-link.cur{color:var(--orange);background:rgba(249,115,22,0.1)}
+/* Main area */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;box-shadow:var(--shadow-xs)}
+.topbar-title{font-size:16px;font-weight:700;flex:1}
+.topbar-date{font-size:12px;color:var(--muted);background:var(--bg);padding:5px 12px;border-radius:99px;border:1px solid var(--border)}
+.topbar-btn{width:34px;height:34px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer;position:relative}
+#content{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
+.page{display:none}.page.active{display:block;animation:fadeIn 0.28s cubic-bezier(0.4,0,0.2,1) both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* Page header */
+.ph{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ph-left{flex:1}.ph-eyebrow{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.11em;margin-bottom:3px}
+.ph-title{font-size:21px;font-weight:700;letter-spacing:-0.02em}
+.ph-desc{font-size:13px;color:var(--text2);margin-top:4px}
+.ph-right{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:4px}
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:600;white-space:nowrap;border:1px solid transparent;cursor:pointer;transition:all var(--t);box-shadow:var(--shadow-xs)}
+.btn-primary{background:var(--orange);color:#fff;border-color:var(--orange)}.btn-primary:hover{background:var(--orange-dark);transform:translateY(-1px)}
+.btn-brand{background:var(--brand);color:#fff;border-color:var(--brand)}.btn-brand:hover{background:var(--brand-dark);transform:translateY(-1px)}
+.btn-outline{background:var(--surface);color:var(--text2);border-color:var(--border)}.btn-outline:hover{border-color:var(--muted);color:var(--text)}
+.btn-success{background:var(--success);color:#fff}.btn-ghost{background:transparent;color:var(--text2);box-shadow:none}.btn-ghost:hover{background:var(--bg)}
+.btn-sm{padding:5px 12px;font-size:12px}.btn-lg{padding:11px 22px;font-size:14px}
+.btn-danger{background:var(--danger);color:#fff}
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-xs)}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:13px;border-bottom:1px solid var(--border-light)}
+.card-title{font-size:13.5px;font-weight:700;flex:1}
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-xs);transition:transform var(--t),box-shadow var(--t)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-icon{font-size:20px;margin-bottom:10px}.stat-label{font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.stat-val{font-size:24px;font-weight:700;letter-spacing:-0.02em;line-height:1}.stat-sub{font-size:11px;color:var(--muted);margin-top:5px}
+/* Badges */
+.badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:var(--r-pill);white-space:nowrap;text-transform:uppercase;letter-spacing:0.04em}
+.b-success{background:var(--success-bg);color:#065F46;border:1px solid var(--success-border)}
+.b-warning{background:var(--warning-bg);color:#92400E;border:1px solid var(--warning-border)}
+.b-danger{background:var(--danger-bg);color:#991B1B;border:1px solid var(--danger-border)}
+.b-info{background:var(--info-bg);color:#1D4ED8;border:1px solid var(--info-border)}
+.b-neutral{background:var(--bg);color:#64748B;border:1px solid var(--border)}
+.b-orange{background:var(--orange-bg);color:#9A3412;border:1px solid var(--orange-border)}
+.b-purple{background:var(--purple-bg);color:#5B21B6;border:1px solid var(--purple-border)}
+/* Forms */
+.form-group{display:flex;flex-direction:column;gap:5px}.form-group label{font-size:12px;font-weight:600;color:var(--text2)}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border-radius:var(--r);border:1px solid var(--border);font-size:13.5px;background:var(--surface);color:var(--text);transition:border-color var(--t)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(249,115,22,0.12)}
+.form-grid{display:grid;gap:14px}.form-grid-2{grid-template-columns:1fr 1fr}
+/* Modal */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.65);backdrop-filter:blur(5px);z-index:999;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);max-height:92vh;overflow-y:auto;width:680px;max-width:100%;animation:modalIn 0.22s ease}
+.modal-lg{width:900px}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-hdr{display:flex;align-items:center;padding:17px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
+.modal-hdr h2{flex:1;font-size:15px;font-weight:700}
+.modal-close{width:30px;height:30px;border-radius:7px;background:var(--bg);color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.modal-body{padding:22px}.modal-footer{padding:13px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface)}
+/* Toast */
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:370px;pointer-events:none}
+.toast{display:flex;align-items:flex-start;gap:11px;background:var(--text);color:#fff;padding:13px 15px;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);animation:toastIn 0.28s ease;font-size:13px;line-height:1.4;pointer-events:all}
+.toast-icon{font-size:17px;flex-shrink:0}.toast-body{flex:1}.toast-title{font-weight:700;font-size:13px;margin-bottom:1px}.toast-msg{font-size:12px;opacity:0.72}
+.toast-close{background:none;color:rgba(255,255,255,0.45);font-size:16px;cursor:pointer;padding:0}
+.toast.success{background:#064E3B;border-left:3px solid var(--success)}.toast.error{background:#7F1D1D;border-left:3px solid var(--danger)}
+.toast.warning{background:#78350F;border-left:3px solid var(--warning)}.toast.info{background:#1E3A8A;border-left:3px solid var(--info)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px) scale(0.92)}to{opacity:1;transform:translateX(0) scale(1)}}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Search */
+#search-wrap{position:relative;flex:0 0 280px}
+#gsearch{width:100%;padding:7px 14px 7px 34px;border:1px solid var(--border);border-radius:var(--r-pill);font-size:13px;background:var(--bg);color:var(--text);transition:all 0.15s}
+#gsearch:focus{outline:none;border-color:var(--orange);background:var(--surface);box-shadow:0 0 0 3px rgba(249,115,22,0.12)}
+#gsearch-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none}
+.sdrop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);z-index:500;display:none;max-height:340px;overflow-y:auto}
+.sdrop.open{display:block}
+.sdrop-label{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;padding:10px 14px 4px}
+.sdrop-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background 0.1s}
+.sdrop-item:hover{background:var(--orange-bg)}
+/* Notifications */
+.notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--surface)}
+#ndrop{position:absolute;top:calc(100% + 8px);right:0;width:340px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);z-index:500;display:none}
+#ndrop.open{display:block}
+.nh{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.ni{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background 0.1s}
+.ni:hover{background:var(--bg)}.ni.unread{background:#FFF8F5}
+/* AR claim rows */
+.ar-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);margin-bottom:8px;overflow:hidden;transition:all 0.15s;cursor:pointer}
+.ar-row:hover{border-color:var(--orange);box-shadow:var(--shadow-sm)}
+.ar-row.bucket-30{border-left:4px solid var(--success)}
+.ar-row.bucket-60{border-left:4px solid var(--warning)}
+.ar-row.bucket-90{border-left:4px solid var(--orange)}
+.ar-row.bucket-90p{border-left:4px solid var(--danger)}
+/* Aging bar */
+.aging-wrap{display:flex;height:14px;border-radius:99px;overflow:hidden;margin:8px 0}
+.aging-seg{height:100%;transition:width 0.6s ease}
+/* AI Priority card */
+.ai-priority-card{border-radius:var(--r-xl);padding:18px 20px;margin-bottom:8px;display:flex;gap:14px;align-items:flex-start}
+.ai-priority-high{background:linear-gradient(135deg,#1A0A0A,#2D1212);border:1px solid rgba(239,68,68,0.3)}
+.ai-priority-medium{background:linear-gradient(135deg,#1A150A,#2D220D);border:1px solid rgba(245,158,11,0.3)}
+.ai-priority-low{background:linear-gradient(135deg,#0A1A12,#0D2D1A);border:1px solid rgba(16,185,129,0.3)}
+/* Notes log */
+.note-item{padding:12px 0;border-bottom:1px solid var(--border-light);display:flex;gap:10px}
+.note-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+/* Follow-up timeline */
+.fu-step{display:flex;gap:12px;padding:10px 0;position:relative}
+.fu-step:not(:last-child)::after{content:'';position:absolute;left:15px;top:36px;bottom:0;width:2px;background:var(--border-light)}
+.fu-dot{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;z-index:1}
+/* ── AR MANAGEMENT AI STYLES ─────────────────────────── */
+#ai-ar-fab{position:fixed;bottom:28px;right:28px;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+#ai-ar-fab-btn{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#F97316,#EF4444);box-shadow:0 4px 20px rgba(249,115,22,0.45);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:none;color:#fff;transition:transform 0.2s,box-shadow 0.2s;position:relative}
+#ai-ar-fab-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(249,115,22,0.6)}
+#ai-ar-fab-panel{width:360px;background:var(--surface);border:1px solid var(--orange-border,#FDBA74);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:arFabIn 0.22s ease}
+#ai-ar-fab-panel.open{display:flex}
+@keyframes arFabIn{from{opacity:0;transform:translateY(10px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ai-ar-hdr{background:linear-gradient(135deg,#F97316,#EF4444);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ai-ar-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:380px;min-height:160px}
+.ai-ar-row{display:flex;gap:8px;align-items:flex-start}
+.ai-ar-row.user{flex-direction:row-reverse}
+.ai-ar-bubble{max-width:88%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.55}
+.ai-ar-bubble.bot{background:var(--orange-bg,#FFF7ED);color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--orange-border,#FDBA74)}
+.ai-ar-bubble.user{background:var(--orange,#F97316);color:#fff;border-bottom-right-radius:4px}
+.ar-chip{font-size:11px;padding:4px 10px;border-radius:99px;background:var(--orange-bg,#FFF7ED);color:#9A3412;border:1px solid var(--orange-border,#FDBA74);cursor:pointer;font-weight:600;transition:all 0.1s;white-space:nowrap}
+.ar-chip:hover{background:var(--orange,#F97316);color:#fff}
+.ai-ar-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface)}
+.ai-ar-input-row input{flex:1;padding:7px 11px;border:1px solid var(--border);border-radius:99px;font-size:13px;font-family:inherit;background:var(--bg)}
+.ai-ar-input-row input:focus{outline:none;border-color:var(--orange,#F97316)}
+.ar-fab-dot{width:10px;height:10px;border-radius:50%;background:#10B981;animation:arDotPulse 2s infinite;position:absolute;top:4px;right:4px;border:2px solid var(--surface)}
+@keyframes arDotPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4)}}
+.ar-typing span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--orange,#F97316);margin:0 2px;animation:artdot 1.2s infinite}
+.ar-typing span:nth-child(2){animation-delay:0.2s}.ar-typing span:nth-child(3){animation-delay:0.4s}
+@keyframes artdot{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
+/* Follow-up script box */
+.fu-script-box{background:linear-gradient(135deg,#0A0E1A,#1A110A);border:1px solid rgba(249,115,22,0.3);border-radius:var(--r-lg);padding:16px 18px;color:#fff;margin-top:10px;animation:fuScriptIn 0.3s ease}
+@keyframes fuScriptIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* AI dash banner */
+.ai-ar-banner{background:linear-gradient(135deg,#0A0E1A,#1A0A00);border-radius:var(--r-xl);padding:16px 20px;margin-bottom:16px}
+/* Shimmer */
+.ar-shimmer{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:arShim 1.2s infinite;border-radius:6px;height:14px;margin:4px 0}
+@keyframes arShim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+
+/* ── ENHANCED POLISH ── */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes subtlePulse{0%,100%{opacity:1}50%{opacity:0.7}}
+#content{scroll-behavior:smooth}
+#content::-webkit-scrollbar{width:6px}
+#content::-webkit-scrollbar-track{background:transparent}
+#content::-webkit-scrollbar-thumb{background:#C1CDD9;border-radius:99px}
+#content::-webkit-scrollbar-thumb:hover{background:#94A3B8}
+.card{transition:transform 0.22s cubic-bezier(0.4,0,0.2,1),box-shadow 0.22s cubic-bezier(0.4,0,0.2,1),border-color 0.22s}
+.card:hover{box-shadow:var(--shadow-md);border-color:#D1D9E6}
+.stat-card{position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),#7C3AED);opacity:0;transition:opacity 0.25s}
+.stat-card:hover::before{opacity:1}
+.btn{transition:all 0.18s cubic-bezier(0.4,0,0.2,1)}
+.btn-primary{box-shadow:0 2px 8px rgba(26,86,255,0.25)}
+.btn-primary:hover{box-shadow:0 4px 16px rgba(26,86,255,0.35)}
+.nav-item{transition:all 0.15s cubic-bezier(0.4,0,0.2,1)}
+#sidebar{background:linear-gradient(180deg,#080C18 0%,#0D1630 50%,#0A0E1A 100%)}
+.sb-mark{box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.modal{animation:modalIn 0.25s cubic-bezier(0.4,0,0.2,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.toast{animation:toastIn 0.32s cubic-bezier(0.34,1.56,0.64,1)}
+}
+.ph-title{background:linear-gradient(135deg,var(--text) 0%,#334155 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-btn{transition:all 0.15s}
+.topbar-btn:hover{background:var(--surface);border-color:var(--muted);transform:scale(1.05)}
+.sb-footer{background:rgba(0,0,0,0.15)}
+.recovery-card{box-shadow:0 8px 32px rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06)}
+.risk-alert{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+.risk-alert:hover{transform:translateX(4px);box-shadow:var(--shadow-sm)}
+#global-search{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+#global-search:focus{transform:scale(1.01)}
+::selection{background:rgba(26,86,255,0.15);color:var(--text)}
+
+.stats-grid .stat-card{animation:fadeIn 0.3s ease both}
+.stats-grid .stat-card:nth-child(1){animation-delay:0.05s}
+.stats-grid .stat-card:nth-child(2){animation-delay:0.1s}
+.stats-grid .stat-card:nth-child(3){animation-delay:0.15s}
+.stats-grid .stat-card:nth-child(4){animation-delay:0.2s}
+.stats-grid .stat-card:nth-child(5){animation-delay:0.25s}
+.stats-grid .stat-card:nth-child(6){animation-delay:0.3s}
+
+.form-group input,.form-group select,.form-group textarea{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+.form-group input:hover,.form-group select:hover,.form-group textarea:hover{border-color:#CBD5E1}
+
+table{border-collapse:separate;border-spacing:0}
+table tr{transition:background 0.12s}
+table td,table th{transition:color 0.12s}
+
+.loading-shimmer{background:linear-gradient(90deg,var(--bg) 25%,#E2E8F0 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.demo-banner{transition:all 0.3s;overflow:hidden}
+.demo-banner:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+
+#notif-dropdown{animation:fadeIn 0.18s ease;border:1px solid rgba(0,0,0,0.08)}
+.notif-item{transition:all 0.12s}
+.notif-dot{animation:subtlePulse 2s infinite}
+
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(26,86,255,0.02) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(124,58,237,0.015) 0%,transparent 50%);pointer-events:none;z-index:0}
+#app{position:relative;z-index:1}
+
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:4px}
+*{scroll-behavior:smooth}
+
+.portal-link{font-size:10px;padding:3px 7px;border-radius:5px;color:rgba(255,255,255,0.3);cursor:pointer;transition:all 0.15s;text-decoration:none;display:inline-block}
+.portal-link:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
+.portal-link.active{color:rgba(124,58,237,0.9);background:rgba(124,58,237,0.1)}
+
+.hover-row{transition:background 0.12s}
+.hover-row:hover{background:var(--bg) !important}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state-icon{font-size:40px;margin-bottom:12px;opacity:0.5}
+.empty-state-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-state-desc{font-size:13px;color:var(--muted);max-width:300px;margin:0 auto}
+
+.badge,.b-success,.b-warning,.b-danger,.b-info,.b-neutral{transition:all 0.15s;letter-spacing:0.03em}
+
+#topbar{position:relative}
+#topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(26,86,255,0.08) 50%,transparent)}
+
+.search-dropdown{animation:fadeIn 0.15s ease}
+.search-item{border-radius:8px;margin:2px 6px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo"><div class="sb-mark">N</div><div><div class="sb-name">NexRCM</div><div class="sb-sub">AR Management</div></div></div>
+  </div>
+  <div class="sb-role-badge"><div class="sb-role-dot"></div><div><div class="sb-role-name">Marcus Webb</div><div class="sb-role-title">AR Specialist</div></div></div>
+  <div class="sb-nav">
+    <div class="sb-section">AR Overview</div>
+    <div class="nav-item active" data-page="dashboard" onclick="go('dashboard')"><span class="nav-icon">📊</span><span>AR Dashboard</span></div>
+    <div class="nav-item" data-page="aging" onclick="go('aging')"><span class="nav-icon">📅</span><span>AR Aging</span><span class="nav-badge" id="aging-badge" style="display:none">!</span></div>
+    <div class="nav-item" data-page="unpaid" onclick="go('unpaid')"><span class="nav-icon">💸</span><span>Unpaid Claims</span><span class="nav-badge" id="unpaid-badge" style="display:none">0</span></div>
+    <div class="sb-section">Follow-up</div>
+    <div class="nav-item" data-page="followup" onclick="go('followup')"><span class="nav-icon">📞</span><span>Follow-up Queue</span></div>
+    <div class="nav-item" data-page="appeals" onclick="go('appeals')"><span class="nav-icon">⚖️</span><span>Appeals Tracker</span></div>
+    <div class="nav-item" data-page="notes" onclick="go('notes')"><span class="nav-icon">📝</span><span>Follow-up Notes</span></div>
+    <div class="sb-section">AI Tools</div>
+    <div class="nav-item" data-page="ai-priority" onclick="go('ai-priority')"><span class="nav-icon">🤖</span><span>AI Prioritization</span></div>
+    <div class="nav-item" data-page="reports" onclick="go('reports')"><span class="nav-icon">📈</span><span>AR Reports</span></div>
+  </div>
+  <div class="portal-switch">
+    <div style="width:100%;font-size:9px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">All Portals</div>
+    <a class="ps-link" href="front-desk.html">🏥 Front Desk</a>
+    <a class="ps-link" href="insurance-verification.html">🛡️ Ins. Verify</a>
+    <a class="ps-link" href="billing.html">💳 Billing</a>
+    <a class="ps-link cur" href="#">📊 AR Mgmt</a>
+    <a class="ps-link" href="admin.html">⚙️ Admin</a>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user"><div class="sb-avatar">MW</div><div><div class="sb-uname">Marcus Webb</div><div class="sb-urole">AR Specialist</div></div></div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div class="topbar-title" id="page-title">AR Dashboard</div>
+    <div id="search-wrap" style="margin-left:16px">
+      <span id="gsearch-icon">🔍</span>
+      <input id="gsearch" type="text" placeholder="Search claims, patients, payers..." oninput="globalSearch(this.value)" onblur="setTimeout(function(){var d=document.getElementById('gsearch-drop');if(d)d.classList.remove('open')},180)"/>
+      <div class="sdrop" id="gsearch-drop"></div>
+    </div>
+    <div class="topbar-date" id="topbar-date" style="margin-left:12px"></div>
+    <div style="display:flex;gap:6px;margin-left:12px;position:relative">
+      <div class="topbar-btn" id="notif-btn" onclick="toggleNotif()">🔔<span class="notif-dot" id="notif-dot"></span></div>
+      <div id="ndrop">
+        <div class="nh"><span style="font-size:13px;font-weight:700">AR Alerts</span><button class="btn btn-sm btn-ghost" onclick="markAllRead()" style="font-size:11px">Clear all</button></div>
+        <div id="notif-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">AR Management</div><div class="ph-title">AR Dashboard</div><div class="ph-desc">Full accounts receivable overview — aging, unpaid claims, and recovery status.</div></div>
+      <div class="ph-right">
+        <button class="btn btn-outline" id="gen-btn" onclick="generateDemoData()">⚡ Generate Demo Data</button>
+        <button class="btn btn-outline" onclick="go('followup')">📞 Follow-up Queue</button>
+        <button class="btn btn-primary" onclick="go('ai-priority')">🤖 AI Prioritize</button>
+      </div>
+    </div>
+    <div class="stats-grid" id="dash-stats" style="grid-template-columns:repeat(5,1fr)"></div>
+    <div id="dash-alerts"></div>
+    <!-- AI AR Intelligence Banner -->
+    <div id="ai-ar-banner-wrap" style="margin-bottom:16px"></div>
+    <!-- Aging chart -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📅 AR Aging Breakdown</div><button class="btn btn-sm btn-ghost" onclick="go('aging')">Full Aging →</button></div>
+        <div id="dash-aging-chart"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">🤖 AI Recovery Insights</div></div>
+        <div id="dash-ai-recovery"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Top Unpaid Claims</div><button class="btn btn-sm btn-ghost" onclick="go('unpaid')">All Claims →</button></div>
+        <div id="dash-top-claims"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title">Activity Timeline</div></div>
+        <div id="dash-timeline"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AR AGING -->
+  <div class="page" id="page-aging">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">AR Aging</div><div class="ph-title">AR Aging Analysis</div><div class="ph-desc">Claims grouped by days outstanding. Industry benchmark: keep 90+ under 15% of AR.</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('AR aging report exported to CSV','success')">Export CSV</button></div>
+    </div>
+    <!-- Aging overview bar -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><div class="card-title">Total AR by Age Bucket</div></div>
+      <div id="aging-overview"></div>
+    </div>
+    <!-- Bucket tabs -->
+    <div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+      <button class="btn btn-sm" id="ab-all" style="background:var(--orange);color:#fff;border-color:var(--orange)" onclick="filterAging('all',this)">All Buckets</button>
+      <button class="btn btn-sm btn-outline" onclick="filterAging('30',this)">✅ 0–30 Days</button>
+      <button class="btn btn-sm btn-outline" onclick="filterAging('60',this)">⚠️ 31–60 Days</button>
+      <button class="btn btn-sm btn-outline" onclick="filterAging('90',this)">🟠 61–90 Days</button>
+      <button class="btn btn-sm btn-outline" onclick="filterAging('90p',this)">🔴 90+ Days</button>
+    </div>
+    <div id="aging-list"></div>
+  </div>
+
+  <!-- UNPAID CLAIMS -->
+  <div class="page" id="page-unpaid">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Claims</div><div class="ph-title">Unpaid Claims</div><div class="ph-desc" id="unpaid-desc"></div></div>
+      <div class="ph-right">
+        <input id="unpaid-search" type="text" placeholder="Search patient, payer, ID..." oninput="renderUnpaid(this.value)" style="padding:8px 14px;border:1px solid var(--border);border-radius:var(--r);font-size:13px;width:240px;background:var(--surface)"/>
+        <button class="btn btn-outline" onclick="toast('Unpaid claims exported','success')">Export</button>
+      </div>
+    </div>
+    <div class="card" style="overflow:hidden;padding:0"><div id="unpaid-list"></div></div>
+  </div>
+
+  <!-- FOLLOW-UP QUEUE -->
+  <div class="page" id="page-followup">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Follow-up</div><div class="ph-title">Follow-up Queue</div><div class="ph-desc" id="fu-desc"></div></div>
+      <div class="ph-right">
+        <button class="btn btn-outline" onclick="bulkFollowUp()">📬 Bulk Follow-up All</button>
+        <button class="btn btn-primary" onclick="go('ai-priority')">🤖 AI Sort</button>
+      </div>
+    </div>
+    <div id="fu-list"></div>
+  </div>
+
+  <!-- APPEALS TRACKER -->
+  <div class="page" id="page-appeals">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Appeals</div><div class="ph-title">Appeals Tracker</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('Appeals report exported','success')">Export</button></div>
+    </div>
+    <div id="appeals-list"></div>
+  </div>
+
+  <!-- NOTES LOG -->
+  <div class="page" id="page-notes">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Notes</div><div class="ph-title">Follow-up Notes Log</div><div class="ph-desc">All call notes, actions, and follow-up log entries.</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('Notes exported','success')">Export</button></div>
+    </div>
+    <div id="notes-list"></div>
+  </div>
+
+  <!-- AI PRIORITIZATION -->
+  <div class="page" id="page-ai-priority">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">AI</div><div class="ph-title">AI Prioritization</div><div class="ph-desc">AI-ranked list of claims needing action, sorted by recovery probability and urgency.</div></div>
+      <div class="ph-right">
+        <button class="btn btn-outline" onclick="arFabAsk('Summarize all claims and recommend top 3 actions')">🤖 Ask AI</button>
+        <button class="btn btn-primary" onclick="runAIPriority()">🔄 Re-run Analysis</button>
+      </div>
+    </div>
+    <div id="ai-priority-content"></div>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="page" id="page-reports">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Reports</div><div class="ph-title">AR Reports</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('Weekly AR report scheduled','success')">Schedule Weekly</button></div>
+    </div>
+    <div id="reports-content"></div>
+  </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /app -->
+
+<div id="toast-container"></div>
+
+<!-- Claim Action Modal -->
+<div class="modal-bg" id="claim-modal">
+  <div class="modal modal-lg">
+    <div class="modal-hdr"><h2 id="cm-title">Claim Actions</h2><button class="modal-close" onclick="closeModal('claim-modal')">×</button></div>
+    <div class="modal-body" id="cm-body"></div>
+    <div class="modal-footer" id="cm-footer"></div>
+  </div>
+</div>
+
+<!-- Follow-up Letter Modal -->
+<div class="modal-bg" id="fu-modal">
+  <div class="modal">
+    <div class="modal-hdr"><h2>📬 Follow-up Letter</h2><button class="modal-close" onclick="closeModal('fu-modal')">×</button></div>
+    <div class="modal-body">
+      <div id="fu-modal-info" style="background:var(--bg);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--text2)"></div>
+      <textarea id="fu-letter" style="width:100%;height:320px;padding:12px;border:1px solid var(--border);border-radius:var(--r);font-size:12.5px;font-family:monospace;resize:vertical;line-height:1.6;background:var(--surface);color:var(--text)"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('fu-modal')">Close</button>
+      <button class="btn btn-outline" onclick="toast('Letter copied to clipboard','success')">Copy</button>
+      <button class="btn btn-primary" onclick="toast('Follow-up faxed to payer','success');closeModal('fu-modal')">Send via Fax</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note Entry Modal -->
+<div class="modal-bg" id="note-modal">
+  <div class="modal" style="width:480px">
+    <div class="modal-hdr"><h2>📝 Add Follow-up Note</h2><button class="modal-close" onclick="closeModal('note-modal')">×</button></div>
+    <div class="modal-body">
+      <div id="note-claim-info" style="background:var(--bg);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--text2)"></div>
+      <div class="form-grid">
+        <div class="form-group"><label>Note Type</label>
+          <select id="note-type">
+            <option value="call">📞 Phone Call</option>
+            <option value="fax">📠 Fax Sent</option>
+            <option value="portal">💻 Portal Action</option>
+            <option value="appeal">⚖️ Appeal Filed</option>
+            <option value="resubmit">🔄 Resubmitted</option>
+            <option value="info">ℹ️ General Note</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Action Taken</label><input id="note-action" type="text" placeholder="e.g. Called Delta Dental, spoke with rep Susan"/></div>
+        <div class="form-group"><label>Next Follow-up Date</label><input id="note-next" type="date"/></div>
+        <div class="form-group"><label>Notes</label><textarea id="note-text" style="height:80px" placeholder="Details of call, response, promised payment date..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('note-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+<script>
+/* NexRCM — AR Management Portal (Demo Only) */
+
+// ── Shared Data ───────────────────────────────────────────
+var D = (function(){
+  var TODAY = '2026-03-17';
+  var PAYERS = ['Delta Dental','Cigna','Aetna','United Healthcare','BlueCross BlueShield','Humana','MetLife','Guardian'];
+  var PROVIDERS = ['Dr. Martinez','Dr. Patel','Dr. Thompson'];
+
+  var CLAIMS = [
+    {id:'CLM001',patient:'Sarah Johnson',patientId:'P001',provider:'Dr. Martinez',insurance:'Delta Dental',dos:'2026-02-15',submitted:'2026-02-16',billed:1450,balance:220,status:'Partial',denialCode:'CO-2',bucket:30,notes:[]},
+    {id:'CLM002',patient:'James Lee',patientId:'P002',provider:'Dr. Patel',insurance:'Cigna',dos:'2026-02-18',submitted:'2026-02-19',billed:1800,balance:1800,status:'Pending',denialCode:'',bucket:30,notes:[]},
+    {id:'CLM003',patient:'Maria Garcia',patientId:'P003',provider:'Dr. Thompson',insurance:'Aetna',dos:'2026-01-22',submitted:'2026-01-23',billed:2100,balance:2100,status:'Denied',denialCode:'CO-50',bucket:60,notes:[{ts:'2026-02-05',type:'appeal',user:'Marcus Webb',action:'Appeal filed',text:'Submitted appeal with clinical notes and X-rays. Waiting for response.',next:'2026-03-05'}]},
+    {id:'CLM005',patient:'Linda Wilson',patientId:'P005',provider:'Dr. Thompson',insurance:'Humana',dos:'2026-01-10',submitted:'2026-01-11',billed:420,balance:125,status:'Partial',denialCode:'CO-45',bucket:60,notes:[]},
+    {id:'CLM007',patient:'Jennifer Adams',patientId:'P007',provider:'Dr. Martinez',insurance:'Delta Dental',dos:'2026-02-22',submitted:'2026-02-23',billed:680,balance:680,status:'Submitted',denialCode:'',bucket:30,notes:[]},
+    {id:'CLM008',patient:'David Kim',patientId:'P008',provider:'Dr. Thompson',insurance:'Cigna',dos:'2025-11-15',submitted:'2025-11-16',billed:1900,balance:1900,status:'Under Appeal',denialCode:'CO-97',bucket:'90p',notes:[{ts:'2025-12-01',type:'appeal',user:'Marcus Webb',action:'Appeal filed',text:'CO-97 bundling dispute. Submitted with modifier and unbundled codes.',next:'2026-01-15'},{ts:'2026-01-16',type:'call',user:'Marcus Webb',action:'Called Cigna',text:'Rep says appeal under review. Estimated 30-day turnaround.',next:'2026-02-16'}]},
+    {id:'CLM010',patient:'Christopher Hall',patientId:'P010',provider:'Dr. Martinez',insurance:'BlueCross BlueShield',dos:'2026-02-26',submitted:'2026-02-27',billed:1650,balance:1650,status:'Pending',denialCode:'',bucket:30,notes:[]},
+    {id:'CLM011',patient:'Amanda Foster',patientId:'P011',provider:'Dr. Patel',insurance:'MetLife',dos:'2026-03-01',submitted:'2026-03-02',billed:380,balance:62,status:'Partial',denialCode:'CO-2',bucket:30,notes:[]},
+    {id:'EXTCLM1',patient:'Robert Chen',patientId:'P004',provider:'Dr. Martinez',insurance:'United Healthcare',dos:'2025-12-10',submitted:'2025-12-11',billed:2800,balance:2800,status:'Pending',denialCode:'',bucket:'90p',notes:[{ts:'2026-01-15',type:'call',user:'Marcus Webb',action:'Called UHC',text:'Rep confirmed receipt. Processing.',next:'2026-02-15'},{ts:'2026-02-16',type:'call',user:'Marcus Webb',action:'Follow-up call',text:'Still processing. Escalated to supervisor.',next:'2026-03-16'}]},
+    {id:'EXTCLM2',patient:'Patricia Brown',patientId:'P009',provider:'Dr. Martinez',insurance:'United Healthcare',dos:'2025-10-05',submitted:'2025-10-06',billed:3200,balance:3200,status:'Denied',denialCode:'CO-29',bucket:'90p',notes:[{ts:'2025-11-01',type:'appeal',user:'Marcus Webb',action:'Appeal filed',text:'Timely filing appeal with clearinghouse proof of submission.',next:'2025-12-01'}]},
+    {id:'EXTCLM3',patient:'Thomas Wright',patientId:'P012',provider:'Dr. Thompson',insurance:'Guardian',dos:'2026-01-15',submitted:'2026-01-16',billed:950,balance:950,status:'Pending',denialCode:'',bucket:60,notes:[]},
+    {id:'EXTCLM4',patient:'Michael Torres',patientId:'P006',provider:'Dr. Patel',insurance:'BlueCross BlueShield',dos:'2025-12-20',submitted:'2025-12-21',billed:1200,balance:1200,status:'Denied',denialCode:'CO-4',bucket:'90p',notes:[]},
+  ];
+
+  function daysSince(ds){
+    if(!ds)return 0;
+    return Math.floor((new Date(TODAY)-new Date(ds))/(1000*60*60*24));
+  }
+
+  function fmt$(n){n=parseFloat(n)||0;if(n>=1000)return'$'+(n/1000).toFixed(1)+'K';return'$'+n.toFixed(0);}
+  function fmtDate(d){if(!d)return'—';var p=d.split('-'),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m[+p[1]-1]+' '+(+p[2])+', '+p[0];}
+  function esc(s){var e={'<':'&lt;','>':'&gt;','&':'&amp;'};return String(s||'').replace(/[<>&]/g,function(c){return e[c]||c;});}
+
+  return{CLAIMS:CLAIMS,PAYERS:PAYERS,PROVIDERS:PROVIDERS,TODAY:TODAY,daysSince:daysSince,fmt$:fmt$,fmtDate:fmtDate,esc:esc};
+})();
+
+// ── State ─────────────────────────────────────────────────
+var _claims = D.CLAIMS.map(function(c){return Object.assign({},c,{notes:c.notes.slice()});});
+var _agingFilter = 'all';
+var _activeClaimId = null;
+var _noteFocusId = null;
+var _notifs = [
+  {id:1,icon:'🔴',title:'90+ Day Claims',msg:'Patricia Brown (CLM): $3,200 unpaid 164 days — CO-29 timely filing risk.',time:'Just now',unread:true},
+  {id:2,icon:'⚠️',title:'Denial Follow-up',msg:'David Kim appeal pending 97 days. Follow up with Cigna today.',time:'15 min ago',unread:true},
+  {id:3,icon:'💸',title:'High-Value Unpaid',msg:'Robert Chen: $2,800 unpaid 97 days. Immediate follow-up needed.',time:'1 hr ago',unread:true},
+  {id:4,icon:'✅',title:'Payment Posted',msg:'Patricia Brown — UHC posted $3,600 to CLM009.',time:'Yesterday',unread:false},
+];
+
+// ── Init ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  var now=new Date();
+  var ds=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var ms=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('topbar-date').textContent=ds[now.getDay()]+', '+ms[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+  renderNotifs();updateBadges();
+  go('dashboard');
+});
+
+var TITLES={dashboard:'AR Dashboard',aging:'AR Aging',unpaid:'Unpaid Claims',followup:'Follow-up Queue',appeals:'Appeals Tracker',notes:'Follow-up Notes',reports:'AR Reports','ai-priority':'AI Prioritization'};
+
+function go(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var pg=document.getElementById('page-'+page);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-item[data-page]').forEach(function(n){n.classList.remove('active');});
+  var nav=document.querySelector('[data-page="'+page+'"]');if(nav)nav.classList.add('active');
+  var t=document.getElementById('page-title');if(t)t.textContent=TITLES[page]||page;
+  if(page==='dashboard')renderDash();
+  if(page==='aging')renderAging();
+  if(page==='unpaid')renderUnpaid('');
+  if(page==='followup')renderFollowUp();
+  if(page==='appeals')renderAppeals();
+  if(page==='notes')renderNotes();
+  if(page==='ai-priority')renderAIPriority();
+  if(page==='reports')renderReports();
+}
+
+function updateBadges(){
+  var unpaid=_claims.filter(function(c){return c.balance>0;}).length;
+  var ub=document.getElementById('unpaid-badge');if(ub){ub.textContent=unpaid;ub.style.display=unpaid>0?'inline-flex':'none';}
+  var ab=document.getElementById('aging-badge');if(ab)ab.style.display=_claims.some(function(c){return c.bucket==='90p'&&c.balance>0;})?'inline-flex':'none';
+}
+
+// ── Dashboard ─────────────────────────────────────────────
+function renderDash(){
+  var unpaid=_claims.filter(function(c){return c.balance>0;});
+  var b30=unpaid.filter(function(c){return c.bucket===30;});
+  var b60=unpaid.filter(function(c){return c.bucket===60;});
+  var b90=unpaid.filter(function(c){return c.bucket===90;});
+  var b90p=unpaid.filter(function(c){return c.bucket==='90p';});
+  var totalAR=unpaid.reduce(function(s,c){return s+(c.balance||0);},0);
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+
+  var sg=document.getElementById('dash-stats');
+  if(sg)sg.innerHTML=[
+    {icon:'💰',label:'Total AR',val:D.fmt$(totalAR),sub:unpaid.length+' open claims',c:'#F59E0B'},
+    {icon:'✅',label:'0–30 Days',val:D.fmt$(b30.reduce(function(s,c){return s+(c.balance||0);},0)),sub:b30.length+' claims',c:'#10B981'},
+    {icon:'⚠️',label:'31–60 Days',val:D.fmt$(b60.reduce(function(s,c){return s+(c.balance||0);},0)),sub:b60.length+' claims',c:'#F59E0B'},
+    {icon:'🟠',label:'61–90 Days',val:D.fmt$(b90.reduce(function(s,c){return s+(c.balance||0);},0)),sub:b90.length+' claims',c:'#F97316'},
+    {icon:'🔴',label:'90+ Days',val:D.fmt$(b90p.reduce(function(s,c){return s+(c.balance||0);},0)),sub:b90p.length+' claims',c:'#EF4444'},
+  ].map(function(s){return'<div class="stat-card"><div class="stat-icon">'+s.icon+'</div><div class="stat-label">'+s.label+'</div><div class="stat-val" style="color:'+s.c+'">'+s.val+'</div><div class="stat-sub">'+s.sub+'</div></div>';}).join('');
+
+  // Alert bar
+  var al=document.getElementById('dash-alerts');
+  if(al){
+    var a90=b90p.reduce(function(s,c){return s+(c.balance||0);},0);
+    var alerts=[];
+    if(a90>0)alerts.push({t:'danger',m:'🔴 '+D.fmt$(a90)+' in 90+ day AR — immediate action needed to prevent write-offs'});
+    if(denied.length>0)alerts.push({t:'warning',m:'⚖️ '+denied.length+' denied/appealed claims — total '+D.fmt$(denied.reduce(function(s,c){return s+(c.balance||0);},0))+' at risk'});
+    var BC={danger:'var(--danger-bg)',warning:'var(--warning-bg)'};
+    var BD={danger:'var(--danger-border)',warning:'var(--warning-border)'};
+    var CO={danger:'#991B1B',warning:'#92400E'};
+    al.innerHTML=alerts.length?'<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+alerts.map(function(a){return'<div style="flex:1;min-width:220px;background:'+BC[a.t]+';border:1px solid '+BD[a.t]+';border-radius:var(--r-lg);padding:10px 14px;font-size:13px;font-weight:500;color:'+CO[a.t]+'">'+a.m+'</div>';}).join('')+'</div>':'';
+  }
+
+  // Aging chart
+  var ac=document.getElementById('dash-aging-chart');
+  if(ac){
+    var buckets=[
+      {label:'0–30 days',amt:b30.reduce(function(s,c){return s+(c.balance||0);},0),count:b30.length,c:'#10B981',bg:'var(--success-bg)'},
+      {label:'31–60 days',amt:b60.reduce(function(s,c){return s+(c.balance||0);},0),count:b60.length,c:'#F59E0B',bg:'var(--warning-bg)'},
+      {label:'61–90 days',amt:b90.reduce(function(s,c){return s+(c.balance||0);},0),count:b90.length,c:'#F97316',bg:'var(--orange-bg)'},
+      {label:'90+ days',amt:b90p.reduce(function(s,c){return s+(c.balance||0);},0),count:b90p.length,c:'#EF4444',bg:'var(--danger-bg)'},
+    ];
+    var maxAmt=Math.max.apply(null,buckets.map(function(b){return b.amt;}));
+    // Visual bar summary
+    var totalSum=buckets.reduce(function(s,b){return s+b.amt;},0)||1;
+    ac.innerHTML='<div class="aging-wrap" style="margin-bottom:16px">'+buckets.map(function(b){return'<div class="aging-seg" style="width:'+(b.amt/totalSum*100)+'%;background:'+b.c+'" title="'+b.label+': '+D.fmt$(b.amt)+'"></div>';}).join('')+'</div>'
+      +'<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">'+buckets.map(function(b){return'<div style="display:flex;align-items:center;gap:6px;font-size:12px"><div style="width:10px;height:10px;border-radius:50%;background:'+b.c+'"></div>'+b.label+' · <b>'+D.fmt$(b.amt)+'</b></div>';}).join('')+'</div>'
+      +buckets.map(function(b){var pct=maxAmt>0?Math.round(b.amt/maxAmt*100):0;return'<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:12.5px"><span style="font-weight:600">'+b.label+'</span><span style="font-weight:700;color:'+b.c+'">'+D.fmt$(b.amt)+' · '+b.count+' claims</span></div><div style="height:8px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+b.c+';border-radius:99px;transition:width 0.8s ease"></div></div></div>';}).join('');
+  }
+
+  // AI recovery
+  var air=document.getElementById('dash-ai-recovery');
+  if(air){
+    air.innerHTML=[
+      {icon:'🤖',title:'AI Detected Recoverable',val:D.fmt$(totalAR),note:'Total open AR'},
+      {icon:'🎯',title:'High Recovery Probability',val:D.fmt$(b30.reduce(function(s,c){return s+(c.balance||0);},0)+b60.reduce(function(s,c){return s+(c.balance||0);},0)),note:'0–60 day claims'},
+      {icon:'⚠️',title:'At-Risk (90+ Days)',val:D.fmt$(b90p.reduce(function(s,c){return s+(c.balance||0);},0)),note:'May require write-off'},
+      {icon:'⚖️',title:'Under Appeal',val:D.fmt$(denied.reduce(function(s,c){return s+(c.balance||0);},0)),note:denied.length+' claims'},
+    ].map(function(i){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:11px;color:var(--muted)">'+i.icon+' '+i.title+'</div><div style="font-size:11px;color:var(--muted);margin-top:1px">'+i.note+'</div></div><div style="font-size:16px;font-weight:700;color:var(--orange)">'+i.val+'</div></div>';}).join('');
+  }
+
+  // Top claims
+  var tc=document.getElementById('dash-top-claims');
+  if(tc){
+    var top=_claims.filter(function(c){return c.balance>0;}).sort(function(a,b){return b.balance-a.balance;}).slice(0,5);
+    var bc={'Partial':'b-warning','Pending':'b-info','Submitted':'b-info','Denied':'b-danger','Under Appeal':'b-purple'};
+    tc.innerHTML=top.map(function(c){return'<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border-light);cursor:pointer" onclick="openClaimModal(\''+c.id+'\')">'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+D.esc(c.patient)+'</div><div style="font-size:11.5px;color:var(--muted)">'+D.esc(c.insurance)+' · '+D.esc(c.id)+'</div></div>'
+      +'<span class="badge '+(bc[c.status]||'b-neutral')+'">'+c.status+'</span>'
+      +'<div style="font-size:14px;font-weight:700;color:var(--orange);min-width:60px;text-align:right">'+D.fmt$(c.balance)+'</div>'
+    +'</div>';}).join('');
+  }
+
+  // Timeline
+  var tl=document.getElementById('dash-timeline');
+  if(tl){
+    var events=[];
+    _claims.forEach(function(c){(c.notes||[]).forEach(function(n){events.push({ts:n.ts,action:n.action,claim:c.id,patient:c.patient,type:n.type});});});
+    events.push({ts:'2026-03-17',action:'AR dashboard reviewed',claim:'',patient:'',type:'info'});
+    events.push({ts:'2026-03-16',action:'Batch follow-up sent to 3 payers',claim:'',patient:'',type:'info'});
+    events.sort(function(a,b){return b.ts.localeCompare(a.ts);});
+    var tc2={call:'#3B82F6',appeal:'#7C3AED',fax:'#F59E0B',info:'#94A3B8',resubmit:'#10B981'};
+    tl.innerHTML=events.slice(0,8).map(function(e){return'<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border-light)">'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:'+(tc2[e.type]||'#94A3B8')+';flex-shrink:0;margin-top:5px"></div>'
+      +'<div style="flex:1"><div style="font-size:12.5px;font-weight:500">'+D.esc(e.action)+(e.patient?' — '+D.esc(e.patient):'')+'</div><div style="font-size:11px;color:var(--muted)">'+D.esc(e.ts)+(e.claim?' · '+e.claim:'')+'</div></div>'
+    +'</div>';}).join('');
+  }
+}
+
+// ── AR Aging ──────────────────────────────────────────────
+function renderAging(){
+  var unpaid=_claims.filter(function(c){return c.balance>0;});
+  var b30=unpaid.filter(function(c){return c.bucket===30;});
+  var b60=unpaid.filter(function(c){return c.bucket===60;});
+  var b90=unpaid.filter(function(c){return c.bucket===90;});
+  var b90p=unpaid.filter(function(c){return c.bucket==='90p';});
+  var totalSum=unpaid.reduce(function(s,c){return s+(c.balance||0);},0)||1;
+
+  var ov=document.getElementById('aging-overview');
+  if(ov){
+    var segs=[
+      {l:'0–30',cls:'bucket-30',c:'#10B981',arr:b30},
+      {l:'31–60',cls:'bucket-60',c:'#F59E0B',arr:b60},
+      {l:'61–90',cls:'bucket-90',c:'#F97316',arr:b90},
+      {l:'90+',cls:'bucket-90p',c:'#EF4444',arr:b90p},
+    ];
+    var maxA=Math.max.apply(null,segs.map(function(s){return s.arr.reduce(function(x,c){return x+(c.balance||0);},0);}));
+    ov.innerHTML='<div class="aging-wrap" style="height:18px;margin-bottom:16px">'+segs.map(function(s){var a=s.arr.reduce(function(x,c){return x+(c.balance||0);},0);return'<div class="aging-seg" style="width:'+(a/totalSum*100)+'%;background:'+s.c+'" title="'+s.l+' days: '+D.fmt$(a)+'"></div>';}).join('')+'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">'+segs.map(function(s){var a=s.arr.reduce(function(x,c){return x+(c.balance||0);},0);var pct=Math.round(a/totalSum*100);return'<div style="text-align:center;background:var(--bg);border-radius:var(--r);padding:14px"><div style="font-size:22px;font-weight:700;color:'+s.c+'">'+D.fmt$(a)+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+s.l+' Days · '+pct+'%</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+s.arr.length+' claims</div></div>';}).join('')+'</div>';
+  }
+
+  var items=unpaid.slice();
+  if(_agingFilter==='30')items=b30;
+  else if(_agingFilter==='60')items=b60;
+  else if(_agingFilter==='90')items=b90;
+  else if(_agingFilter==='90p')items=b90p;
+
+  var el=document.getElementById('aging-list');if(!el)return;
+  if(!items.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">No claims in this bucket</div>';return;}
+  var bc2={'Partial':'b-warning','Pending':'b-info','Submitted':'b-info','Denied':'b-danger','Under Appeal':'b-purple'};
+  var bkCls={30:'bucket-30',60:'bucket-60',90:'bucket-90','90p':'bucket-90p'};
+  el.innerHTML=items.sort(function(a,b){return b.balance-a.balance;}).map(function(c){
+    var days=D.daysSince(c.submitted);
+    return'<div class="ar-row '+(bkCls[c.bucket]||'bucket-30')+'" onclick="openClaimModal(\''+c.id+'\')">'
+      +'<div style="display:flex;align-items:center;gap:14px;padding:14px 18px">'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+            +'<div style="font-size:14px;font-weight:700">'+D.esc(c.patient)+'</div>'
+            +'<span class="badge '+(bc2[c.status]||'b-neutral')+'">'+c.status+'</span>'
+            +(c.denialCode?'<span class="badge b-danger">'+D.esc(c.denialCode)+'</span>':'')
+          +'</div>'
+          +'<div style="font-size:12px;color:var(--muted)">'+D.esc(c.insurance)+' · '+D.esc(c.id)+' · DOS '+D.fmtDate(c.dos)+' · Submitted '+D.fmtDate(c.submitted)+'</div>'
+          +(c.notes&&c.notes.length?'<div style="font-size:11.5px;color:var(--brand);margin-top:4px">'+c.notes.length+' note'+(c.notes.length>1?'s':'')+' logged</div>':'')
+        +'</div>'
+        +'<div style="text-align:right;min-width:120px">'
+          +'<div style="font-size:18px;font-weight:700;color:var(--orange)">'+D.fmt$(c.balance)+'</div>'
+          +'<div style="font-size:11px;color:var(--muted);margin-top:2px">'+days+' days outstanding</div>'
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;gap:5px;min-width:110px;align-items:flex-end">'
+          +'<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openClaimModal(\''+c.id+'\')">Actions</button>'
+          +'<button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openNoteModal(\''+c.id+'\')">+ Note</button>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function filterAging(f,btn){
+  _agingFilter=f;
+  document.querySelectorAll('[onclick^="filterAging"]').forEach(function(b){b.style.background='';b.style.color='';b.style.borderColor='';});
+  if(btn){btn.style.background='var(--orange)';btn.style.color='#fff';btn.style.borderColor='var(--orange)';}
+  renderAging();
+}
+
+// ── Unpaid Claims ─────────────────────────────────────────
+function renderUnpaid(q){
+  var el=document.getElementById('unpaid-list');if(!el)return;
+  var items=_claims.filter(function(c){return c.balance>0;});
+  if(q){var ql=q.toLowerCase();items=items.filter(function(c){return c.patient.toLowerCase().includes(ql)||c.insurance.toLowerCase().includes(ql)||c.id.toLowerCase().includes(ql);});}
+  var dc=document.getElementById('unpaid-desc');if(dc)dc.textContent=items.length+' claims · '+D.fmt$(items.reduce(function(s,c){return s+(c.balance||0);},0))+' total AR';
+  if(!items.length){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">No results</div>';return;}
+  var bc={'Partial':'b-warning','Pending':'b-info','Submitted':'b-info','Denied':'b-danger','Under Appeal':'b-purple'};
+  var bklabel={30:'0–30d',60:'31–60d',90:'61–90d','90p':'90+d'};
+  var bkc={30:'#10B981',60:'#F59E0B',90:'#F97316','90p':'#EF4444'};
+  el.innerHTML='<table style="width:100%;border-collapse:collapse">'
+    +'<thead><tr style="background:var(--bg);border-bottom:1px solid var(--border)">'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Claim</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Patient</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Insurance</th>'
+    +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Amount</th>'
+    +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Days Out</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Status</th>'
+    +'<th style="padding:10px 14px;text-align:center;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Action</th>'
+    +'</tr></thead><tbody>'
+    +items.sort(function(a,b){return b.balance-a.balance;}).map(function(c){
+      var days=D.daysSince(c.submitted);
+      return'<tr style="border-bottom:1px solid var(--border-light);cursor:pointer" onclick="openClaimModal(\''+c.id+'\')" onmouseover="this.style.background=\'var(--bg)\'" onmouseout="this.style.background=\'\'">'
+        +'<td style="padding:10px 14px;font-family:monospace;font-size:12px;font-weight:600;color:var(--brand)">'+D.esc(c.id)+'</td>'
+        +'<td style="padding:10px 14px;font-size:13px;font-weight:600">'+D.esc(c.patient)+'</td>'
+        +'<td style="padding:10px 14px;font-size:13px;color:var(--text2)">'+D.esc(c.insurance)+'</td>'
+        +'<td style="padding:10px 14px;text-align:right;font-size:14px;font-weight:700;color:var(--orange)">'+D.fmt$(c.balance)+'</td>'
+        +'<td style="padding:10px 14px;text-align:right"><span style="font-size:12px;font-weight:700;color:'+(bkc[c.bucket]||'var(--text)')+';background:'+(bkc[c.bucket]||'var(--text)')+'20;padding:2px 8px;border-radius:99px">'+days+'d ('+(bklabel[c.bucket]||c.bucket)+')</span></td>'
+        +'<td style="padding:10px 14px"><span class="badge '+(bc[c.status]||'b-neutral')+'">'+c.status+'</span>'+(c.denialCode?'<span class="badge b-danger" style="margin-left:4px">'+D.esc(c.denialCode)+'</span>':'')+'</td>'
+        +'<td style="padding:10px 14px;text-align:center"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openClaimModal(\''+c.id+'\')">Actions</button></td>'
+      +'</tr>';
+    }).join('')+'</tbody></table>';
+}
+
+// ── Follow-up Queue ───────────────────────────────────────
+function renderFollowUp(){
+  var el=document.getElementById('fu-list');if(!el)return;
+  var items=_claims.filter(function(c){return c.balance>0;}).sort(function(a,b){return b.balance-a.balance;});
+  var fd=document.getElementById('fu-desc');if(fd)fd.textContent=items.length+' claims need follow-up · '+D.fmt$(items.reduce(function(s,c){return s+(c.balance||0);},0))+' total';
+  if(!items.length){el.innerHTML='<div style="text-align:center;padding:60px;color:var(--muted)">All claims followed up!</div>';return;}
+  var bkc={30:'#10B981',60:'#F59E0B',90:'#F97316','90p':'#EF4444'};
+  var bklabel={30:'0–30 days',60:'31–60 days',90:'61–90 days','90p':'90+ days'};
+  var priorities={30:'LOW','60':'MEDIUM',90:'HIGH','90p':'CRITICAL'};
+  var priorityCols={LOW:'#10B981',MEDIUM:'#F59E0B',HIGH:'#F97316',CRITICAL:'#EF4444'};
+  el.innerHTML=items.map(function(c){
+    var days=D.daysSince(c.submitted);
+    var pri=priorities[String(c.bucket)]||'MEDIUM';
+    var lastNote=c.notes&&c.notes.length?c.notes[c.notes.length-1]:null;
+    return'<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;transition:all 0.15s" onmouseover="this.style.boxShadow=\'var(--shadow-md)\'" onmouseout="this.style.boxShadow=\'\'">'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">'
+          +'<div style="font-size:14px;font-weight:700">'+D.esc(c.patient)+' · <span style="font-family:monospace;font-size:12px;color:var(--brand)">'+D.esc(c.id)+'</span></div>'
+          +'<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:'+priorityCols[pri]+'20;color:'+priorityCols[pri]+';border:1px solid '+priorityCols[pri]+'40">'+pri+'</span>'
+        +'</div>'
+        +'<div style="font-size:12px;color:var(--muted);margin-bottom:6px">'+D.esc(c.insurance)+' · '+D.fmt$(c.balance)+' · '+days+' days ('+bklabel[c.bucket]+')</div>'
+        +(c.denialCode?'<div style="font-size:12px;color:var(--danger);margin-bottom:6px">Denial Code: <strong>'+D.esc(c.denialCode)+'</strong></div>':'')
+        +(lastNote?'<div style="font-size:12px;color:var(--text2);background:var(--bg);padding:6px 10px;border-radius:6px">📋 Last note ('+D.esc(lastNote.ts)+'): '+D.esc(lastNote.action)+'</div>':'<div style="font-size:11.5px;color:var(--muted)">No notes logged yet</div>')
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+        +'<button class="btn btn-sm btn-primary" onclick="generateAIFollowUpScript(\''+c.id+'\')">🤖 AI Script</button>'+'<button class="btn btn-sm btn-outline" onclick="openFollowUpLetter(\''+c.id+'\')">📬 Letter</button>'
+        +'<button class="btn btn-sm btn-outline" onclick="openClaimModal(\''+c.id+'\')">📋 Actions</button>'
+        +'<button class="btn btn-sm btn-outline" onclick="openNoteModal(\''+c.id+'\')">+ Add Note</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function bulkFollowUp(){
+  var cnt=_claims.filter(function(c){return c.balance>0;}).length;
+  toast('Generating follow-up letters for '+cnt+' claims...','info');
+  setTimeout(function(){toast(cnt+' follow-up messages sent to payers','success','Bulk Follow-up Sent');},2000);
+}
+
+// ── Appeals Tracker ───────────────────────────────────────
+function renderAppeals(){
+  var el=document.getElementById('appeals-list');if(!el)return;
+  var appeals=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  if(!appeals.length){el.innerHTML='<div style="text-align:center;padding:60px;color:var(--muted)">No denied/appealed claims</div>';return;}
+  var sc={'Denied':'b-danger','Under Appeal':'b-purple'};
+  el.innerHTML=appeals.map(function(c){
+    return'<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;margin-bottom:10px">'
+      +'<div style="display:flex;align-items:flex-start;gap:14px">'
+        +'<div style="flex:1">'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><div style="font-size:14px;font-weight:700">'+D.esc(c.patient)+'</div><span class="badge '+(sc[c.status]||'b-neutral')+'">'+c.status+'</span>'+(c.denialCode?'<span class="badge b-danger">'+D.esc(c.denialCode)+'</span>':'')+'</div>'
+          +'<div style="font-size:12px;color:var(--muted);margin-bottom:10px">'+D.esc(c.insurance)+' · '+D.esc(c.id)+' · '+D.fmt$(c.balance)+' · Submitted '+D.fmtDate(c.submitted)+'</div>'
+          +'<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px">Appeal Timeline</div>'
+          +(c.notes&&c.notes.length?c.notes.map(function(n,i){return'<div class="fu-step"><div class="fu-dot" style="background:var(--purple-bg);border:2px solid var(--purple)">'+{call:'📞',appeal:'⚖️',fax:'📠',resubmit:'🔄',info:'ℹ️'}[n.type]+'</div><div><div style="font-size:13px;font-weight:600">'+D.esc(n.action)+'</div><div style="font-size:11.5px;color:var(--muted);margin-top:2px">'+D.esc(n.ts)+' · '+D.esc(n.user)+'</div>'+(n.text?'<div style="font-size:12.5px;color:var(--text2);margin-top:4px">'+D.esc(n.text)+'</div>':'')+'</div></div>';}).join(''):'<div style="font-size:12.5px;color:var(--muted);padding:8px 0">No appeal history logged yet.</div>')
+        +'</div>'
+        +'<div style="display:flex;flex-direction:column;gap:6px;min-width:120px;align-items:flex-end">'
+          +'<button class="btn btn-sm btn-primary" onclick="openFollowUpLetter(\''+c.id+'\')">Draft Letter</button>'
+          +'<button class="btn btn-sm btn-outline" onclick="openNoteModal(\''+c.id+'\')">+ Note</button>'
+          +'<button class="btn btn-sm btn-outline" onclick="toast(\'Claim resubmitted with corrections\',\'success\')">Resubmit</button>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+// ── Notes Log ─────────────────────────────────────────────
+function renderNotes(){
+  var el=document.getElementById('notes-list');if(!el)return;
+  var allNotes=[];
+  _claims.forEach(function(c){
+    (c.notes||[]).forEach(function(n){allNotes.push(Object.assign({},n,{claimId:c.id,patient:c.patient,insurance:c.insurance}));});
+  });
+  allNotes.sort(function(a,b){return b.ts.localeCompare(a.ts);});
+  if(!allNotes.length){el.innerHTML='<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">📝</div><div style="font-size:15px;font-weight:700">No notes logged yet</div><div style="font-size:13px;margin-top:6px">Add notes from any claim action.</div></div>';return;}
+  var typeColors={call:'#3B82F6',appeal:'#7C3AED',fax:'#F59E0B',resubmit:'#10B981',portal:'#06B6D4',info:'#94A3B8'};
+  var typeLabels={call:'📞 Phone Call',appeal:'⚖️ Appeal Filed',fax:'📠 Fax Sent',resubmit:'🔄 Resubmitted',portal:'💻 Portal',info:'ℹ️ Note'};
+  el.innerHTML='<div class="card">'+allNotes.map(function(n){return'<div class="note-item"><div class="note-dot" style="background:'+(typeColors[n.type]||'#94A3B8')+'"></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><span style="font-size:12px;font-weight:700;color:var(--text)">'+D.esc(n.patient)+'</span><span style="font-size:10px;padding:1px 6px;border-radius:99px;background:'+(typeColors[n.type]||'#94A3B8')+'20;color:'+(typeColors[n.type]||'#94A3B8')+';font-weight:700">'+(typeLabels[n.type]||n.type)+'</span></div><div style="font-size:13px;font-weight:600;color:var(--text)">'+D.esc(n.action)+'</div>'+(n.text?'<div style="font-size:12.5px;color:var(--text2);margin-top:3px">'+D.esc(n.text)+'</div>':'')+'<div style="font-size:11px;color:var(--muted);margin-top:4px">'+D.esc(n.ts)+' · '+D.esc(n.user)+' · Claim <span style="font-family:monospace;color:var(--brand)">'+D.esc(n.claimId)+'</span>'+(n.next?' · Next: '+D.esc(n.next):'')+'</div></div></div>';}).join('')+'</div>';
+}
+
+// ── AI Prioritization ─────────────────────────────────────
+function renderAIPriority(){
+  var el=document.getElementById('ai-priority-content');if(!el)return;
+  var items=_claims.filter(function(c){return c.balance>0;});
+  // Score: higher = more urgent
+  items.forEach(function(c){
+    var score=0;
+    var days=D.daysSince(c.submitted);
+    score+=days*2;
+    score+=c.balance/10;
+    if(c.status==='Denied')score+=200;
+    if(c.status==='Under Appeal')score+=150;
+    if(c.bucket==='90p')score+=300;
+    c._score=Math.round(score);
+    c._days=days;
+    c._pri=score>500?'CRITICAL':score>300?'HIGH':score>150?'MEDIUM':'LOW';
+  });
+  items.sort(function(a,b){return b._score-a._score;});
+  var pri={CRITICAL:{c:'#EF4444',bg:'#1A0A0A',border:'rgba(239,68,68,0.3)',label:'🔴 CRITICAL'},HIGH:{c:'#F97316',bg:'#1A110A',border:'rgba(249,115,22,0.3)',label:'🟠 HIGH'},MEDIUM:{c:'#F59E0B',bg:'#1A180A',border:'rgba(245,158,11,0.3)',label:'⚠️ MEDIUM'},LOW:{c:'#10B981',bg:'#0A1A12',border:'rgba(16,185,129,0.3)',label:'✅ LOW'}};
+  el.innerHTML='<div style="background:linear-gradient(135deg,#0A0E1A,#1A2540);border-radius:var(--r-xl);padding:20px;color:#fff;margin-bottom:20px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="font-size:24px">🤖</span><div><div style="font-size:16px;font-weight:700;color:#fff">AI Recovery Analysis</div><div style="font-size:12px;color:rgba(255,255,255,0.4)">Sorted by recovery urgency and financial impact</div></div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">'+['CRITICAL','HIGH','MEDIUM','LOW'].map(function(p){var cnt=items.filter(function(i){return i._pri===p;}).length;var amt=items.filter(function(i){return i._pri===p;}).reduce(function(s,c){return s+(c.balance||0);},0);return'<div style="background:rgba(255,255,255,0.06);border-radius:var(--r);padding:12px;text-align:center"><div style="font-size:18px;font-weight:700;color:'+pri[p].c+'">'+cnt+'</div><div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">'+p+'</div><div style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.7);margin-top:4px">'+D.fmt$(amt)+'</div></div>';}).join('')
+    +'</div></div>'
+    +items.map(function(c,i){var p=pri[c._pri];return'<div style="background:'+p.bg+';border:1px solid '+p.border+';border-radius:var(--r-lg);padding:16px 20px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px">'
+      +'<div style="font-size:22px;font-weight:800;color:'+p.c+';min-width:36px;text-align:center;margin-top:2px">'+(i+1)+'</div>'
+      +'<div style="flex:1;min-width:0">'
+        +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap">'
+          +'<div style="font-size:14px;font-weight:700;color:#fff">'+D.esc(c.patient)+'</div>'
+          +'<span style="font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;background:'+p.c+'20;color:'+p.c+';border:1px solid '+p.c+'40">'+p.label+'</span>'
+        +'</div>'
+        +'<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px">'+D.esc(c.insurance)+' · '+D.esc(c.id)+' · '+c._days+' days outstanding · '+c.status+'</div>'
+        +'<div style="font-size:12.5px;color:rgba(255,255,255,0.7)">🤖 AI: '+(c.status==='Denied'?'Appeal with clinical notes and resubmit urgently. Denial code: '+c.denialCode:c.bucket==='90p'?'Escalate to payer supervisor. Risk of write-off increasing.':c.bucket===60?'Follow-up call overdue. Contact payer and confirm processing status.':'Monitor. Submit follow-up if no response within 30 days.')+'</div>'
+      +'</div>'
+      +'<div style="font-size:20px;font-weight:700;color:'+p.c+';min-width:80px;text-align:right">'+D.fmt$(c.balance)+'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:5px;min-width:110px;align-items:flex-end">'
+        +'<button class="btn btn-sm" style="background:'+p.c+';color:#fff;border-color:'+p.c+'" onclick="openClaimModal(\''+c.id+'\')">Take Action</button>'
+        +'<button class="btn btn-sm btn-ghost" style="color:rgba(255,255,255,0.5)" onclick="openFollowUpLetter(\''+c.id+'\')">📬 Letter</button>'
+      +'</div>'
+    +'</div>';}).join('');
+}
+
+function runAIPriority(){
+  toast('Running AI prioritization analysis...','info');
+  setTimeout(function(){renderAIPriority();toast('AI analysis complete','success','AI Prioritization Updated');},1800);
+}
+
+// ── Reports ───────────────────────────────────────────────
+function renderReports(){
+  var el=document.getElementById('reports-content');if(!el)return;
+  var totalAR=_claims.filter(function(c){return c.balance>0;}).reduce(function(s,c){return s+(c.balance||0);},0);
+  var collected=_claims.filter(function(c){return c.balance===0&&c.billed>0;}).reduce(function(s,c){return s+(c.billed||0);},0);
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+    +'<div class="card">'
+      +'<div class="card-header"><div class="card-title">📊 AR Summary Report</div><button class="btn btn-sm btn-outline" onclick="toast(\'Report exported to PDF\',\'success\')">Export PDF</button></div>'
+      +'<div style="background:var(--bg);border-radius:var(--r);padding:14px;font-size:13px;line-height:2;font-family:monospace;color:var(--text2)">'
+        +'AR AGING REPORT — '+D.TODAY+'\n'
+        +'——————————————————————\n'
+        +'Total Open AR:       '+D.fmt$(totalAR)+'\n'
+        +'0–30 Days:          '+D.fmt$(_claims.filter(function(c){return c.balance>0&&c.bucket===30;}).reduce(function(s,c){return s+(c.balance||0);},0))+'\n'
+        +'31–60 Days:         '+D.fmt$(_claims.filter(function(c){return c.balance>0&&c.bucket===60;}).reduce(function(s,c){return s+(c.balance||0);},0))+'\n'
+        +'61–90 Days:         '+D.fmt$(_claims.filter(function(c){return c.balance>0&&c.bucket===90;}).reduce(function(s,c){return s+(c.balance||0);},0))+'\n'
+        +'90+ Days:           '+D.fmt$(_claims.filter(function(c){return c.balance>0&&c.bucket==='90p';}).reduce(function(s,c){return s+(c.balance||0);},0))+'\n'
+        +'——————————————————————\n'
+        +'Denied / Appeal:    '+D.fmt$(denied.reduce(function(s,c){return s+(c.balance||0);},0))+'\n'
+        +'Collected (Paid):   '+D.fmt$(collected)+'\n'
+        +'——————————————————————\n'
+        +'Generated: '+new Date().toLocaleString()
+      +'</div>'
+    +'</div>'
+    +'<div class="card">'
+      +'<div class="card-header"><div class="card-title">📈 Payer Performance</div></div>'
+      +function(){
+        var payers={};
+        _claims.forEach(function(c){if(!payers[c.insurance])payers[c.insurance]={billed:0,balance:0,count:0,denied:0};payers[c.insurance].billed+=(c.billed||0);payers[c.insurance].balance+=(c.balance||0);payers[c.insurance].count++;if(c.status==='Denied'||c.status==='Under Appeal')payers[c.insurance].denied++;});
+        return Object.entries(payers).sort(function(a,b){return b[1].balance-a[1].balance;}).map(function(e){var p=e[1];var rate=p.billed>0?Math.round((p.billed-p.balance)/p.billed*100):0;return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:13px;font-weight:600">'+D.esc(e[0])+'</div><div style="font-size:11.5px;color:var(--muted)">'+p.count+' claims · '+p.denied+' denied · '+rate+'% collected</div></div><div style="font-size:14px;font-weight:700;color:var(--orange)">'+D.fmt$(p.balance)+' AR</div></div>';}).join('');
+      }()
+    +'</div>'
+  +'</div>';
+}
+
+// ── Claim Modal ───────────────────────────────────────────
+function openClaimModal(id){
+  var c=_claims.find(function(x){return x.id===id;});if(!c)return;
+  _activeClaimId=id;
+  document.getElementById('cm-title').textContent='Claim Actions — '+c.id+' · '+c.patient;
+  var days=D.daysSince(c.submitted);
+  var bc={'Partial':'b-warning','Pending':'b-info','Submitted':'b-info','Denied':'b-danger','Under Appeal':'b-purple'};
+  document.getElementById('cm-body').innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'
+      +'<div>'
+        +[['Patient',c.patient],['Insurance',c.insurance],['Claim ID',c.id],['DOS',D.fmtDate(c.dos)],['Submitted',D.fmtDate(c.submitted)],['Billed',D.fmt$(c.billed)],['Balance',D.fmt$(c.balance)],['Days Out',days+'d'],['Status',c.status]]
+        .map(function(r){return'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span style="color:var(--text2)">'+r[0]+'</span><span style="font-weight:600">'+D.esc(String(r[1]))+'</span></div>';}).join('')
+        +(c.denialCode?'<div style="margin-top:10px;background:var(--danger-bg);border:1px solid var(--danger-border);border-radius:var(--r);padding:10px 14px"><div style="font-size:11px;font-weight:700;color:#991B1B;margin-bottom:3px">DENIAL CODE</div><div style="font-size:14px;font-weight:700;color:#991B1B">'+D.esc(c.denialCode)+'</div></div>':'')
+      +'</div>'
+      +'<div>'
+        +'<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Follow-up Actions</div>'
+        +'<div style="display:grid;gap:8px">'
+          +'<button class="btn btn-outline" style="justify-content:flex-start" onclick="closeModal(\'claim-modal\');openFollowUpLetter(\''+c.id+'\')">📬 Generate Follow-up Letter</button>'
+          +'<button class="btn btn-outline" style="justify-content:flex-start" onclick="closeModal(\'claim-modal\');openNoteModal(\''+c.id+'\')">📝 Add Note</button>'
+          +(c.status==='Denied'||c.status==='Under Appeal'?'<button class="btn btn-outline" style="justify-content:flex-start;color:var(--purple)" onclick="toast(\'Appeal workflow started\',\'success\');closeModal(\'claim-modal\')">⚖️ File/Continue Appeal</button>':'')
+          +'<button class="btn btn-outline" style="justify-content:flex-start" onclick="toast(\'Claim resubmitted with corrections\',\'success\');closeModal(\'claim-modal\')">🔄 Resubmit Claim</button>'
+          +'<button class="btn btn-outline" style="justify-content:flex-start" onclick="toast(\'Calling payer script opened\',\'info\')">📞 Call Insurance</button>'
+        +'</div>'
+        +(c.notes&&c.notes.length?'<div style="margin-top:14px"><div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Previous Notes ('+c.notes.length+')</div>'+c.notes.slice(-3).map(function(n){return'<div style="background:var(--bg);border-radius:var(--r);padding:8px 10px;margin-bottom:6px"><div style="font-size:12px;font-weight:600">'+D.esc(n.action)+'</div><div style="font-size:11.5px;color:var(--muted)">'+D.esc(n.ts)+' · '+D.esc(n.user)+'</div></div>';}).join('')+'</div>':'')
+      +'</div>'
+    +'</div>';
+  document.getElementById('cm-footer').innerHTML='<button class="btn btn-outline" onclick="closeModal(\'claim-modal\')">Close</button><button class="btn btn-primary" onclick="openNoteModal(\''+c.id+'\');closeModal(\'claim-modal\')">+ Add Note</button>';
+  document.getElementById('claim-modal').classList.add('open');
+}
+
+// ── Follow-up Letter ──────────────────────────────────────
+function openFollowUpLetter(id){
+  var c=_claims.find(function(x){return x.id===id;});if(!c)return;
+  var days=D.daysSince(c.submitted);
+  var letter='Subject: Follow-up on Claim '+c.id+' — '+c.patient+'\n\nDate: '+D.TODAY+'\nFrom: Lux Dental Group | NPI: 1234567890\nTo: '+c.insurance+' Provider Relations\n\nRe: Claim #'+c.id+'\nPatient: '+c.patient+'\nDate of Service: '+D.fmtDate(c.dos)+'\nBilled Amount: '+D.fmt$(c.billed)+'\nBalance: '+D.fmt$(c.balance)+'\n\nDear Provider Relations Team,\n\nThis claim was submitted on '+D.fmtDate(c.submitted)+' and remains '+c.status.toLowerCase()+' after '+days+' days.\n\n'+(c.status==='Denied'?'The claim was denied with code '+c.denialCode+'. We are requesting a detailed explanation of the denial reason and documentation required to resolve or appeal this claim. We will provide any additional information needed within 5 business days.\n\n':'We are following up to confirm receipt and request an estimated payment date. Please advise if any additional documentation is required.\n\n')+'Timely resolution of this claim is appreciated. Please respond via fax or our provider portal.\n\nSincerely,\nMarcus Webb, AR Specialist\nLux Dental Group\n(310) 555-0100';
+  document.getElementById('fu-modal-info').textContent=c.id+' — '+c.patient+' · '+c.insurance+' · '+D.fmt$(c.balance)+' · '+days+' days';
+  document.getElementById('fu-letter').value=letter;
+  document.getElementById('fu-modal').classList.add('open');
+}
+
+// ── Note Modal ────────────────────────────────────────────
+function openNoteModal(id){
+  _noteFocusId=id;
+  var c=_claims.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById('note-claim-info').textContent=c.id+' — '+c.patient+' · '+c.insurance+' · '+D.fmt$(c.balance)+' outstanding';
+  document.getElementById('note-action').value='';
+  document.getElementById('note-text').value='';
+  document.getElementById('note-next').value='';
+  document.getElementById('note-modal').classList.add('open');
+}
+
+function saveNote(){
+  var c=_claims.find(function(x){return x.id===_noteFocusId;});if(!c)return;
+  var action=document.getElementById('note-action').value.trim();
+  if(!action){toast('Please enter the action taken','error');return;}
+  var type=document.getElementById('note-type').value;
+  var text=document.getElementById('note-text').value.trim();
+  var next=document.getElementById('note-next').value;
+  if(!c.notes)c.notes=[];
+  c.notes.push({ts:D.TODAY,type:type,user:'Marcus Webb',action:action,text:text,next:next});
+  closeModal('note-modal');
+  toast('Note saved to '+c.id,'success');
+  // refresh visible page
+  var page=document.querySelector('.page.active');if(page){var id=page.id.replace('page-','');if(id==='notes')renderNotes();if(id==='followup')renderFollowUp();if(id==='appeals')renderAppeals();}
+}
+
+// ── Demo Data Generator ───────────────────────────────────
+function generateDemoData(){
+  var btn=document.getElementById('gen-btn');
+  if(btn){btn.innerHTML='<span class="spinner" style="width:14px;height:14px;border-width:2px"></span> Generating...';btn.disabled=true;}
+  setTimeout(function(){
+    var names=[['Alex','Williams'],['Jordan','Martinez'],['Taylor','Brown'],['Morgan','Davis'],['Casey','Miller'],['Riley','Wilson'],['Avery','Moore'],['Quinn','Anderson'],['Blake','Thomas'],['Dakota','Jackson']];
+    var ins=['Delta Dental','Cigna','Aetna','United Healthcare','BlueCross BlueShield','Humana','MetLife','Guardian'];
+    var statuses=['Pending','Pending','Denied','Under Appeal','Partial'];
+    var buckets=[30,30,60,60,90,'90p','90p'];
+    var denials=['','','CO-50','CO-4','CO-29','CO-57',''];
+    for(var i=0;i<20;i++){
+      var nm=names[i%names.length];var st=statuses[i%statuses.length];var bk=buckets[i%buckets.length];var dc=denials[i%denials.length];
+      var billed=Math.round(500+Math.random()*3000);
+      _claims.push({id:'DEMOCLM'+i,patient:nm[0]+' '+nm[1],patientId:'D'+i,provider:'Dr. Martinez',insurance:ins[i%ins.length],dos:'2026-01-'+(10+i%15),submitted:'2026-01-'+(12+i%15),billed:billed,balance:billed,status:st,denialCode:dc,bucket:bk,notes:[]});
+    }
+    if(btn){btn.innerHTML='✅ Demo Active';btn.style.background='var(--success)';btn.style.color='#fff';btn.disabled=false;}
+    updateBadges();renderDash();
+    toast('20 demo AR claims generated','success','Demo Data Generated');
+  },1500);
+}
+
+// ── Global Search ─────────────────────────────────────────
+function globalSearch(q){
+  var dd=document.getElementById('gsearch-drop');
+  if(!q||q.length<2){dd.classList.remove('open');return;}
+  q=q.toLowerCase();
+  var matches=_claims.filter(function(c){return c.patient.toLowerCase().includes(q)||c.insurance.toLowerCase().includes(q)||c.id.toLowerCase().includes(q);}).slice(0,6);
+  var html='';
+  if(matches.length){html='<div class="sdrop-label">📋 Claims</div>'+matches.map(function(c){return'<div class="sdrop-item" onclick="openClaimModal(\''+c.id+'\')"><div style="width:28px;height:28px;border-radius:7px;background:var(--orange-bg);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">📋</div><div><div style="font-size:13px;font-weight:600">'+c.patient+' · '+c.id+'</div><div style="font-size:11.5px;color:var(--muted)">'+c.insurance+' · '+D.fmt$(c.balance)+' · '+c.status+'</div></div></div>';}).join('');}
+  if(!html)html='<div style="padding:16px;text-align:center;font-size:13px;color:var(--muted)">No results</div>';
+  dd.innerHTML=html;dd.classList.add('open');
+}
+
+// ── Notifications ─────────────────────────────────────────
+function renderNotifs(){
+  var list=document.getElementById('notif-list');if(!list)return;
+  list.innerHTML=_notifs.map(function(n){return'<div class="ni'+(n.unread?' unread':'')+'" onclick="markRead('+n.id+')" style="align-items:flex-start">'+'<div style="font-size:18px;flex-shrink:0;margin-top:1px">'+n.icon+'</div><div style="flex:1;margin-left:12px"><div style="font-size:13px;font-weight:600">'+n.title+'</div><div style="font-size:12px;color:var(--text2);line-height:1.4">'+n.msg+'</div><div style="font-size:11px;color:var(--muted);margin-top:3px">'+n.time+'</div></div>'+(n.unread?'<div style="width:7px;height:7px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:4px"></div>':'')+'</div>';}).join('')+'<div style="padding:10px;text-align:center"><button class="btn btn-ghost btn-sm" onclick="toggleNotif()" style="font-size:12px">View All</button></div>';
+  var u=_notifs.filter(function(n){return n.unread;}).length;
+  var d=document.getElementById('notif-dot');if(d)d.style.display=u>0?'block':'none';
+}
+function toggleNotif(){var d=document.getElementById('ndrop');d.classList.toggle('open');renderNotifs();document.addEventListener('click',function h(e){if(!d.contains(e.target)&&e.target.id!=='notif-btn'){d.classList.remove('open');document.removeEventListener('click',h);}});}
+function markRead(id){_notifs=_notifs.map(function(n){return n.id===id?Object.assign({},n,{unread:false}):n;});renderNotifs();}
+function markAllRead(){_notifs=_notifs.map(function(n){return Object.assign({},n,{unread:false});});renderNotifs();toast('All alerts cleared','success');}
+
+// ── Utilities ─────────────────────────────────────────────
+function closeModal(id){var m=document.getElementById(id);if(m)m.classList.remove('open');}
+document.addEventListener('click',function(e){if(e.target.classList.contains('modal-bg'))e.target.classList.remove('open');});
+function toast(msg,type,title){
+  var c=document.getElementById('toast-container');if(!c)return;
+  var t=document.createElement('div');t.className='toast '+(type||'info');
+  var icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+  var titles={success:'Success',error:'Error',warning:'Warning',info:'Info'};
+  t.innerHTML='<div class="toast-icon">'+icons[type||'info']+'</div><div class="toast-body"><div class="toast-title">'+(title||titles[type||'info'])+'</div><div class="toast-msg">'+D.esc(msg)+'</div></div><button class="toast-close" onclick="this.parentElement.remove()">×</button>';
+  c.appendChild(t);setTimeout(function(){if(t.parentNode)t.remove();},4500);
+}
+</script>
+</body>
+</html>
+<script>
+/* ============================================================
+   OPENROUTER CONFIG + AR MANAGEMENT AI MODULE
+============================================================ */
+var OPENROUTER_API_KEY = 'YOUR_OPENROUTER_KEY_HERE';
+var AI_MODEL = 'meta-llama/llama-3.3-70b-instruct';
+
+async function callOpenRouter(systemPrompt, userMessage, onChunk) {
+  if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_KEY_HERE') return null;
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENROUTER_API_KEY,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://nexrcm.demo',
+        'X-Title': 'NexRCM AR Management AI'
+      },
+      body: JSON.stringify({
+        model: AI_MODEL, stream: true, max_tokens: 450,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
+    if (!res.ok) return null;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '));
+      for (const line of lines) {
+        const data = line.replace('data: ', '');
+        if (data === '[DONE]') continue;
+        try {
+          const delta = JSON.parse(data).choices[0].delta.content || '';
+          full += delta;
+          if (onChunk) onChunk(delta, full);
+        } catch(e) {}
+      }
+    }
+    return full;
+  } catch(e) { return null; }
+}
+
+var AR_SYSTEM_PROMPT = `You are an expert AR (Accounts Receivable) specialist AI for NexRCM dental RCM platform.
+You help AR specialists at Lux Dental Group collect unpaid insurance claims, draft follow-up scripts,
+prioritize collections, and resolve denials.
+Be concise and actionable. Use bullet points. Max 5 items.
+Know CARC codes, timely filing rules (90-365 days by payer), and escalation strategies.
+Today: 2026-03-17. Practice: Lux Dental Group, Los Angeles CA.`;
+
+// ── Build AR context for AI prompts ──────────────────────
+function buildARContext() {
+  var unpaid = _claims.filter(function(c){return c.balance>0;});
+  var denied = _claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var critical = unpaid.filter(function(c){return c.bucket==='90p';});
+  var totalAR = unpaid.reduce(function(s,c){return s+(c.balance||0);},0);
+  return '\n\nLive AR data: '
+    + 'Total open claims: '+unpaid.length+'. '
+    + 'Total AR: $'+totalAR+'. '
+    + 'Denied/appeal: '+denied.length+'. '
+    + '90+ days: '+critical.length+' claims totaling $'+critical.reduce(function(s,c){return s+(c.balance||0);},0)+'. '
+    + 'Top unpaid: '+unpaid.sort(function(a,b){return b.balance-a.balance;}).slice(0,3).map(function(c){return c.patient+'($'+c.balance+','+D.daysSince(c.submitted)+'d,'+c.insurance+')';}).join('; ')+'.';
+}
+
+// ── Mock fallback responses ───────────────────────────────
+function getARMockResponse(q) {
+  q = q.toLowerCase();
+  var unpaid = _claims.filter(function(c){return c.balance>0;});
+  var denied = _claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var critical = unpaid.filter(function(c){return c.bucket==='90p';});
+  var totalAR = unpaid.reduce(function(s,c){return s+(c.balance||0);},0);
+
+  if (q.includes('priorit') || q.includes('top') || q.includes('urgent') || q.includes('action')) {
+    var top = unpaid.sort(function(a,b){return b.balance-a.balance;}).slice(0,3);
+    return '🎯 **Top Priority Actions:**\n'
+      + top.map(function(c,i){return (i+1)+'. **'+c.patient+'** ('+c.id+') — $'+c.balance+', '+D.daysSince(c.submitted)+'d, '+c.insurance+(c.denialCode?' ['+c.denialCode+']':'');}).join('\n')
+      + '\n\n• Call payers on 90+ day claims first\n• File appeals for all denied claims within 180 days\n• Escalate to supervisor for claims >$1,000 unpaid 60+ days';
+  }
+  if (q.includes('denied') || q.includes('appeal') || q.includes('denial')) {
+    return '⚖️ **Denied Claims Summary:**\n• **'+denied.length+'** claims denied totaling $'+denied.reduce(function(s,c){return s+(c.balance||0);},0)+'\n'
+      + denied.slice(0,3).map(function(c){return '• '+c.patient+' ('+c.id+'): **'+c.denialCode+'** — $'+c.balance;}).join('\n')
+      + '\n\n💡 CO-50: attach clinical notes + X-rays\n💡 CO-97: resubmit unbundled with modifier\n💡 CO-29: submit clearinghouse proof immediately';
+  }
+  if (q.includes('90') || q.includes('critical') || q.includes('write-off') || q.includes('overdue')) {
+    return '🔴 **90+ Day Critical Claims:**\n• **'+critical.length+'** claims at write-off risk\n• Total at risk: **$'+critical.reduce(function(s,c){return s+(c.balance||0);},0)+'**\n'
+      + critical.slice(0,3).map(function(c){return '• '+c.patient+' ('+c.id+'): $'+c.balance+', '+D.daysSince(c.submitted)+'d';}).join('\n')
+      + '\n\n⚡ **Action required now:** Call payer supervisor and escalate. Document all calls for appeal support.';
+  }
+  if (q.includes('script') || q.includes('call') || q.includes('phone')) {
+    var topClaim = unpaid.sort(function(a,b){return b.balance-a.balance;})[0];
+    if (topClaim) return '📞 **Call Script for '+topClaim.insurance+':**\n"Hello, this is [Name] from Lux Dental Group, NPI 1234567890. I\'m calling about claim **'+topClaim.id+'** for patient '+topClaim.patient+', DOB [DOB], submitted [DATE].\n\nCan you: ① Confirm receipt ② Provide processing status ③ Give expected payment date?\n\nIf denied: What documentation is needed to appeal?"\n\n• Get rep name and reference number\n• Document outcome in AR notes';
+    return '📞 **Generic Follow-up Script:**\n"This is [Name] from Lux Dental, NPI 1234567890, calling re claim [ID] for [PATIENT]. Can you confirm receipt and provide payment timeline? If on hold — why and what\'s needed to resolve?"';
+  }
+  if (q.includes('summary') || q.includes('overview') || q.includes('status')) {
+    var rate = _claims.length > 0 ? Math.round(_claims.filter(function(c){return c.status==='Paid';}).length / _claims.length * 100) : 0;
+    return '📊 **AR Summary:**\n• Total AR: **$'+totalAR+'** across '+unpaid.length+' open claims\n• '+critical.length+' claims 90+ days — highest write-off risk\n• '+denied.length+' denied claims — file appeals ASAP\n• Resolution rate: '+rate+'% of claims paid\n\n💡 Focus on 90+ day claims and denials first for maximum recovery';
+  }
+  return '📋 I can help with:\n• AR prioritization — which claims to call first\n• Follow-up call scripts by payer\n• Denial appeal strategy by CARC code\n• 90+ day escalation guidance\n• Recovery probability estimates\n\nTry: "What are my critical claims?" or "Give me a call script for Delta Dental"';
+}
+
+function formatARText(t) {
+  return t.replace(/[*][*]([^*]+)[*][*]/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+}
+
+// ── Floating AI Panel ─────────────────────────────────────
+var _arFabOpen = false;
+var _arFabInit = false;
+
+function toggleARFab() {
+  _arFabOpen = !_arFabOpen;
+  var panel = document.getElementById('ai-ar-fab-panel');
+  if (_arFabOpen) {
+    panel.classList.add('open');
+    if (!_arFabInit) {
+      _arFabInit = true;
+      var unpaid = _claims.filter(function(c){return c.balance>0;});
+      var critical = unpaid.filter(function(c){return c.bucket==='90p';});
+      var totalAR = unpaid.reduce(function(s,c){return s+(c.balance||0);},0);
+      arFabAddMsg('bot',
+        '📊 **AR Intelligence Ready**\n\n'
+        +'• **$'+totalAR+'** total AR across '+unpaid.length+' open claims\n'
+        +'• **'+critical.length+'** critical 90+ day claims at write-off risk\n'
+        +'• **'+_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';}).length+'** denied claims need appeals\n\n'
+        +'Ask me to prioritize collections, generate call scripts, or analyze denial patterns.'
+      );
+    }
+    setTimeout(function(){ var i=document.getElementById('ai-ar-input'); if(i) i.focus(); },100);
+  } else {
+    panel.classList.remove('open');
+  }
+}
+
+function closeARFab() {
+  _arFabOpen = false;
+  document.getElementById('ai-ar-fab-panel').classList.remove('open');
+}
+
+function arFabSend() {
+  var inp = document.getElementById('ai-ar-input');
+  var q = (inp.value||'').trim();
+  if (!q) return;
+  inp.value = '';
+  arFabAsk(q);
+}
+
+function arFabAsk(question) {
+  if (!_arFabOpen) toggleARFab();
+  arFabAddMsg('user', question);
+  var typId = 'artyp_'+Date.now();
+  arFabAddMsg('bot','<div class="ar-typing"><span></span><span></span><span></span></div>', typId);
+  var ctx = buildARContext();
+  callOpenRouter(AR_SYSTEM_PROMPT+ctx, question, null).then(function(res) {
+    removeARMsg(typId);
+    arFabAddMsg('bot', res || getARMockResponse(question));
+  }).catch(function() {
+    removeARMsg(typId);
+    arFabAddMsg('bot', getARMockResponse(question));
+  });
+}
+
+function arFabAddMsg(role, html, id) {
+  var msgs = document.getElementById('ai-ar-msgs');
+  if (!msgs) return;
+  var div = document.createElement('div');
+  div.className = 'ai-ar-row ' + role;
+  if (id) div.id = id;
+  div.innerHTML = '<div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;background:'
+    + (role==='bot'?'linear-gradient(135deg,#F97316,#EF4444)':'linear-gradient(135deg,#F59E0B,#7C3AED)')
+    + ';color:#fff">'+(role==='bot'?'📊':'👤')+'</div>'
+    + '<div class="ai-ar-bubble '+role+'">'+formatARText(html)+'</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeARMsg(id) { var el=document.getElementById(id); if(el) el.remove(); }
+
+// ── AI Dashboard Banner ───────────────────────────────────
+function renderARBanner() {
+  var el = document.getElementById('ai-ar-banner-wrap');
+  if (!el) return;
+  var unpaid = _claims.filter(function(c){return c.balance>0;});
+  var denied = _claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var critical = unpaid.filter(function(c){return c.bucket==='90p';});
+  var totalAR = unpaid.reduce(function(s,c){return s+(c.balance||0);},0);
+  var criticalAmt = critical.reduce(function(s,c){return s+(c.balance||0);},0);
+  if (!critical.length && !denied.length) { el.innerHTML=''; return; }
+
+  var items = [];
+  if (critical.length) {
+    items.push({
+      icon:'🔴', priority:'CRITICAL', color:'#FCA5A5',
+      msg: critical.length+' claim'+(critical.length>1?'s':'')+' 90+ days outstanding — $'+criticalAmt+' at write-off risk',
+      action: "go('ai-priority')"
+    });
+  }
+  if (denied.length) {
+    var deniedAmt = denied.reduce(function(s,c){return s+(c.balance||0);},0);
+    items.push({
+      icon:'⚖️', priority:'HIGH', color:'#FDE68A',
+      msg: denied.length+' denied claim'+(denied.length>1?'s':'')+' — $'+deniedAmt+' recoverable via appeal',
+      action: "go('appeals')"
+    });
+  }
+  var overdue30 = unpaid.filter(function(c){return (c.bucket===60||c.bucket===90)&&c.notes&&c.notes.length===0;});
+  if (overdue30.length) {
+    items.push({
+      icon:'📞', priority:'MEDIUM', color:'#FED7AA',
+      msg: overdue30.length+' claim'+(overdue30.length>1?'s':'')+' 30-90 days with no follow-up notes — call payers today',
+      action: "go('followup')"
+    });
+  }
+
+  el.innerHTML = '<div class="ai-ar-banner">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      + '<div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#F97316,#EF4444);display:flex;align-items:center;justify-content:center;font-size:18px">🤖</div>'
+      + '<div><div style="font-size:13px;font-weight:700;color:#fff">AI AR Intelligence</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">$'+totalAR+' total AR · '+items.length+' issue'+(items.length>1?'s':'')+' require immediate action</div></div>'
+      + '<button onclick="arFabAsk(\'What are the most critical AR actions I need to take today?\')" style="margin-left:auto;background:rgba(249,115,22,0.25);border:1px solid rgba(249,115,22,0.4);color:#FCA87A;padding:5px 12px;border-radius:99px;font-size:11.5px;font-weight:700;cursor:pointer">Ask AI →</button>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px">'
+    + items.map(function(it) {
+      return '<div onclick="'+it.action+'" style="display:flex;align-items:flex-start;gap:9px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:var(--r);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background=\'rgba(255,255,255,0.09)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\'">'
+        + '<span style="font-size:18px;flex-shrink:0">'+it.icon+'</span>'
+        + '<div><span style="font-size:9.5px;font-weight:800;color:'+it.color+';display:block;margin-bottom:3px">'+it.priority+'</span>'
+          + '<div style="font-size:12.5px;color:rgba(255,255,255,0.8)">'+it.msg+'</div>'
+        + '</div>'
+      + '</div>';
+    }).join('')
+    + '</div></div>';
+}
+
+// ── AI Follow-up Script Generator ────────────────────────
+function generateAIFollowUpScript(claimId) {
+  var c = _claims.find(function(x){return x.id===claimId;});
+  if (!c) return;
+  var days = D.daysSince(c.submitted);
+
+  // Show script in follow-up letter modal with AI content
+  var el = document.getElementById('fu-modal-info');
+  var letterEl = document.getElementById('fu-letter');
+  if (el) el.textContent = c.id+' — '+c.patient+' · '+c.insurance+' · $'+c.balance+' · '+days+' days';
+  if (letterEl) {
+    letterEl.value = 'Generating AI follow-up script...';
+    letterEl.style.color = 'var(--muted)';
+  }
+  document.getElementById('fu-modal').classList.add('open');
+
+  var userMsg = 'Generate a professional insurance follow-up call script for: '
+    + 'Patient: '+c.patient+', Claim ID: '+c.id+', Insurance: '+c.insurance
+    + ', Amount: $'+c.balance+', Days outstanding: '+days
+    + (c.denialCode ? ', Denial code: '+c.denialCode : ', Status: '+c.status)
+    + '. Include: opening, claim details to verify, specific question based on status, escalation if needed, closing. Keep under 200 words.';
+
+  callOpenRouter(AR_SYSTEM_PROMPT, userMsg, function(delta, full) {
+    if (letterEl) {
+      letterEl.value = full;
+      letterEl.style.color = 'var(--text)';
+    }
+  }).then(function(result) {
+    if (!result && letterEl) {
+      letterEl.style.color = 'var(--text)';
+      letterEl.value = buildMockFollowUpScript(c, days);
+    }
+    toast('AI follow-up script generated for '+c.id, 'success');
+  }).catch(function() {
+    if (letterEl) {
+      letterEl.style.color = 'var(--text)';
+      letterEl.value = buildMockFollowUpScript(c, days);
+    }
+    toast('Follow-up script ready', 'success');
+  });
+}
+
+function buildMockFollowUpScript(c, days) {
+  var payers = {
+    'Delta Dental': { phone: '1-800-765-6003', ref: 'deltadentalins.com' },
+    'Cigna': { phone: '1-800-244-6224', ref: 'cigna.com/providers' },
+    'Aetna': { phone: '1-800-282-4548', ref: 'aetna.com/providers' },
+    'United Healthcare': { phone: '1-877-842-3210', ref: 'uhcprovider.com' },
+    'BlueCross BlueShield': { phone: '1-800-676-2583', ref: 'bcbs.com/providers' },
+    'Guardian': { phone: '1-800-538-4047', ref: 'guardianlife.com/providers' },
+    'Humana': { phone: '1-800-448-6262', ref: 'humana.com/providers' },
+    'MetLife': { phone: '1-800-638-5000', ref: 'metlife.com/providers' },
+  };
+  var pd = payers[c.insurance] || { phone: '1-800-000-0000', ref: 'payer portal' };
+
+  return 'INSURANCE FOLLOW-UP CALL SCRIPT\n'
+    + 'Payer: ' + c.insurance + ' · Phone: ' + pd.phone + '\n'
+    + 'Claim: ' + c.id + ' · Patient: ' + c.patient + '\n'
+    + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n'
+    + 'OPENING:\n'
+    + '"Hello, this is [Your Name] calling from Lux Dental Group.\n'
+    + 'Our NPI is 1234567890. I\'m calling regarding a claim for patient\n'
+    + c.patient + ', date of birth [DOB]."\n\n'
+    + 'CLAIM DETAILS TO REFERENCE:\n'
+    + '• Claim ID: ' + c.id + '\n'
+    + '• Date of Service: ' + D.fmtDate(c.submitted) + '\n'
+    + '• Billed Amount: $' + c.balance + '\n'
+    + '• Days Outstanding: ' + days + ' days\n\n'
+    + (c.denialCode
+      ? 'DENIAL FOLLOW-UP:\n'
+        + '"I\'m following up on a denial with code ' + c.denialCode + '.\n'
+        + 'Can you clarify what specific documentation is needed\n'
+        + 'to appeal this claim successfully?"\n\n'
+        + '• Request the exact appeal address and deadline\n'
+        + '• Ask for a reference number for this call\n\n'
+      : 'PAYMENT STATUS:\n'
+        + '"This claim was submitted ' + days + ' days ago and we have\n'
+        + 'not yet received payment. Can you:\n'
+        + '① Confirm you received the claim\n'
+        + '② Provide the current processing status\n'
+        + '③ Give an estimated payment date?"\n\n'
+    )
+    + (days > 60
+      ? 'ESCALATION:\n'
+        + '"Given that this has been outstanding for ' + days + ' days,\n'
+        + 'I\'d like to speak with a supervisor or escalation team.\n'
+        + 'This is now past our expected payment window."\n\n'
+      : '')
+    + 'CLOSING:\n'
+    + '"Thank you for your time. Can I get your name and a\n'
+    + 'reference number for this call? I\'ll document this\n'
+    + 'in our system. Have a great day."\n\n'
+    + '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n'
+    + 'Generated by NexRCM AI · ' + new Date().toLocaleString();
+}
+
+// ── Upgrade runAIPriority to use OpenRouter ───────────────
+function runAIPriority() {
+  toast('Running AI prioritization...', 'info');
+  var unpaid = _claims.filter(function(c){return c.balance>0;});
+  var ctx = buildARContext();
+  var userMsg = 'Analyze these unpaid AR claims and provide a prioritized action plan. '
+    + 'For each of the top 3 claims, give: priority level, specific action to take, and expected outcome. '
+    + 'Keep it practical and brief.';
+
+  callOpenRouter(AR_SYSTEM_PROMPT+ctx, userMsg, null).then(function(res) {
+    renderAIPriority();
+    if (res) {
+      // Append AI narrative to top of priority page
+      var el = document.getElementById('ai-priority-content');
+      if (el) {
+        var aiNarrative = document.createElement('div');
+        aiNarrative.className = 'fu-script-box';
+        aiNarrative.style.marginBottom = '16px';
+        aiNarrative.innerHTML = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+          + '<span style="font-size:18px">🤖</span>'
+          + '<span style="font-size:13px;font-weight:700;color:#FCA87A">AI Priority Analysis</span>'
+          + '<span style="margin-left:auto;font-size:10px;color:rgba(255,255,255,0.3)">OpenRouter · just now</span>'
+          + '</div>'
+          + '<div style="font-size:13px;color:rgba(255,255,255,0.8);line-height:1.7">'+formatARText(res)+'</div>';
+        el.insertBefore(aiNarrative, el.firstChild);
+      }
+    }
+    toast('AI prioritization complete', 'success', 'Analysis Updated');
+  }).catch(function() {
+    renderAIPriority();
+    toast('AI prioritization complete', 'success', 'Analysis Updated');
+  });
+}
+
+// ── Patch go() to show AI banner on dashboard ─────────────
+var _origARGo = go;
+go = function(page) {
+  _origARGo(page);
+  if (page === 'dashboard') setTimeout(renderARBanner, 60);
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(renderARBanner, 300);
+});
+</script>
+
+<!-- ── AR MANAGEMENT FLOATING AI PANEL ──────────────────── -->
+<div id="ai-ar-fab">
+  <div id="ai-ar-fab-panel">
+    <div class="ai-ar-hdr">
+      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">📊</div>
+      <div style="flex:1;margin-left:8px">
+        <div style="font-size:13px;font-weight:700;color:#fff">AR Intelligence AI</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.55)">Collections · Denials · Scripts · OpenRouter</div>
+      </div>
+      <button onclick="closeARFab()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div class="ai-ar-msgs" id="ai-ar-msgs"></div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;padding:0 12px 8px">
+      <div class="ar-chip" onclick="arFabAsk('What are my most critical AR claims?')">Critical claims</div>
+      <div class="ar-chip" onclick="arFabAsk('Give me a call script for my top unpaid claim')">Call script</div>
+      <div class="ar-chip" onclick="arFabAsk('Summarize my denied claims and appeal strategy')">Appeal strategy</div>
+      <div class="ar-chip" onclick="arFabAsk('What should I do with 90+ day claims?')">90+ day guidance</div>
+    </div>
+    <div class="ai-ar-input-row">
+      <input id="ai-ar-input" type="text" placeholder="Ask about AR, collections, scripts..." onkeydown="if(event.key==='Enter')arFabSend()"/>
+      <button onclick="arFabSend()" style="width:34px;height:34px;border-radius:var(--r);background:var(--orange,#F97316);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">↑</button>
+    </div>
+  </div>
+  <button id="ai-ar-fab-btn" onclick="toggleARFab()" title="AR AI Assistant">
+    📊
+    <span class="ar-fab-dot"></span>
+  </button>
+</div>

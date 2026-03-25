@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NexRCM - Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--brand:#1A56FF;--brand-dark:#0B3FCC;--brand-light:#EEF3FF;--brand-glow:rgba(26,86,255,0.14);--navy:#0A0E1A;--navy-mid:#0D1630;--success:#10B981;--success-bg:#ECFDF5;--success-border:#A7F3D0;--warning:#F59E0B;--warning-bg:#FFFBEB;--warning-border:#FDE68A;--danger:#EF4444;--danger-bg:#FEF2F2;--danger-border:#FECACA;--info:#3B82F6;--info-bg:#EFF6FF;--info-border:#BFDBFE;--purple:#7C3AED;--purple-bg:#F5F3FF;--purple-border:#DDD6FE;--bg:#F0F3F8;--surface:#FFFFFF;--text:#0F172A;--text2:#475569;--muted:#94A3B8;--border:#E2E8F0;--border-light:#EDF2F7;--r:10px;--r-lg:14px;--r-xl:20px;--r-pill:999px;--shadow-xs:0 1px 2px rgba(15,23,42,0.05),0 0 0 1px rgba(15,23,42,0.02);--shadow-sm:0 2px 4px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04);--shadow-md:0 4px 16px rgba(15,23,42,0.07),0 2px 6px rgba(15,23,42,0.04);--shadow-lg:0 20px 40px rgba(15,23,42,0.10),0 8px 16px rgba(15,23,42,0.06);--t:200ms;--sidebar-w:230px}
+html,body{height:100%;font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px}
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar-w);height:100%;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0;border-right:1px solid rgba(255,255,255,0.055)}
+.sb-header{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.055)}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-mark{width:34px;height:34px;border-radius:9px;background:#F59E0B;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#0A0E1A;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700;color:#fff}.sb-sub{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em}
+.sb-role-badge{margin:10px 16px 0;background:rgba(245,158,11,0.15);border:1px solid rgba(245,158,11,0.3);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px}
+.sb-role-dot{width:7px;height:7px;border-radius:50%;background:#F59E0B;flex-shrink:0}
+.sb-role-name{font-size:12px;font-weight:600;color:#FCD34D}.sb-role-title{font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px}
+.sb-section{font-size:9.5px;font-weight:700;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.14em;padding:12px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;margin-bottom:1px;color:rgba(255,255,255,0.44);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.12s;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.84)}
+.nav-item.active{background:rgba(245,158,11,0.15);color:#FCD34D}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.sb-footer{border-top:1px solid rgba(255,255,255,0.055);padding:10px}
+.sb-user{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#EF4444);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-uname{font-size:12px;font-weight:700;color:rgba(255,255,255,0.82)}.sb-urole{font-size:10.5px;color:rgba(255,255,255,0.28)}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;box-shadow:var(--shadow-xs)}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text);flex:1}
+.topbar-date{font-size:12px;color:var(--muted);background:var(--bg);padding:5px 12px;border-radius:99px;border:1px solid var(--border)}
+.topbar-btn{width:34px;height:34px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer}
+#content{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
+.page{display:none}.page.active{display:block;animation:fadeIn 0.28s cubic-bezier(0.4,0,0.2,1) both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ph-left{flex:1;min-width:0}.ph-eyebrow{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.11em;margin-bottom:3px}
+.ph-title{font-size:21px;font-weight:700;color:var(--text);letter-spacing:-0.02em}
+.ph-desc{font-size:13px;color:var(--text2);margin-top:4px}
+.ph-right{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:600;letter-spacing:-0.01em;white-space:nowrap;border:1px solid transparent;cursor:pointer;transition:all var(--t);box-shadow:var(--shadow-xs)}
+.btn-primary{background:var(--brand);color:#fff}.btn-primary:hover{background:var(--brand-dark);transform:translateY(-1px)}
+.btn-outline{background:var(--surface);color:var(--text2);border-color:var(--border)}.btn-outline:hover{border-color:var(--muted);color:var(--text)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-xs)}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:13px;border-bottom:1px solid var(--border-light)}
+.card-title{font-size:13.5px;font-weight:700;color:var(--text);flex:1}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-xs);transition:transform var(--t),box-shadow var(--t)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-icon{font-size:20px;margin-bottom:10px}.stat-label{font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.stat-val{font-size:24px;font-weight:700;color:var(--text);letter-spacing:-0.02em;line-height:1}.stat-sub{font-size:11px;color:var(--muted);margin-top:5px}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.65);backdrop-filter:blur(5px);z-index:999;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}.modal{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);max-height:92vh;overflow-y:auto;width:640px;max-width:100%}
+.modal-hdr{display:flex;align-items:center;padding:17px 22px;border-bottom:1px solid var(--border)}.modal-hdr h2{flex:1;font-size:15px;font-weight:700}
+.modal-close{width:30px;height:30px;border-radius:7px;background:var(--bg);color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.modal-body{padding:22px}.modal-footer{padding:13px 22px;border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;justify-content:flex-end}
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:370px;pointer-events:none}
+.toast{display:flex;align-items:flex-start;gap:11px;background:var(--text);color:#fff;padding:13px 15px;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);animation:toastIn 0.28s ease;font-size:13px;line-height:1.4;pointer-events:all}
+.toast-icon{font-size:17px;flex-shrink:0}.toast-body{flex:1}.toast-title{font-weight:700;font-size:13px;margin-bottom:1px}.toast-msg{font-size:12px;opacity:0.72}
+.toast-close{background:none;color:rgba(255,255,255,0.45);font-size:15px;cursor:pointer;padding:0;flex-shrink:0}
+.toast.success{background:#064E3B;border-left:3px solid var(--success)}.toast.error{background:#7F1D1D;border-left:3px solid var(--danger)}
+.toast.warning{background:#78350F;border-left:3px solid var(--warning)}.toast.info{background:#1E3A8A;border-left:3px solid var(--info)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px) scale(0.92)}to{opacity:1;transform:translateX(0) scale(1)}}
+
+/* ── GLOBAL SEARCH ── */
+#search-wrap{position:relative;flex:0 0 280px}
+#global-search{width:100%;padding:7px 14px 7px 34px;border:1px solid var(--border);border-radius:var(--r-pill);font-size:13px;background:var(--bg);color:var(--text);transition:all 0.15s}
+#global-search:focus{outline:none;border-color:var(--brand);background:var(--surface);box-shadow:0 0 0 3px var(--brand-glow)}
+#search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none}
+.search-dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);z-index:500;display:none;max-height:360px;overflow-y:auto}
+.search-dropdown.open{display:block}
+.search-section-label{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;padding:10px 14px 4px}
+.search-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background 0.1s}
+.search-item:hover{background:var(--brand-light)}
+.search-item-icon{width:28px;height:28px;border-radius:7px;background:var(--brand-light);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.search-item-name{font-size:13px;font-weight:600;color:var(--text)}
+.search-item-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+
+/* ── NOTIFICATIONS ── */
+#notif-btn{position:relative}
+.notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--surface)}
+#notif-dropdown{position:absolute;top:calc(100% + 8px);right:0;width:340px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);z-index:500;display:none}
+#notif-dropdown.open{display:block}
+.notif-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.notif-item{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background 0.1s}
+.notif-item:hover{background:var(--bg)}
+.notif-item.unread{background:#F0F4FF}
+.notif-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.notif-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px}
+.notif-msg{font-size:12px;color:var(--text2);line-height:1.4}
+.notif-time{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* ── AI ASSISTANT ── */
+#ai-panel{position:fixed;bottom:24px;right:24px;z-index:800;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+#ai-toggle{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#7C3AED);box-shadow:0 4px 20px rgba(26,86,255,0.4);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:none;color:#fff;transition:transform 0.2s}
+#ai-toggle:hover{transform:scale(1.08)}
+#ai-chat-box{width:360px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:slideUp 0.2s ease}
+#ai-chat-box.open{display:flex}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+#ai-chat-hdr{background:linear-gradient(135deg,var(--brand),#7C3AED);padding:14px 16px;display:flex;align-items:center;gap:10px}
+#ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;min-height:260px;max-height:360px}
+.ai-msg{display:flex;gap:9px;align-items:flex-start}
+.ai-msg-bubble{max-width:85%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.5}
+.ai-msg.bot .ai-msg-bubble{background:var(--brand-light);color:var(--text);border-bottom-left-radius:4px}
+.ai-msg.user .ai-msg-bubble{background:var(--brand);color:#fff;border-bottom-right-radius:4px;margin-left:auto}
+.ai-msg.user{flex-direction:row-reverse}
+.ai-avatar-sm{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#7C3AED);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+#ai-input-row{display:flex;gap:8px;padding:10px 14px;border-top:1px solid var(--border);background:var(--surface)}
+#ai-input{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:var(--r-pill);font-size:13px;font-family:inherit;background:var(--bg)}
+#ai-input:focus{outline:none;border-color:var(--brand)}
+.ai-quick-btns{display:flex;gap:6px;padding:0 14px 10px;flex-wrap:wrap}
+.ai-quick-btn{font-size:11px;padding:4px 10px;border-radius:var(--r-pill);background:var(--brand-light);color:var(--brand);border:1px solid var(--brand);cursor:pointer;font-weight:600;white-space:nowrap;transition:all 0.1s}
+.ai-quick-btn:hover{background:var(--brand);color:#fff}
+
+/* ── ACTIVITY TIMELINE ── */
+.timeline-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border-light)}
+.timeline-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.timeline-content{flex:1;min-width:0}
+.timeline-action{font-size:13px;font-weight:500;color:var(--text)}
+.timeline-meta{font-size:11.5px;color:var(--muted);margin-top:2px}
+
+/* ── REVENUE RECOVERY CARD ── */
+.recovery-card{background:linear-gradient(135deg,#0A0E1A,#1A2540);border-radius:var(--r-xl);padding:22px;color:#fff;margin-bottom:16px}
+.recovery-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+.recovery-row:last-child{border-bottom:none;padding-top:12px;margin-top:4px}
+
+/* ── CHART BARS ── */
+.chart-bar-wrap{display:flex;align-items:flex-end;gap:8px;height:120px;padding-bottom:4px}
+.chart-bar-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:4px;height:100%}
+.chart-bar{width:100%;border-radius:5px 5px 0 0;transition:all 0.4s ease;min-height:4px;cursor:pointer}
+.chart-bar:hover{filter:brightness(1.15)}
+.chart-label{font-size:10px;color:var(--muted);text-align:center}
+.chart-val{font-size:10.5px;font-weight:700;color:var(--text2);text-align:center}
+
+/* ── AR AGING ── */
+.aging-bar-wrap{display:flex;height:12px;border-radius:99px;overflow:hidden;margin:8px 0}
+.aging-segment{height:100%;transition:all 0.4s}
+.aging-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.aging-legend-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text2)}
+.aging-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── RISK ALERTS ── */
+.risk-alert{display:flex;align-items:flex-start;gap:11px;padding:13px 15px;border-radius:var(--r-lg);border:1px solid;margin-bottom:8px;cursor:pointer;transition:all 0.15s}
+.risk-alert:hover{transform:translateX(3px)}
+
+/* ── GENERATE DEMO DATA BTN ── */
+.demo-banner{background:linear-gradient(135deg,#1E3A8A,#312E81);border-radius:var(--r-lg);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1)}
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:#10B981;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+
+/* ── ENHANCED POLISH ── */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes subtlePulse{0%,100%{opacity:1}50%{opacity:0.7}}
+#content{scroll-behavior:smooth}
+#content::-webkit-scrollbar{width:6px}
+#content::-webkit-scrollbar-track{background:transparent}
+#content::-webkit-scrollbar-thumb{background:#C1CDD9;border-radius:99px}
+#content::-webkit-scrollbar-thumb:hover{background:#94A3B8}
+.card{transition:transform 0.22s cubic-bezier(0.4,0,0.2,1),box-shadow 0.22s cubic-bezier(0.4,0,0.2,1),border-color 0.22s}
+.card:hover{box-shadow:var(--shadow-md);border-color:#D1D9E6}
+.stat-card{position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),#7C3AED);opacity:0;transition:opacity 0.25s}
+.stat-card:hover::before{opacity:1}
+.btn{transition:all 0.18s cubic-bezier(0.4,0,0.2,1)}
+.btn-primary{box-shadow:0 2px 8px rgba(26,86,255,0.25)}
+.btn-primary:hover{box-shadow:0 4px 16px rgba(26,86,255,0.35)}
+.nav-item{transition:all 0.15s cubic-bezier(0.4,0,0.2,1)}
+#sidebar{background:linear-gradient(180deg,#0C0A18 0%,#141028 50%,#0A0E1A 100%)}
+.sb-mark{box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.modal{animation:modalIn 0.25s cubic-bezier(0.4,0,0.2,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.toast{animation:toastIn 0.32s cubic-bezier(0.34,1.56,0.64,1)}
+}
+.ph-title{background:linear-gradient(135deg,var(--text) 0%,#334155 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-btn{transition:all 0.15s}
+.topbar-btn:hover{background:var(--surface);border-color:var(--muted);transform:scale(1.05)}
+.sb-footer{background:rgba(0,0,0,0.15)}
+.recovery-card{box-shadow:0 8px 32px rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06)}
+.risk-alert{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+.risk-alert:hover{transform:translateX(4px);box-shadow:var(--shadow-sm)}
+#global-search{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+#global-search:focus{transform:scale(1.01)}
+::selection{background:rgba(26,86,255,0.15);color:var(--text)}
+
+.stats-grid .stat-card{animation:fadeIn 0.3s ease both}
+.stats-grid .stat-card:nth-child(1){animation-delay:0.05s}
+.stats-grid .stat-card:nth-child(2){animation-delay:0.1s}
+.stats-grid .stat-card:nth-child(3){animation-delay:0.15s}
+.stats-grid .stat-card:nth-child(4){animation-delay:0.2s}
+.stats-grid .stat-card:nth-child(5){animation-delay:0.25s}
+.stats-grid .stat-card:nth-child(6){animation-delay:0.3s}
+
+#ai-toggle{transition:all 0.25s cubic-bezier(0.4,0,0.2,1)}
+#ai-toggle:hover{transform:scale(1.1) rotate(8deg);box-shadow:0 6px 28px rgba(26,86,255,0.5)}
+#ai-chat-box{border:1px solid rgba(26,86,255,0.15)}
+.ai-msg-bubble{animation:fadeIn 0.2s ease both}
+
+.form-group input,.form-group select,.form-group textarea{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+.form-group input:hover,.form-group select:hover,.form-group textarea:hover{border-color:#CBD5E1}
+
+table{border-collapse:separate;border-spacing:0}
+table tr{transition:background 0.12s}
+table td,table th{transition:color 0.12s}
+
+.loading-shimmer{background:linear-gradient(90deg,var(--bg) 25%,#E2E8F0 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.demo-banner{transition:all 0.3s;overflow:hidden}
+.demo-banner:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+
+#notif-dropdown{animation:fadeIn 0.18s ease;border:1px solid rgba(0,0,0,0.08)}
+.notif-item{transition:all 0.12s}
+.notif-dot{animation:subtlePulse 2s infinite}
+
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(26,86,255,0.02) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(124,58,237,0.015) 0%,transparent 50%);pointer-events:none;z-index:0}
+#app{position:relative;z-index:1}
+
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:4px}
+*{scroll-behavior:smooth}
+
+.portal-link{font-size:10px;padding:3px 7px;border-radius:5px;color:rgba(255,255,255,0.3);cursor:pointer;transition:all 0.15s;text-decoration:none;display:inline-block}
+.portal-link:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
+.portal-link.active{color:rgba(245,158,11,0.9);background:rgba(245,158,11,0.1)}
+
+.hover-row{transition:background 0.12s}
+.hover-row:hover{background:var(--bg) !important}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state-icon{font-size:40px;margin-bottom:12px;opacity:0.5}
+.empty-state-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-state-desc{font-size:13px;color:var(--muted);max-width:300px;margin:0 auto}
+
+.badge,.b-success,.b-warning,.b-danger,.b-info,.b-neutral{transition:all 0.15s;letter-spacing:0.03em}
+
+#topbar{position:relative}
+#topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(26,86,255,0.08) 50%,transparent)}
+
+.search-dropdown{animation:fadeIn 0.15s ease}
+.search-item{border-radius:8px;margin:2px 6px}
+</style>
+</head>
+<body>
+<div id="app">
+<nav id="sidebar">
+  <div class="sb-header"><div class="sb-logo"><div class="sb-mark">N</div><div><div class="sb-name">NexRCM</div><div class="sb-sub">Admin Portal</div></div></div></div>
+  <div class="sb-role-badge"><div class="sb-role-dot"></div><div><div class="sb-role-name" id="sb-user-name">Loading...</div><div class="sb-role-title">Practice Owner</div></div></div>
+  <div class="sb-nav">
+    <div class="sb-section">Overview</div>
+    <div class="nav-item active" data-page="dashboard" onclick="go('dashboard')"><span class="nav-icon">📊</span><span>Executive Dashboard</span></div>
+    <div class="nav-item" data-page="insights" onclick="go('insights')"><span class="nav-icon">🤖</span><span>AI Insights</span></div>
+    <div class="sb-section">Analytics</div>
+    <div class="nav-item" data-page="analytics" onclick="go('analytics')"><span class="nav-icon">📈</span><span>Revenue Analytics</span></div>
+    <div class="sb-section">Management</div>
+    <div class="nav-item" data-page="staff" onclick="go('staff')"><span class="nav-icon">👥</span><span>Staff Management</span></div>
+    <div class="nav-item" data-page="locations" onclick="go('locations')"><span class="nav-icon">📍</span><span>Locations</span></div>
+    <div class="nav-item" data-page="audit-log" onclick="go('audit-log')"><span class="nav-icon">🔍</span><span>Audit Log</span></div>
+    <div class="nav-item" data-page="settings" onclick="go('settings')"><span class="nav-icon">⚙️</span><span>System Settings</span></div>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:5px;padding:8px 14px;border-top:1px solid rgba(255,255,255,0.06)">
+    <div style="width:100%;font-size:9px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">All Portals</div>
+    <a class="portal-link" href="front-desk.html">🏥 Front Desk</a>
+    <a class="portal-link" href="insurance-verification.html">🛡️ Ins. Verify</a>
+    <a class="portal-link" href="billing.html">💳 Billing</a>
+    <a class="portal-link" href="ar-management.html">📊 AR Mgmt</a>
+    <a class="portal-link active" href="#">⚙️ Admin</a>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user"><div class="sb-avatar" id="sb-avatar">A</div><div><div class="sb-uname" id="sb-name2">Dr. Alan Reid</div><div class="sb-urole">Practice Owner</div></div></div>
+  </div>
+</nav>
+<div id="main">
+  <div id="topbar">
+    <div class="topbar-title" id="page-title">Executive Dashboard</div>
+    <div id="search-wrap" style="margin-left:16px">
+      <span id="search-icon">🔍</span>
+      <input id="global-search" type="text" placeholder="Search patients, claims, providers..." oninput="globalSearch(this.value)" onfocus="if(this.value)globalSearch(this.value)" onblur="setTimeout(function(){document.getElementById('search-results-dd').classList.remove('open')},200)"/>
+      <div class="search-dropdown" id="search-results-dd"></div>
+    </div>
+    <div class="topbar-date" id="topbar-date" style="margin-left:12px"></div>
+    <div style="display:flex;gap:6px;margin-left:12px;position:relative">
+      <div class="topbar-btn" id="notif-btn" onclick="toggleNotifications()" style="position:relative">🔔<span class="notif-dot" id="notif-indicator"></span></div>
+      <div id="notif-dropdown">
+        <div class="notif-header"><span style="font-size:13px;font-weight:700">Notifications</span><button class="btn btn-sm btn-ghost" onclick="markAllRead()" style="font-size:11px;padding:3px 8px">Mark all read</button></div>
+        <div id="notif-list"></div>
+      </div>
+      <div class="topbar-btn" onclick="go('settings')">⚙️</div>
+    </div>
+  </div>
+  <div id="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Admin</div><div class="ph-title">Executive Dashboard</div><div class="ph-desc">Practice-wide revenue cycle performance at a glance.</div></div>
+      <div class="ph-right">
+        <button class="btn btn-outline" id="gen-demo-btn" onclick="generateDemoData()">⚡ Generate Demo Data</button>
+        <button class="btn btn-outline" onclick="go('insights')">AI Insights</button>
+        <button class="btn btn-primary" onclick="go('analytics')">Full Analytics</button>
+      </div>
+    </div>
+    <!-- AI Risk Alerts Banner -->
+    <div id="risk-alerts-banner"></div>
+    <!-- Revenue Recovery + Stats -->
+    <div id="recovery-section"></div>
+    <!-- AI Revenue Forecast Panel -->
+    <div id="ai-forecast-panel" style="margin-bottom:16px"></div>
+    <div class="stats-grid" id="admin-stats" style="grid-template-columns:repeat(6,1fr)"></div>
+    <!-- Charts Row -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="card"><div class="card-header"><div class="card-title">📈 Revenue Trend - Last 6 Months</div><span style="font-size:11px;color:var(--muted);background:var(--success-bg);color:#065F46;padding:2px 8px;border-radius:99px;border:1px solid var(--success-border)">↑ 8.3% vs prior period</span></div><div id="revenue-chart"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">📊 AR Aging</div></div><div id="ar-aging-visual"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
+      <div class="card"><div class="card-header"><div class="card-title">Provider Performance</div><button class="btn btn-sm btn-outline" onclick="toast('Performance report exported','success')">Export</button></div><div id="admin-providers"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">Activity Timeline</div><span class="pulse-dot" style="margin-left:4px" title="Live"></span></div><div id="activity-timeline"></div></div>
+    </div>
+    <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card"><div class="card-header"><div class="card-title">📍 Locations</div></div><div id="admin-locations-snap"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">🤖 AI Quick Analysis</div></div><div id="ai-quick-analysis"></div></div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="page" id="page-analytics">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Analytics</div><div class="ph-title">Revenue Analytics</div></div>
+      <div class="ph-right">
+        <div id="analytics-tabs" style="display:flex;gap:6px">
+          <button class="btn btn-sm" style="background:var(--brand);color:#fff;border-color:var(--brand)" onclick="setAnalyticsTab('revenue',this)">Revenue</button>
+          <button class="btn btn-sm btn-outline" onclick="setAnalyticsTab('payer',this)">By Payer</button>
+          <button class="btn btn-sm btn-outline" onclick="setAnalyticsTab('procedure',this)">By Procedure</button>
+          <button class="btn btn-sm btn-outline" onclick="setAnalyticsTab('denial',this)">Denials</button>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="toast('Report exported to CSV','success')">Export</button>
+      </div>
+    </div>
+    <div id="analytics-content"></div>
+  </div>
+
+  <!-- STAFF -->
+  <div class="page" id="page-staff">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Management</div><div class="ph-title">Staff Management</div><div class="ph-desc">4 staff members across all roles.</div></div>
+      <div class="ph-right"><button class="btn btn-primary" onclick="toast('Invite sent! Staff will receive email with portal access.','success')">+ Invite Staff</button></div>
+    </div>
+    <div id="staff-list"></div>
+  </div>
+
+  <!-- LOCATIONS -->
+  <div class="page" id="page-locations">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Management</div><div class="ph-title">Locations and Offices</div></div>
+      <div class="ph-right"><button class="btn btn-primary" onclick="toast('Add location form coming soon','info')">+ Add Location</button></div>
+    </div>
+    <div id="locations-list"></div>
+  </div>
+
+  <!-- AUDIT LOG -->
+  <div class="page" id="page-audit-log">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Compliance</div><div class="ph-title">Audit Log</div><div class="ph-desc">All actions logged for HIPAA compliance. 7-year retention.</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('Audit log exported','success')">Export Log</button></div>
+    </div>
+    <div class="card" style="overflow:hidden;padding:0"><div id="audit-list"></div></div>
+  </div>
+
+  <!-- AI INSIGHTS -->
+  <div class="page" id="page-insights">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">AI</div><div class="ph-title">AI Insights</div><div class="ph-desc">Automated analysis of your revenue cycle performance, risks, and opportunities.</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('Weekly AI insights report scheduled for Monday 7am','success')">Schedule Weekly</button></div>
+    </div>
+    <div id="insights-content"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">System</div><div class="ph-title">System Settings</div></div>
+    </div>
+    <div id="settings-content"></div>
+  </div>
+
+  </div>
+</div>
+</div>
+<div id="toast-container"></div>
+
+<!-- AI FLOATING ASSISTANT -->
+<div id="ai-panel">
+  <div id="ai-chat-box">
+    <div id="ai-chat-hdr">
+      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">🤖</div>
+      <div style="flex:1;margin-left:8px"><div style="font-size:13px;font-weight:700;color:#fff">NexRCM AI Assistant</div><div style="font-size:11px;color:rgba(255,255,255,0.6)">Ask anything about your RCM</div></div>
+      <button onclick="toggleAI()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+    </div>
+    <div id="ai-msgs"></div>
+    <div class="ai-quick-btns">
+      <button class="ai-quick-btn" onclick="askAI('Why was claim denied?')">Why denied?</button>
+      <button class="ai-quick-btn" onclick="askAI('Which claims need follow up?')">Follow-up needed</button>
+      <button class="ai-quick-btn" onclick="askAI('What is our AR risk?')">AR risk</button>
+      <button class="ai-quick-btn" onclick="askAI('Revenue recovery opportunities')">Recovery</button>
+    </div>
+    <div id="ai-input-row">
+      <input id="ai-input" type="text" placeholder="Ask about claims, revenue, denials..." onkeydown="if(event.key==='Enter')sendAI()"/>
+      <button class="btn btn-primary btn-sm" onclick="sendAI()">Send</button>
+    </div>
+  </div>
+  <button id="ai-toggle" onclick="toggleAI()" title="AI Assistant">🤖</button>
+</div>
+<script>
+/* ============================================================
+   NEXRCM SHARED DATA LAYER
+   Used by all 3 apps. Simulates a real database.
+   In production: replace with Firestore/Supabase calls.
+============================================================ */
+
+var NexRCM = (function() {
+
+  /* ── Design tokens ─────────────────────────────────────── */
+  var COLORS = {
+    brand:'#1A56FF', brandDark:'#0B3FCC', brandLight:'#EEF3FF',
+    navy:'#0A0E1A', navyMid:'#0D1630', navyLight:'#1A2540',
+    success:'#10B981', successBg:'#ECFDF5', successBorder:'#A7F3D0',
+    warning:'#F59E0B', warningBg:'#FFFBEB', warningBorder:'#FDE68A',
+    danger:'#EF4444', dangerBg:'#FEF2F2', dangerBorder:'#FECACA',
+    info:'#3B82F6', infoBg:'#EFF6FF', infoBorder:'#BFDBFE',
+    purple:'#7C3AED', purpleBg:'#F5F3FF', purpleBorder:'#DDD6FE',
+    bg:'#F1F4F9', surface:'#FFFFFF', text:'#0F172A', textMuted:'#94A3B8',
+    border:'#E2E8F0', borderLight:'#EDF2F7',
+  };
+
+  /* ── Master patient list ───────────────────────────────── */
+  var PATIENTS = [
+    {id:'P001',first:'Sarah',last:'Johnson',dob:'1985-03-14',gender:'F',phone:'(310) 555-0192',email:'sarah.j@email.com',address:'123 Oak St, Los Angeles, CA 90001',insurance:'Delta Dental',ins2:'',memberId:'DD-4521987',groupNum:'G-9021',ssn:'***-**-1234',notes:'Allergic to penicillin',lastVisit:'2026-02-15',nextAppt:'2026-03-20 10:00',provider:'Dr. Martinez',balance:280,totalBilled:12400,totalPaid:10920,status:'active'},
+    {id:'P002',first:'James',last:'Lee',dob:'1972-11-28',gender:'M',phone:'(424) 555-0847',email:'james.lee@email.com',address:'456 Elm Ave, Beverly Hills, CA 90210',insurance:'Cigna',ins2:'',memberId:'CIG-7823401',groupNum:'G-4455',ssn:'***-**-5678',notes:'',lastVisit:'2026-02-18',nextAppt:'2026-03-18 14:00',provider:'Dr. Patel',balance:450,totalBilled:8900,totalPaid:7250,status:'active'},
+    {id:'P003',first:'Maria',last:'Garcia',dob:'1990-07-05',gender:'F',phone:'(818) 555-0234',email:'m.garcia@email.com',address:'789 Pine Rd, Santa Monica, CA 90404',insurance:'Aetna',ins2:'Medicare',memberId:'AET-3310982',groupNum:'G-7788',ssn:'***-**-9012',notes:'Anxiety  -  needs extra reassurance',lastVisit:'2026-01-22',nextAppt:'2026-03-22 09:00',provider:'Dr. Thompson',balance:0,totalBilled:5600,totalPaid:5600,status:'active'},
+    {id:'P004',first:'Robert',last:'Chen',dob:'1968-01-19',gender:'M',phone:'(213) 555-0561',email:'rob.chen@email.com',address:'321 Maple Dr, Culver City, CA 90232',insurance:'United Healthcare',ins2:'',memberId:'UHC-9017234',groupNum:'G-3312',ssn:'***-**-3456',notes:'Prefers morning appointments',lastVisit:'2026-02-20',nextAppt:'2026-03-17 08:30',provider:'Dr. Martinez',balance:0,totalBilled:9800,totalPaid:9800,status:'active'},
+    {id:'P005',first:'Linda',last:'Wilson',dob:'1955-09-30',gender:'F',phone:'(626) 555-0783',email:'lwilson@email.com',address:'654 Cedar Ln, Pasadena, CA 91101',insurance:'Humana',ins2:'',memberId:'HUM-5542187',groupNum:'G-6634',ssn:'***-**-7890',notes:'On warfarin  -  check before extractions',lastVisit:'2026-01-10',nextAppt:'2026-03-19 11:30',provider:'Dr. Thompson',balance:185,totalBilled:3800,totalPaid:2915,status:'active'},
+    {id:'P006',first:'Michael',last:'Torres',dob:'1988-04-22',gender:'M',phone:'(323) 555-0419',email:'m.torres@email.com',address:'987 Birch St, Hollywood, CA 90028',insurance:'BlueCross BlueShield',ins2:'',memberId:'BCBS-7712039',groupNum:'G-5521',ssn:'***-**-2345',notes:'',lastVisit:'2026-02-05',nextAppt:'2026-03-21 13:00',provider:'Dr. Patel',balance:0,totalBilled:7200,totalPaid:7200,status:'active'},
+    {id:'P007',first:'Jennifer',last:'Adams',dob:'1994-12-07',gender:'F',phone:'(310) 555-0674',email:'j.adams@email.com',address:'147 Willow Way, Venice, CA 90291',insurance:'Delta Dental',ins2:'',memberId:'DD-8823451',groupNum:'G-9021',ssn:'***-**-6789',notes:'New patient',lastVisit:'2026-02-22',nextAppt:'2026-03-17 15:00',provider:'Dr. Martinez',balance:350,totalBilled:4900,totalPaid:4250,status:'active'},
+    {id:'P008',first:'David',last:'Kim',dob:'1979-06-16',gender:'M',phone:'(714) 555-0328',email:'d.kim@email.com',address:'258 Spruce Ave, Burbank, CA 91505',insurance:'Cigna',ins2:'',memberId:'CIG-4490112',groupNum:'G-4455',ssn:'***-**-0123',notes:'Missed last 2 appointments',lastVisit:'2025-11-15',nextAppt:null,provider:'Dr. Thompson',balance:180,totalBilled:4400,totalPaid:3520,status:'inactive'},
+    {id:'P009',first:'Patricia',last:'Brown',dob:'1962-08-03',gender:'F',phone:'(818) 555-0912',email:'pat.b@email.com',address:'369 Ash Court, Glendale, CA 91201',insurance:'United Healthcare',ins2:'Medicare',memberId:'UHC-7123090',groupNum:'G-3312',ssn:'***-**-4567',notes:'Diabetic  -  note healing times',lastVisit:'2026-02-24',nextAppt:'2026-03-24 10:30',provider:'Dr. Martinez',balance:0,totalBilled:15200,totalPaid:15200,status:'active'},
+    {id:'P010',first:'Christopher',last:'Hall',dob:'2000-05-21',gender:'M',phone:'(310) 555-0345',email:'chall@email.com',address:'741 Walnut Blvd, West Hollywood, CA 90046',insurance:'BlueCross BlueShield',ins2:'',memberId:'BCBS-9900123',groupNum:'G-5521',ssn:'***-**-8901',notes:'College student  -  payment plan preferred',lastVisit:'2026-02-26',nextAppt:'2026-03-18 16:00',provider:'Dr. Martinez',balance:350,totalBilled:6300,totalPaid:5250,status:'active'},
+    {id:'P011',first:'Amanda',last:'Foster',dob:'1998-03-11',gender:'F',phone:'(323) 555-0228',email:'amanda.f@email.com',address:'852 Oak Blvd, Culver City, CA 90230',insurance:'MetLife',ins2:'',memberId:'MET-6623019',groupNum:'G-8897',ssn:'***-**-3344',notes:'',lastVisit:'2026-03-01',nextAppt:'2026-03-17 09:30',provider:'Dr. Patel',balance:120,totalBilled:2100,totalPaid:1680,status:'active'},
+    {id:'P012',first:'Thomas',last:'Wright',dob:'1975-12-25',gender:'M',phone:'(714) 555-0991',email:'t.wright@email.com',address:'963 Maple Ct, Orange, CA 92867',insurance:'Guardian',ins2:'',memberId:'GRD-4451278',groupNum:'G-2234',ssn:'***-**-5566',notes:'',lastVisit:'2026-02-28',nextAppt:'2026-03-20 14:30',provider:'Dr. Thompson',balance:0,totalBilled:1800,totalPaid:1800,status:'active'},
+  ];
+
+  /* ── Today's appointment schedule ──────────────────────── */
+  var TODAY = '2026-03-17';
+  var APPOINTMENTS = [
+    {id:'APT001',patientId:'P001',patient:'Sarah Johnson',time:'08:30',duration:60,provider:'Dr. Martinez',type:'Crown Delivery',room:'Op 1',status:'completed',notes:'D2740 porcelain crown',checkedIn:'08:28',insurance:'Delta Dental'},
+    {id:'APT002',patientId:'P004',patient:'Robert Chen',time:'09:00',duration:45,provider:'Dr. Martinez',type:'Recall Exam + Cleaning',room:'Op 2',status:'in-chair',notes:'D0120 + D1110',checkedIn:'08:55',insurance:'United Healthcare'},
+    {id:'APT003',patientId:'P011',patient:'Amanda Foster',time:'09:30',duration:30,provider:'Dr. Patel',type:'Composite Filling x2',room:'Op 3',status:'checked-in',notes:'D2391, D2392  -  #14, #15',checkedIn:'09:25',insurance:'MetLife'},
+    {id:'APT004',patientId:'P002',patient:'James Lee',time:'10:00',duration:90,provider:'Dr. Patel',type:'Periodontal SRP (2 quads)',room:'Op 3',status:'scheduled',notes:'D4341 x2  -  lower arch',checkedIn:null,insurance:'Cigna'},
+    {id:'APT005',patientId:'P007',patient:'Jennifer Adams',time:'10:30',duration:60,provider:'Dr. Martinez',type:'Wisdom Tooth Extraction',room:'Op 1',status:'scheduled',notes:'D7240  -  lower right #32',checkedIn:null,insurance:'Delta Dental'},
+    {id:'APT006',patientId:'P005',patient:'Linda Wilson',time:'11:30',duration:45,provider:'Dr. Thompson',type:'Follow-up + X-rays',room:'Op 4',status:'scheduled',notes:'D0330, D0274',checkedIn:null,insurance:'Humana'},
+    {id:'APT007',patientId:'P010',patient:'Christopher Hall',time:'13:00',duration:90,provider:'Dr. Martinez',type:'Root Canal #19',room:'Op 1',status:'scheduled',notes:'D3330 molar RCT',checkedIn:null,insurance:'BlueCross BlueShield'},
+    {id:'APT008',patientId:'P012',patient:'Thomas Wright',time:'14:30',duration:60,provider:'Dr. Thompson',type:'Implant Consult',room:'Op 4',status:'scheduled',notes:'D6010 implant planning',checkedIn:null,insurance:'Guardian'},
+    {id:'APT009',patientId:'P003',patient:'Maria Garcia',time:'15:00',duration:45,provider:'Dr. Thompson',type:'Denture Adjustment',room:'Op 4',status:'scheduled',notes:'D5410 complete denture adj',checkedIn:null,insurance:'Aetna'},
+    {id:'APT010',patientId:'P006',patient:'Michael Torres',time:'16:00',duration:30,provider:'Dr. Patel',type:'Emergency  -  Toothache',room:'Op 3',status:'scheduled',notes:'#18  -  evaluate D3310 or extraction',checkedIn:null,insurance:'BlueCross BlueShield'},
+  ];
+
+  /* ── Claims / Deposits ─────────────────────────────────── */
+  var CLAIMS = [
+    {id:'CLM001',patientId:'P001',patient:'Sarah Johnson',aptId:'APT001',provider:'Dr. Martinez',dos:'2026-02-15',insurance:'Delta Dental',memberId:'DD-4521987',cdtCodes:'D2750',procedures:'Porcelain Crown  -  Tooth #19',billedAmt:1450,allowedAmt:1100,insurancePaid:880,patientResp:220,postedAmt:880,balance:220,status:'Paid',submittedDate:'2026-02-16',paidDate:'2026-02-28',eraReceived:true,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-02-16',user:'Emily Clark',action:'Claim submitted'},        {ts:'2026-02-28',user:'System',action:'ERA posted  -  $880.00'}]},
+    {id:'CLM002',patientId:'P002',patient:'James Lee',aptId:null,provider:'Dr. Patel',dos:'2026-02-18',insurance:'Cigna',memberId:'CIG-7823401',cdtCodes:'D4341, D4342',procedures:'Periodontal SRP  -  Full Mouth',billedAmt:1800,allowedAmt:0,insurancePaid:0,patientResp:0,postedAmt:0,balance:1800,status:'Pending',submittedDate:'2026-02-19',paidDate:null,eraReceived:false,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-02-19',user:'Emily Clark',action:'Claim submitted via clearinghouse'}]},
+    {id:'CLM003',patientId:'P003',patient:'Maria Garcia',aptId:null,provider:'Dr. Thompson',dos:'2026-01-22',insurance:'Aetna',memberId:'AET-3310982',cdtCodes:'D6010',procedures:'Endosseous Implant  -  Tooth #30',billedAmt:2100,allowedAmt:0,insurancePaid:0,patientResp:0,postedAmt:0,balance:2100,status:'Denied',submittedDate:'2026-01-23',paidDate:null,eraReceived:true,denialCode:'CO-50',appealStatus:'Appeal Filed',auditLog:[{ts:'2026-01-23',user:'Emily Clark',action:'Claim submitted'},{ts:'2026-01-30',user:'System',action:'ERA received  -  Denied CO-50'},{ts:'2026-02-05',user:'Emily Clark',action:'Appeal letter submitted'}]},
+    {id:'CLM004',patientId:'P004',patient:'Robert Chen',aptId:null,provider:'Dr. Martinez',dos:'2026-02-20',insurance:'United Healthcare',memberId:'UHC-9017234',cdtCodes:'D0120, D1110',procedures:'Recall Exam + Prophylaxis',billedAmt:320,allowedAmt:280,insurancePaid:280,patientResp:0,postedAmt:280,balance:0,status:'Paid',submittedDate:'2026-02-21',paidDate:'2026-03-05',eraReceived:true,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-02-21',user:'Emily Clark',action:'Submitted'},{ts:'2026-03-05',user:'System',action:'Paid  -  $280.00'}]},
+    {id:'CLM005',patientId:'P005',patient:'Linda Wilson',aptId:null,provider:'Dr. Thompson',dos:'2026-01-10',insurance:'Humana',memberId:'HUM-5542187',cdtCodes:'D0330, D0274',procedures:'Panoramic X-ray + Bitewings',billedAmt:420,allowedAmt:310,insurancePaid:185,patientResp:125,postedAmt:185,balance:125,status:'Partial',submittedDate:'2026-01-11',paidDate:'2026-01-25',eraReceived:true,denialCode:'CO-45',appealStatus:'',auditLog:[{ts:'2026-01-11',user:'Lisa Coord',action:'Submitted'},{ts:'2026-01-25',user:'System',action:'Partial  -  $185 paid, CO-45 adj applied'}]},
+    {id:'CLM006',patientId:'P006',patient:'Michael Torres',aptId:null,provider:'Dr. Patel',dos:'2026-02-05',insurance:'BlueCross BlueShield',memberId:'BCBS-7712039',cdtCodes:'D3310, D3330',procedures:'Root Canal  -  Anterior + Molar',billedAmt:2800,allowedAmt:2200,insurancePaid:2200,patientResp:0,postedAmt:2200,balance:0,status:'Paid',submittedDate:'2026-02-06',paidDate:'2026-02-22',eraReceived:true,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-02-06',user:'Emily Clark',action:'Submitted'},{ts:'2026-02-22',user:'System',action:'Paid  -  $2,200.00'}]},
+    {id:'CLM007',patientId:'P007',patient:'Jennifer Adams',aptId:null,provider:'Dr. Martinez',dos:'2026-02-22',insurance:'Delta Dental',memberId:'DD-8823451',cdtCodes:'D2391, D2392',procedures:'Composite Fillings x2',billedAmt:680,allowedAmt:0,insurancePaid:0,patientResp:0,postedAmt:0,balance:680,status:'Submitted',submittedDate:'2026-02-23',paidDate:null,eraReceived:false,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-02-23',user:'Emily Clark',action:'Submitted via EDI'}]},
+    {id:'CLM008',patientId:'P008',patient:'David Kim',aptId:null,provider:'Dr. Thompson',dos:'2025-11-15',insurance:'Cigna',memberId:'CIG-4490112',cdtCodes:'D5110',procedures:'Complete Upper Denture',billedAmt:1900,allowedAmt:0,insurancePaid:0,patientResp:0,postedAmt:0,balance:1900,status:'Under Appeal',submittedDate:'2025-11-16',paidDate:null,eraReceived:true,denialCode:'CO-97',appealStatus:'Pending',auditLog:[{ts:'2025-11-16',user:'Lisa Coord',action:'Submitted'},{ts:'2025-11-25',user:'System',action:'Denied  -  CO-97'},{ts:'2025-12-01',user:'Emily Clark',action:'Appeal filed with clinical notes'}]},
+    {id:'CLM009',patientId:'P009',patient:'Patricia Brown',aptId:null,provider:'Dr. Martinez',dos:'2026-02-24',insurance:'United Healthcare',memberId:'UHC-7123090',cdtCodes:'D6065, D6750',procedures:'Implant Crown + PFM Crown',billedAmt:4200,allowedAmt:3600,insurancePaid:3600,patientResp:0,postedAmt:3600,balance:0,status:'Paid',submittedDate:'2026-02-25',paidDate:'2026-03-10',eraReceived:true,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-02-25',user:'Emily Clark',action:'Submitted'},{ts:'2026-03-10',user:'System',action:'Paid  -  $3,600.00'}]},
+    {id:'CLM010',patientId:'P010',patient:'Christopher Hall',aptId:null,provider:'Dr. Martinez',dos:'2026-02-26',insurance:'BlueCross BlueShield',memberId:'BCBS-9900123',cdtCodes:'D2930, D7240',procedures:'Pedo Crown + Wisdom Extraction',billedAmt:1650,allowedAmt:0,insurancePaid:0,patientResp:0,postedAmt:0,balance:1650,status:'Pending',submittedDate:'2026-02-27',paidDate:null,eraReceived:false,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-02-27',user:'Emily Clark',action:'Submitted'}]},
+    {id:'CLM011',patientId:'P011',patient:'Amanda Foster',aptId:null,provider:'Dr. Patel',dos:'2026-03-01',insurance:'MetLife',memberId:'MET-6623019',cdtCodes:'D2391',procedures:'Composite Filling  -  Posterior',billedAmt:380,allowedAmt:310,insurancePaid:248,patientResp:62,postedAmt:248,balance:62,status:'Partial',submittedDate:'2026-03-02',paidDate:'2026-03-14',eraReceived:true,denialCode:'CO-2',appealStatus:'',auditLog:[{ts:'2026-03-02',user:'Emily Clark',action:'Submitted'},{ts:'2026-03-14',user:'System',action:'Partial  -  $248 paid, CO-2 patient co-ins $62'}]},
+    {id:'CLM012',patientId:'P012',patient:'Thomas Wright',aptId:null,provider:'Dr. Thompson',dos:'2026-02-28',insurance:'Guardian',memberId:'GRD-4451278',cdtCodes:'D4910',procedures:'Periodontal Maintenance',billedAmt:210,allowedAmt:195,insurancePaid:195,patientResp:0,postedAmt:195,balance:0,status:'Paid',submittedDate:'2026-03-01',paidDate:'2026-03-12',eraReceived:true,denialCode:'',appealStatus:'',auditLog:[{ts:'2026-03-01',user:'Emily Clark',action:'Submitted'},{ts:'2026-03-12',user:'System',action:'Paid  -  $195.00'}]},
+  ];
+
+  /* ── Eligibility cache ─────────────────────────────────── */
+  var ELIG_CACHE = {
+    'P001': {status:'active',annualMax:2000,usedBenefit:960,remaining:1040,deductMet:1000,deductTotal:1000,coIns:80,coInsPrev:100,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-15'},
+    'P002': {status:'active',annualMax:1500,usedBenefit:1200,remaining:300,deductMet:150,deductTotal:150,coIns:90,coInsPrev:100,coInsMajor:70,waitingPeriod:'None',lastVerified:'2026-03-10'},
+    'P003': {status:'active',annualMax:2500,usedBenefit:800,remaining:1700,deductMet:200,deductTotal:500,coIns:80,coInsPrev:100,coInsMajor:50,waitingPeriod:'12 months ortho',lastVerified:'2026-03-01'},
+    'P004': {status:'active',annualMax:2500,usedBenefit:280,remaining:2220,deductMet:500,deductTotal:500,coIns:90,coInsPrev:100,coInsMajor:60,waitingPeriod:'None',lastVerified:'2026-03-15'},
+    'P005': {status:'active',annualMax:1000,usedBenefit:420,remaining:580,deductMet:50,deductTotal:50,coIns:80,coInsPrev:100,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-02-28'},
+    'P006': {status:'active',annualMax:2000,usedBenefit:2200,remaining:0,deductMet:500,deductTotal:500,coIns:80,coInsPrev:100,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-05'},
+    'P007': {status:'active',annualMax:2000,usedBenefit:680,remaining:1320,deductMet:0,deductTotal:50,coIns:80,coInsPrev:100,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-14'},
+    'P010': {status:'active',annualMax:1500,usedBenefit:1650,remaining:0,deductMet:150,deductTotal:150,coIns:80,coInsPrev:100,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-10'},
+  };
+
+  /* ── Prior Auths ───────────────────────────────────────── */
+  var PRIOR_AUTHS = [
+    {id:'PA001',patientId:'P001',patient:'Sarah Johnson',insurance:'Delta Dental',cdt:'D6010',procedure:'Dental Implant',provider:'Dr. Martinez',dos:'2026-04-01',amount:3200,status:'approved',authNum:'DA-20260401-4521',expiry:'2026-10-01',notes:'Approved for single implant lower molar',submitted:'2026-03-01',urgency:'routine'},
+    {id:'PA002',patientId:'P002',patient:'James Lee',insurance:'Cigna',cdt:'D4341',procedure:'Periodontal SRP',provider:'Dr. Patel',dos:'2026-03-17',amount:1800,status:'approved',authNum:'CIG-20260310-7823',expiry:'2026-06-17',notes:'Approved 4 quads',submitted:'2026-03-05',urgency:'routine'},
+    {id:'PA003',patientId:'P007',patient:'Jennifer Adams',insurance:'Delta Dental',cdt:'D7240',procedure:'Surgical Extraction',provider:'Dr. Martinez',dos:'2026-03-17',amount:850,status:'pending',authNum:'',expiry:'',notes:'Submitted  -  impacted lower right #32',submitted:'2026-03-10',urgency:'routine'},
+    {id:'PA004',patientId:'P010',patient:'Christopher Hall',insurance:'BlueCross BlueShield',cdt:'D3330',procedure:'Molar Root Canal',provider:'Dr. Martinez',dos:'2026-03-17',amount:1200,status:'approved',authNum:'BCBS-20260312-9900',expiry:'2026-09-17',notes:'Approved',submitted:'2026-03-08',urgency:'routine'},
+  ];
+
+  /* ── Staff / Users ─────────────────────────────────────── */
+  var USERS = [
+    {id:'U001',name:'Dr. Sarah Martinez',email:'dr.martinez@practice.com',role:'provider',title:'DDS',active:true,npi:'1234567890',specialty:'General Dentistry'},
+    {id:'U002',name:'Dr. James Patel',email:'dr.patel@practice.com',role:'provider',title:'DDS',active:true,npi:'0987654321',specialty:'Periodontics'},
+    {id:'U003',name:'Dr. Emma Thompson',email:'dr.thompson@practice.com',role:'provider',title:'DDS',active:true,npi:'1122334455',specialty:'Oral Surgery'},
+    {id:'U004',name:'Emily Clark',email:'emily@practice.com',role:'billing',title:'Insurance Coordinator',active:true,npi:'',specialty:''},
+    {id:'U005',name:'Lisa Rodriguez',email:'lisa@practice.com',role:'billing',title:'Billing Specialist',active:true,npi:'',specialty:''},
+    {id:'U006',name:'Jessica Park',email:'jessica@practice.com',role:'frontdesk',title:'Front Desk Lead',active:true,npi:'',specialty:''},
+    {id:'U007',name:'Mark Johnson',email:'mark@practice.com',role:'frontdesk',title:'Receptionist',active:true,npi:'',specialty:''},
+    {id:'U008',name:'Dr. Alan Reid',email:'alan.reid@practice.com',role:'admin',title:'Practice Owner / DDS',active:true,npi:'5544332211',specialty:'General Dentistry'},
+  ];
+
+  /* ── CDT Code Reference ────────────────────────────────── */
+  var CDT_CODES = {
+    'D0120':'Periodic oral evaluation  -  established patient',
+    'D0150':'Comprehensive oral evaluation  -  new patient',
+    'D0210':'Complete series of radiographic images',
+    'D0274':'Bitewing radiographic images  -  four images',
+    'D0330':'Panoramic radiographic image',
+    'D1110':'Prophylaxis  -  adult',
+    'D1120':'Prophylaxis  -  child',
+    'D2140':'Amalgam restoration  -  1 surface, primary or permanent',
+    'D2391':'Resin-based composite  -  1 surface, posterior, primary or permanent',
+    'D2392':'Resin-based composite  -  2 surfaces, posterior, primary or permanent',
+    'D2740':'Crown  -  porcelain/ceramic substrate',
+    'D2750':'Crown  -  porcelain fused to high noble metal',
+    'D2930':'Prefabricated stainless steel crown  -  primary tooth',
+    'D3310':'Endodontic therapy, anterior tooth',
+    'D3320':'Endodontic therapy, premolar tooth',
+    'D3330':'Endodontic therapy, molar tooth',
+    'D4341':'Periodontal scaling and root planing  -  4 or more teeth per quadrant',
+    'D4342':'Periodontal scaling and root planing  -  1 to 3 teeth per quadrant',
+    'D4910':'Periodontal maintenance',
+    'D5110':'Complete denture  -  maxillary',
+    'D5120':'Complete denture  -  mandibular',
+    'D5410':'Adjust complete denture  -  maxillary',
+    'D6010':'Surgically placed endosseous implant body',
+    'D6065':'Implant supported porcelain/ceramic crown',
+    'D6750':'Retainer crown  -  porcelain fused to high noble metal',
+    'D7140':'Extraction, erupted tooth or exposed root',
+    'D7210':'Extraction, erupted tooth requiring removal of bone',
+    'D7240':'Removal of impacted tooth  -  completely bony',
+  };
+
+  /* ── CARC Codes ────────────────────────────────────────── */
+  var CARC_CODES = [
+    {code:'CO-1',type:'CARC',desc:'Deductible amount',action:'Bill patient for deductible portion',severity:'info'},
+    {code:'CO-2',type:'CARC',desc:'Co-insurance amount',action:'Bill patient for co-insurance percentage',severity:'info'},
+    {code:'CO-4',type:'CARC',desc:'Service not covered by plan',action:'Verify CDT code. Appeal with medical necessity or write off.',severity:'high'},
+    {code:'CO-22',type:'CARC',desc:'Coordination of benefits',action:'Submit primary EOB with secondary claim',severity:'medium'},
+    {code:'CO-29',type:'CARC',desc:'Timely filing limit exceeded',action:'Submit proof of timely filing. Appeal immediately.',severity:'high'},
+    {code:'CO-45',type:'CARC',desc:'Fee exceeds fee schedule/maximum allowable',action:'Contractual write-off required. Do not bill patient.',severity:'info'},
+    {code:'CO-50',type:'CARC',desc:'Non-covered  -  not medically necessary',action:'Appeal with clinical notes, X-rays, and provider narrative',severity:'high'},
+    {code:'CO-57',type:'CARC',desc:'Prior authorization required',action:'Obtain retro auth or appeal. Submit justification.',severity:'high'},
+    {code:'CO-97',type:'CARC',desc:'Payment included in another service allowance',action:'Review bundling rules. Unbundle or submit with modifier.',severity:'medium'},
+    {code:'CO-119',type:'CARC',desc:'Annual benefit maximum reached',action:'Bill patient remainder. Check secondary insurance.',severity:'medium'},
+    {code:'CO-167',type:'CARC',desc:'Tooth not extracted per submitted records',action:'Submit clinical documentation. Correct DOS if needed.',severity:'high'},
+    {code:'PR-1',type:'RARC',desc:'Patient deductible',action:'Bill patient',severity:'info'},
+    {code:'PR-2',type:'RARC',desc:'Patient co-insurance',action:'Bill patient',severity:'info'},
+    {code:'N130',type:'RARC',desc:'Missing/invalid prior authorization',action:'Obtain authorization. Appeal with medical necessity.',severity:'high'},
+    {code:'N362',type:'RARC',desc:'Missing/invalid tooth number',action:'Correct tooth number and resubmit',severity:'medium'},
+  ];
+
+  /* ── Payer Directory ───────────────────────────────────── */
+  var PAYERS = [
+    {name:'Delta Dental',color:'#003087',phone:'1-800-765-6003',fax:'1-800-765-6004',portal:'deltadentalins.com',edi:'DDI',avgDays:14,denialRate:8,cleanClaim:94,script:'Open: "Hello, calling from [Practice] NPI [NPI] about claim [ID] for [NAME], DOB [DOB]." \n\nIf pending: "Can you confirm receipt and estimated processing date?" \n\nIf denied: "Please provide the specific CARC code and documentation needed for appeal."'},
+    {name:'Cigna',color:'#007F7F',phone:'1-800-244-6224',fax:'1-866-843-3908',portal:'cigna.com/providers',edi:'CIGNA',avgDays:18,denialRate:12,cleanClaim:91,script:'Open: "This is [Name] from [Practice], NPI [NPI]. Checking claim [ID] for member [NAME], ID [ID]." \n\nFor auth: "Auth [ID] submitted [DATE]  -  what is the expected decision?" \n\nTimely filing: "I have the clearinghouse confirmation  -  may I fax to [FAX]?"'},
+    {name:'Aetna',color:'#7D2248',phone:'1-800-282-4548',fax:'1-888-632-3862',portal:'aetna.com/providers',edi:'AETNA',avgDays:21,denialRate:15,cleanClaim:88,script:'Open: "Calling about claim [ID], member [NAME], ID [ID], Group [GROUP]." \n\nEligibility: "Please verify deductible met YTD, remaining max, and co-ins for CDT [CODE]." \n\nNote: Appeals must be submitted within 180 days of denial EOB.'},
+    {name:'United Healthcare',color:'#0072CE',phone:'1-877-842-3210',fax:'1-877-842-3211',portal:'uhcprovider.com',edi:'UHC',avgDays:16,denialRate:10,cleanClaim:93,script:'Open: "Calling about claim [ID] for [PATIENT] on plan [PLAN ID]." \n\nAt 30 days: "Submitted [DATE], timely filing is 90 days  -  confirm receipt and estimated payment date." \n\nPrior auth: "Auth [ID] submitted [DATE]  -  status and decision timeline?"'},
+    {name:'BlueCross BlueShield',color:'#003DA5',phone:'1-800-676-2583',fax:'1-800-676-2584',portal:'bcbs.com/providers',edi:'BCBS',avgDays:19,denialRate:11,cleanClaim:90,script:'Open: "Calling about claim [ID] for subscriber [NAME], ID [ID]." \n\nCOB: "Patient has secondary through [INSURER]  -  do you need the primary EOB before processing?" \n\nMedical necessity: "We have clinical notes from [DATE]  -  what additional documentation is needed?"'},
+    {name:'Humana',color:'#4CAF50',phone:'1-800-448-6262',fax:'1-855-778-0306',portal:'humana.com/providers',edi:'HUMANA',avgDays:17,denialRate:9,cleanClaim:92,script:'Open: "Calling about dental claim [ID] for member [NAME], Humana ID [ID]." \n\nUnapplied: "Remittance shows [AMT] but EOB shows [AMT2]  -  can you clarify and reprocess?" \n\nEligibility: "Verify coverage, annual max, used benefit, deductible status for CDT [CODE]."'},
+    {name:'MetLife',color:'#0047AB',phone:'1-800-638-5000',fax:'1-800-638-5001',portal:'metlife.com/providers',edi:'METLIFE',avgDays:20,denialRate:13,cleanClaim:89,script:'Open: "Calling about claim [ID] for [NAME], Group [GROUP], Certificate [CERT]." \n\nAlternate benefit: "Claim processed under alternate benefit  -  explain fee difference and what procedure was considered." \n\nMissing teeth: "Does the missing teeth clause apply? What is the waiting period?"'},
+    {name:'Guardian',color:'#8B0000',phone:'1-800-538-4047',fax:'1-800-538-4048',portal:'guardianlife.com/providers',edi:'GUARDIAN',avgDays:15,denialRate:7,cleanClaim:95,script:'Open: "Calling from [Practice], NPI [NPI], about claim [ID] for insured [NAME], ID [ID]." \n\nFrequency: "Denied for frequency  -  last [PROC] was [DATE], should be within the allowed period. Verify the plan frequency rule." \n\nClean claim: "Confirm receipt as clean, no missing fields, and provide estimated payment date."'},
+  ];
+
+  /* ── Settings ──────────────────────────────────────────── */
+  var SETTINGS = {
+    practice: {name:'Lux Dental Group',address:'123 Dental Ave, Los Angeles, CA 90001',phone:'(310) 555-0100',npi:'1234567890',taxId:'XX-XXXXXXX',logo:null},
+    locations: [
+      {id:'LOC1',name:'Main Office',address:'123 Dental Ave, Los Angeles, CA 90001',phone:'(310) 555-0100',active:true},
+      {id:'LOC2',name:'Beverly Hills',address:'456 Wilshire Blvd, Beverly Hills, CA 90210',phone:'(310) 555-0200',active:true},
+    ],
+    integrations: {clearinghouse:'Office Ally (mock)',pms:'Dentrix (mock)',eligibility:'Availity (mock)',payments:'Stripe (ready)'},
+    notifications: {emailAlerts:true,smsAlerts:false,denialAlert:true,arAlert:true,arThresholdDays:30},
+  };
+
+  /* ── Public API ────────────────────────────────────────── */
+  return {
+    COLORS: COLORS,
+    PATIENTS: PATIENTS,
+    APPOINTMENTS: APPOINTMENTS,
+    CLAIMS: CLAIMS,
+    ELIG_CACHE: ELIG_CACHE,
+    PRIOR_AUTHS: PRIOR_AUTHS,
+    USERS: USERS,
+    CDT_CODES: CDT_CODES,
+    CARC_CODES: CARC_CODES,
+    PAYERS: PAYERS,
+    SETTINGS: SETTINGS,
+    TODAY: TODAY,
+
+    // Helpers
+    getPatient: function(id){ return PATIENTS.find(function(p){return p.id===id;})||null; },
+    getClaims: function(patientId){ return patientId ? CLAIMS.filter(function(c){return c.patientId===patientId;}) : CLAIMS; },
+    getElig: function(patientId){ return ELIG_CACHE[patientId]||null; },
+    getPriorAuths: function(status){ return status ? PRIOR_AUTHS.filter(function(p){return p.status===status;}) : PRIOR_AUTHS; },
+    getTodayAppts: function(){ return APPOINTMENTS; },
+    getOpenClaims: function(){ return CLAIMS.filter(function(c){return ['Pending','Submitted','Partial'].includes(c.status);}); },
+    getDeniedClaims: function(){ return CLAIMS.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';}); },
+    getArSummary: function(){
+      var total=0,pending=0,denied=0,partial=0;
+      CLAIMS.forEach(function(c){ total+=c.balance||0; if(c.status==='Pending'||c.status==='Submitted') pending+=c.balance||0; if(c.status==='Denied'||c.status==='Under Appeal') denied+=c.balance||0; if(c.status==='Partial') partial+=c.balance||0; });
+      return {total:total,pending:pending,denied:denied,partial:partial};
+    },
+    fmt$: function(n){ n=parseFloat(n)||0; if(n>=1000000)return'$'+(n/1000000).toFixed(1)+'M'; if(n>=1000)return'$'+(n/1000).toFixed(1)+'K'; return'$'+n.toFixed(0); },
+    fmtDate: function(d){ if(!d)return'-'; var p=d.split('-'),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return m[+p[1]-1]+' '+(+p[2])+', '+p[0]; },
+    esc: function(s){ var e={'<':'&lt;','>':'&gt;','&':'&amp;'}; return String(s||'').replace(/[<>&]/g,function(c){return e[c]||c;}); },
+    age: function(dob){ if(!dob)return'?'; return Math.floor((Date.now()-new Date(dob))/(365.25*86400000))+'y'; },
+    today: function(){ return new Date().toISOString().slice(0,10); },
+    statusColor: function(s){
+      var m=s||''; if(m==='Paid'||m==='Completed'||m==='approved') return '#065F46'; if(m==='Submitted') return '#1D4ED8'; if(m==='Pending'||m==='pending') return '#92400E'; if(m==='Under Appeal') return '#5B21B6'; if(m==='Denied'||m==='denied') return '#991B1B'; if(m==='Partial') return '#854F0B'; return '#64748B';
+    },
+    statusBg: function(s){
+      var m=s||''; if(m==='Paid'||m==='Completed'||m==='approved') return '#ECFDF5'; if(m==='Submitted') return '#EFF6FF'; if(m==='Pending'||m==='pending') return '#FFFBEB'; if(m==='Under Appeal') return '#F5F3FF'; if(m==='Denied'||m==='denied') return '#FEF2F2'; if(m==='Partial') return '#FFFBEB'; return '#F1F5F9';
+    },
+  };
+})();
+
+var _claims = NexRCM.CLAIMS.slice();
+var currentUser = NexRCM.USERS.find(function(u){return u.role==='admin';})||{name:'Dr. Alan Reid',role:'admin'};
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.getElementById('sb-user-name').textContent = currentUser.name.split(' ').pop();
+  document.getElementById('sb-name2').textContent = currentUser.name;
+  document.getElementById('sb-avatar').textContent = currentUser.name[0];
+  var now = new Date();
+  var days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('topbar-date').textContent = days[now.getDay()]+', '+months[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+  renderNotifications();
+  go('dashboard');
+});
+
+var PAGE_TITLES = {
+  'dashboard':'Executive Dashboard','analytics':'Revenue Analytics',
+  'staff':'Staff Management','locations':'Locations and Offices',
+  'settings':'System Settings','audit-log':'Audit Log','insights':'AI Insights'
+};
+
+function go(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var pg=document.getElementById('page-'+page); if(pg) pg.classList.add('active');
+  document.querySelectorAll('.nav-item[data-page]').forEach(function(n){n.classList.remove('active');});
+  var nav=document.querySelector('[data-page="'+page+'"]'); if(nav) nav.classList.add('active');
+  var t=document.getElementById('page-title'); if(t) t.textContent=PAGE_TITLES[page]||page;
+  if(page==='dashboard') renderAdminDash();
+  if(page==='analytics') renderAnalytics();
+  if(page==='staff') renderStaff();
+  if(page==='locations') renderLocations();
+  if(page==='audit-log') renderAuditLog();
+  if(page==='insights') renderInsights();
+  if(page==='settings') renderSettings();
+}
+
+function daysSince(d){if(!d)return 0;return Math.floor((new Date(NexRCM.TODAY)-new Date(d))/(1000*60*60*24));}
+
+// ── Executive Dashboard ──────────────────────────────────
+function renderAdminDash(){
+  var totalBilled=_claims.reduce(function(s,c){return s+(c.billedAmt||0);},0);
+  var totalPaid=_claims.reduce(function(s,c){return s+(c.insurancePaid||0);},0);
+  var totalAR=_claims.reduce(function(s,c){return s+(c.balance||0);},0);
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var collRate=totalBilled>0?Math.round(totalPaid/totalBilled*100):0;
+  var denialRate=Math.round(denied.length/_claims.length*100);
+
+  var sg=document.getElementById('admin-stats');
+  if(sg) sg.innerHTML=[
+    {icon:'💰',label:'Total Revenue Collected',val:NexRCM.fmt$(totalPaid),sub:'This period',color:'#10B981'},
+    {icon:'📊',label:'Total AR Outstanding',val:NexRCM.fmt$(totalAR),sub:_claims.filter(function(c){return c.balance>0;}).length+' open claims',color:'#F59E0B'},
+    {icon:'✅',label:'Collection Rate',val:collRate+'%',sub:'Industry avg: 95-98%',color:collRate>=90?'#10B981':collRate>=80?'#F59E0B':'#EF4444'},
+    {icon:'❌',label:'Denial Rate',val:denialRate+'%',sub:denied.length+' claims denied',color:denialRate<=10?'#10B981':denialRate<=15?'#F59E0B':'#EF4444'},
+    {icon:'👥',label:'Active Patients',val:NexRCM.PATIENTS.filter(function(p){return p.status==='active';}).length,sub:'Total registered: '+NexRCM.PATIENTS.length,color:'#1A56FF'},
+    {icon:'📅',label:'Appts Today',val:NexRCM.APPOINTMENTS.length,sub:NexRCM.APPOINTMENTS.filter(function(a){return a.status==='completed';}).length+' completed',color:'#7C3AED'},
+  ].map(function(s){return'<div class="stat-card"><div class="stat-icon">'+s.icon+'</div><div class="stat-label">'+s.label+'</div><div class="stat-val" style="color:'+s.color+'">'+s.val+'</div><div class="stat-sub">'+s.sub+'</div></div>';}).join('');
+
+  renderRiskAlerts();
+  renderRecoverySection();
+  renderRevenueChart();
+  renderArAging();
+  renderActivityTimeline();
+  renderAiQuickAnalysis();
+
+  // Provider performance table - enhanced with avg reimbursement & clean claim rate
+  var provEl=document.getElementById('admin-providers');
+  if(provEl){
+    var provs={};
+    _claims.forEach(function(c){
+      if(!provs[c.provider])provs[c.provider]={name:c.provider,billed:0,paid:0,claims:0,denied:0,paidDays:[],payers:{}};
+      provs[c.provider].billed+=(c.billedAmt||0);
+      provs[c.provider].paid+=(c.insurancePaid||0);
+      provs[c.provider].claims++;
+      if(c.status==='Denied'||c.status==='Under Appeal')provs[c.provider].denied++;
+      if(c.paidDate&&c.submittedDate){var d=Math.floor((new Date(c.paidDate)-new Date(c.submittedDate))/(1000*60*60*24));if(d>0)provs[c.provider].paidDays.push(d);}
+      if(!provs[c.provider].payers[c.insurance])provs[c.provider].payers[c.insurance]=0;
+      provs[c.provider].payers[c.insurance]++;
+    });
+    var rows=Object.values(provs).sort(function(a,b){return b.billed-a.billed;});
+    // Calculate avg reimbursement days
+    rows.forEach(function(r){
+      r.avgDays=r.paidDays.length>0?Math.round(r.paidDays.reduce(function(s,d){return s+d;},0)/r.paidDays.length):18;
+      r.cleanRate=r.claims>0?Math.round(((r.claims-r.denied)/r.claims)*100):0;
+      r.topPayer=Object.keys(r.payers).sort(function(a,b){return r.payers[b]-r.payers[a];})[0]||'-';
+    });
+    provEl.innerHTML='<table style="width:100%;border-collapse:collapse">'
+      +'<thead><tr style="background:var(--bg);border-bottom:1px solid var(--border)">'
+      +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Provider</th>'
+      +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Claims</th>'
+      +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Billed</th>'
+      +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Collected</th>'
+      +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Coll. Rate</th>'
+      +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Avg Reimb.</th>'
+      +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Clean Claim</th>'
+      +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Denials</th>'
+      +'</tr></thead><tbody>'
+      +rows.map(function(r){
+        var rate=r.billed>0?Math.round(r.paid/r.billed*100):0;
+        return '<tr style="border-bottom:1px solid var(--border-light)" onmouseover="this.style.background=\'var(--bg)\'" onmouseout="this.style.background=\'\'">'
+          +'<td style="padding:11px 14px"><div style="font-weight:700">'+NexRCM.esc(r.name)+'</div><div style="font-size:11px;color:var(--muted);margin-top:1px">Top payer: '+NexRCM.esc(r.topPayer)+'</div></td>'
+          +'<td style="padding:11px 14px;text-align:right;color:var(--muted)">'+r.claims+'</td>'
+          +'<td style="padding:11px 14px;text-align:right;font-weight:600">'+NexRCM.fmt$(r.billed)+'</td>'
+          +'<td style="padding:11px 14px;text-align:right;font-weight:700;color:#10B981">'+NexRCM.fmt$(r.paid)+'</td>'
+          +'<td style="padding:11px 14px;text-align:right"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:40px;height:5px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;background:'+(rate>=80?'#10B981':'#F59E0B')+';border-radius:99px;width:'+rate+'%"></div></div><span style="font-weight:700;color:'+(rate>=80?'#10B981':'#F59E0B')+'">'+rate+'%</span></div></td>'
+          +'<td style="padding:11px 14px;text-align:right"><span style="font-weight:700;color:'+(r.avgDays<=14?'#10B981':r.avgDays<=21?'#F59E0B':'#EF4444')+'">'+r.avgDays+'d</span></td>'
+          +'<td style="padding:11px 14px;text-align:right"><span style="font-weight:700;color:'+(r.cleanRate>=90?'#10B981':r.cleanRate>=80?'#F59E0B':'#EF4444')+'">'+r.cleanRate+'%</span></td>'
+          +'<td style="padding:11px 14px;text-align:right;font-weight:700;color:'+(r.denied>1?'#EF4444':r.denied===1?'#F59E0B':'#10B981')+'">'+r.denied+'</td>'
+        +'</tr>';
+      }).join('')+'</tbody></table>';
+  }
+
+  // Location breakdown
+  var locEl=document.getElementById('admin-locations-snap');
+  if(locEl){
+    var locs={};
+    _claims.forEach(function(c){var p=NexRCM.getPatient(c.patientId);if(p){var l=p.provider||'Unknown';if(!locs[l])locs[l]={name:l,rev:0};locs[l].rev+=(c.insurancePaid||0);}});
+    locEl.innerHTML=NexRCM.SETTINGS.locations.map(function(loc){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border-light)">'
+        +'<div><div style="font-size:13px;font-weight:600">'+NexRCM.esc(loc.name)+'</div><div style="font-size:11.5px;color:var(--muted)">'+NexRCM.esc(loc.address)+'</div></div>'
+        +'<div style="text-align:right"><div style="font-size:14px;font-weight:700;color:#10B981">Active</div><div style="font-size:11px;color:var(--muted)">'+NexRCM.PATIENTS.length+' patients</div></div>'
+      +'</div>';
+    }).join('');
+  }
+}
+
+// ── Analytics ────────────────────────────────────────────
+var _analyticsTab='revenue';
+function setAnalyticsTab(tab,btn){
+  _analyticsTab=tab;
+  document.querySelectorAll('#analytics-tabs .btn').forEach(function(b){b.style.background='';b.style.color='';b.style.borderColor='';});
+  if(btn){btn.style.background='var(--brand)';btn.style.color='#fff';btn.style.borderColor='var(--brand)';}
+  renderAnalytics();
+}
+function renderAnalytics(){
+  var el=document.getElementById('analytics-content');if(!el)return;
+  if(_analyticsTab==='revenue')renderRevenueAnalytics(el);
+  else if(_analyticsTab==='payer')renderPayerAnalytics(el);
+  else if(_analyticsTab==='procedure')renderProcedureAnalytics(el);
+  else if(_analyticsTab==='denial')renderDenialAnalytics(el);
+}
+function renderRevenueAnalytics(el){
+  var totalBilled=_claims.reduce(function(s,c){return s+(c.billedAmt||0);},0);
+  var totalPaid=_claims.reduce(function(s,c){return s+(c.insurancePaid||0);},0);
+  var totalAR=_claims.reduce(function(s,c){return s+(c.balance||0);},0);
+  var patAR=NexRCM.PATIENTS.reduce(function(s,p){return s+(p.balance||0);},0);
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px">'
+    +'<div class="card" style="text-align:center;padding:28px"><div style="font-size:36px;font-weight:700;color:#10B981;margin-bottom:4px">'+NexRCM.fmt$(totalPaid)+'</div><div style="font-size:13px;color:var(--muted)">Total Collected</div><div style="font-size:11px;color:var(--muted);margin-top:4px">'+Math.round(totalPaid/totalBilled*100)+'% of $'+Math.round(totalBilled/1000)+'K billed</div></div>'
+    +'<div class="card" style="text-align:center;padding:28px"><div style="font-size:36px;font-weight:700;color:#F59E0B;margin-bottom:4px">'+NexRCM.fmt$(totalAR)+'</div><div style="font-size:13px;color:var(--muted)">Insurance AR</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Outstanding from payers</div></div>'
+    +'<div class="card" style="text-align:center;padding:28px"><div style="font-size:36px;font-weight:700;color:#EF4444;margin-bottom:4px">'+NexRCM.fmt$(patAR)+'</div><div style="font-size:13px;color:var(--muted)">Patient AR</div><div style="font-size:11px;color:var(--muted);margin-top:4px">Outstanding from patients</div></div>'
+  +'</div>'
+  +'<div class="card"><div class="card-header"><div class="card-title">Revenue by Provider</div><button class="btn btn-sm btn-outline" onclick="toast(\'Exported to CSV\',\'success\')">Export</button></div>'
+    +'<div id="an-provider-table"></div></div>';
+  var provs={};
+  _claims.forEach(function(c){if(!provs[c.provider])provs[c.provider]={billed:0,paid:0,claims:0,denied:0};provs[c.provider].billed+=(c.billedAmt||0);provs[c.provider].paid+=(c.insurancePaid||0);provs[c.provider].claims++;if(c.status==='Denied'||c.status==='Under Appeal')provs[c.provider].denied++;});
+  var rows=Object.values(provs).sort(function(a,b){return b.billed-a.billed;});
+  var maxBilled=Math.max.apply(null,rows.map(function(r){return r.billed;}));
+  var tbl=document.getElementById('an-provider-table');
+  if(tbl)tbl.innerHTML='<div style="display:flex;flex-direction:column;gap:12px;padding-top:8px">'+rows.map(function(r){var pct=Math.round(r.billed/maxBilled*100);var rate=r.billed>0?Math.round(r.paid/r.billed*100):0;return'<div><div style="display:flex;justify-content:space-between;margin-bottom:5px"><div><span style="font-size:13px;font-weight:600">'+NexRCM.esc(r.name)+'</span><span style="font-size:11.5px;color:var(--muted);margin-left:8px">'+r.claims+' claims</span></div><div style="text-align:right"><span style="font-size:13px;font-weight:700">'+NexRCM.fmt$(r.paid)+'</span><span style="font-size:11.5px;color:var(--muted);margin-left:6px">'+rate+'% collection</span></div></div><div style="height:8px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;background:var(--brand);border-radius:99px;width:'+pct+'%"></div></div></div>';}).join('')+'</div>';
+}
+function renderPayerAnalytics(el){
+  var payers={};
+  _claims.forEach(function(c){if(!payers[c.insurance])payers[c.insurance]={billed:0,paid:0,claims:0,denied:0,days:[]};payers[c.insurance].billed+=(c.billedAmt||0);payers[c.insurance].paid+=(c.insurancePaid||0);payers[c.insurance].claims++;if(c.status==='Denied'||c.status==='Under Appeal')payers[c.insurance].denied++;});
+  var rows=Object.entries(payers).sort(function(a,b){return b[1].billed-a[1].billed;});
+  el.innerHTML='<div class="card"><div class="card-header"><div class="card-title">Payer Performance</div></div>'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--bg);border-bottom:1px solid var(--border)"><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Payer</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Claims</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Billed</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Paid</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Pay Rate</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Denials</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Avg Days</th></tr></thead><tbody>'
+    +rows.map(function(e){var r=e[1];var rate=r.billed>0?Math.round(r.paid/r.billed*100):0;var pd=NexRCM.PAYERS.find(function(p){return p.name===e[0];});var ad=pd?pd.avgDays:18;return'<tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 14px;font-weight:600">'+NexRCM.esc(e[0])+'</td><td style="padding:11px 14px;text-align:right;color:var(--muted)">'+r.claims+'</td><td style="padding:11px 14px;text-align:right;font-weight:600">'+NexRCM.fmt$(r.billed)+'</td><td style="padding:11px 14px;text-align:right;font-weight:600;color:#10B981">'+NexRCM.fmt$(r.paid)+'</td><td style="padding:11px 14px;text-align:right"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:50px;height:5px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;background:'+(rate>=80?'#10B981':'#F59E0B')+';border-radius:99px;width:'+rate+'%"></div></div><span style="font-weight:700;color:'+(rate>=80?'#10B981':'#F59E0B')+'">'+rate+'%</span></div></td><td style="padding:11px 14px;text-align:right;font-weight:700;color:'+(r.denied>1?'#EF4444':'var(--text)')+'">'+r.denied+'</td><td style="padding:11px 14px;text-align:right;color:var(--muted)">'+ad+'d</td></tr>';}).join('')+'</tbody></table></div>';
+}
+function renderProcedureAnalytics(el){
+  var codes={};
+  _claims.forEach(function(c){(c.cdtCodes||'').split(',').forEach(function(cd){cd=cd.trim();if(!cd)return;if(!codes[cd])codes[cd]={code:cd,count:0,billed:0,paid:0,denied:0};codes[cd].count++;codes[cd].billed+=Math.round((c.billedAmt||0)/Math.max(1,(c.cdtCodes||'').split(',').length));codes[cd].paid+=Math.round((c.insurancePaid||0)/Math.max(1,(c.cdtCodes||'').split(',').length));if(c.status==='Denied')codes[cd].denied++;});});
+  var rows=Object.values(codes).sort(function(a,b){return b.billed-a.billed;}).slice(0,12);
+  el.innerHTML='<div class="card"><div class="card-header"><div class="card-title">Procedure Code Analytics (Top 12)</div></div>'
+    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--bg);border-bottom:1px solid var(--border)"><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">CDT Code</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Description</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Claims</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Revenue</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Avg/Claim</th><th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Denials</th></tr></thead><tbody>'
+    +rows.map(function(r){var avg=r.count>0?Math.round(r.billed/r.count):0;return'<tr style="border-bottom:1px solid var(--border-light)"><td style="padding:11px 14px"><span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--brand);background:var(--brand-light);padding:2px 8px;border-radius:5px">'+NexRCM.esc(r.code)+'</span></td><td style="padding:11px 14px;font-size:12.5px;color:var(--text2)">'+NexRCM.esc(NexRCM.CDT_CODES[r.code]||r.code)+'</td><td style="padding:11px 14px;text-align:right;color:var(--muted)">'+r.count+'</td><td style="padding:11px 14px;text-align:right;font-weight:600">'+NexRCM.fmt$(r.billed)+'</td><td style="padding:11px 14px;text-align:right;color:var(--text2)">'+NexRCM.fmt$(avg)+'</td><td style="padding:11px 14px;text-align:right;font-weight:700;color:'+(r.denied>0?'#EF4444':'#10B981')+'">'+r.denied+'</td></tr>';}).join('')+'</tbody></table></div>';
+}
+function renderDenialAnalytics(el){
+  var byPayer={};
+  _claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';}).forEach(function(c){if(!byPayer[c.insurance])byPayer[c.insurance]=0;byPayer[c.insurance]++;});
+  var byCode={};
+  _claims.forEach(function(c){if(c.denialCode){if(!byCode[c.denialCode])byCode[c.denialCode]=0;byCode[c.denialCode]++;}});
+  var total=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';}).length;
+  var deniedAmt=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';}).reduce(function(s,c){return s+(c.billedAmt||0);},0);
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+    +'<div class="card"><div class="card-header"><div class="card-title">Denials by Payer</div></div>'
+      +Object.entries(byPayer).sort(function(a,b){return b[1]-a[1];}).map(function(e){var pct=total>0?Math.round(e[1]/total*100):0;return'<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px"><span>'+NexRCM.esc(e[0])+'</span><span style="font-weight:700">'+e[1]+' denials</span></div><div style="height:7px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;background:#EF4444;border-radius:99px;width:'+pct+'%"></div></div></div>';}).join('')
+    +'</div>'
+    +'<div class="card"><div class="card-header"><div class="card-title">Key Metrics</div></div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'
+        +'<div style="background:var(--danger-bg);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:28px;font-weight:700;color:#EF4444">'+total+'</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Total Denials</div></div>'
+        +'<div style="background:var(--warning-bg);border-radius:var(--r);padding:14px;text-align:center"><div style="font-size:28px;font-weight:700;color:#F59E0B">'+NexRCM.fmt$(deniedAmt)+'</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Revenue at Risk</div></div>'
+      +'</div>'
+      +'<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px">Top Denial Codes</div>'
+      +Object.entries(byCode).sort(function(a,b){return b[1]-a[1];}).slice(0,5).map(function(e){var cd=NexRCM.CARC_CODES.find(function(c){return c.code===e[0];})||{};return'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px"><div><span style="font-family:monospace;font-weight:700;color:var(--brand)">'+NexRCM.esc(e[0])+'</span><span style="font-size:12px;color:var(--muted);margin-left:8px">'+NexRCM.esc(cd.desc||'')+'</span></div><span style="font-weight:700">'+e[1]+'</span></div>';}).join('')
+    +'</div>'
+  +'</div>';
+}
+
+// ── Staff ────────────────────────────────────────────────
+function renderStaff(){
+  var el=document.getElementById('staff-list');if(!el)return;
+  var roleColors={provider:'var(--purple)',billing:'var(--brand)',frontdesk:'#10B981',admin:'#F59E0B'};
+  var roleLabels={provider:'Provider',billing:'Billing',frontdesk:'Front Desk',admin:'Admin'};
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px">'
+    +NexRCM.USERS.map(function(u){return'<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-xs)">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
+        +'<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,'+(roleColors[u.role]||'var(--brand)')+','+((roleColors[u.role]||'var(--brand)')+'99')+');display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">'+u.name[0]+'</div>'
+        +'<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">'+NexRCM.esc(u.name)+'</div><div style="font-size:12px;color:var(--muted);margin-top:1px">'+NexRCM.esc(u.title)+'</div></div>'
+        +'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:'+(roleColors[u.role]||'var(--brand)')+'20;color:'+(roleColors[u.role]||'var(--brand)')+';border:1px solid '+(roleColors[u.role]||'var(--brand)')+'40">'+roleLabels[u.role]+'</span>'
+      +'</div>'
+      +'<div style="font-size:12.5px;color:var(--muted)">'+NexRCM.esc(u.email)+'</div>'
+      +(u.npi?'<div style="font-size:12px;color:var(--text2);margin-top:4px">NPI: '+NexRCM.esc(u.npi)+'</div>':'')
+      +'<div style="display:flex;gap:6px;margin-top:12px">'
+        +'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--success-bg);color:#065F46;border:1px solid var(--success-border)">Active</span>'
+        +(u.specialty?'<span style="font-size:10px;padding:2px 8px;border-radius:99px;background:var(--bg);color:var(--text2);border:1px solid var(--border)">'+NexRCM.esc(u.specialty)+'</span>':'')
+      +'</div>'
+    +'</div>';}).join('')+'</div>';
+}
+
+// ── Locations ────────────────────────────────────────────
+function renderLocations(){
+  var el=document.getElementById('locations-list');if(!el)return;
+  el.innerHTML=NexRCM.SETTINGS.locations.map(function(loc){
+    return '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;margin-bottom:12px;box-shadow:var(--shadow-xs)">'
+      +'<div style="display:flex;align-items:flex-start;gap:14px">'
+        +'<div style="width:44px;height:44px;border-radius:10px;background:var(--brand);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏥</div>'
+        +'<div style="flex:1">'
+          +'<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px">'+NexRCM.esc(loc.name)+'</div>'
+          +'<div style="font-size:13px;color:var(--muted);margin-bottom:8px">'+NexRCM.esc(loc.address)+'</div>'
+          +'<div style="font-size:13px;color:var(--text2)">'+NexRCM.esc(loc.phone)+'</div>'
+        +'</div>'
+        +'<span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--success-bg);color:#065F46;border:1px solid var(--success-border)">Active</span>'
+      +'</div>'
+      +'<div style="margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">'
+        +[['Patients',NexRCM.PATIENTS.length],['Providers',NexRCM.USERS.filter(function(u){return u.role==='provider';}).length],['Staff',NexRCM.USERS.length],['Claims',NexRCM.CLAIMS.length]]
+        .map(function(r){return'<div style="background:var(--bg);border-radius:var(--r);padding:10px;text-align:center"><div style="font-size:18px;font-weight:700;color:var(--brand)">'+r[1]+'</div><div style="font-size:11px;color:var(--muted);margin-top:2px">'+r[0]+'</div></div>';}).join('')
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+// ── Audit Log ────────────────────────────────────────────
+function renderAuditLog(){
+  var el=document.getElementById('audit-list');if(!el)return;
+  var entries=[];
+  NexRCM.CLAIMS.forEach(function(c){(c.auditLog||[]).forEach(function(l){entries.push({ts:l.ts,user:l.user,action:l.action,ref:c.id,patient:c.patient});});});
+  entries.sort(function(a,b){return b.ts.localeCompare(a.ts);});
+  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--bg);border-bottom:1px solid var(--border)"><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Time</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">User</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Action</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Patient</th><th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Claim</th></tr></thead><tbody>'
+    +entries.slice(0,30).map(function(e){return'<tr style="border-bottom:1px solid var(--border-light)"><td style="padding:10px 14px;font-size:12px;font-family:monospace;color:var(--muted)">'+NexRCM.esc(e.ts)+'</td><td style="padding:10px 14px;font-size:13px;font-weight:600">'+NexRCM.esc(e.user)+'</td><td style="padding:10px 14px;font-size:13px;color:var(--text2)">'+NexRCM.esc(e.action)+'</td><td style="padding:10px 14px;font-size:13px;color:var(--text2)">'+NexRCM.esc(e.patient||'')+'</td><td style="padding:10px 14px;font-family:monospace;font-size:12px;color:var(--brand)">'+NexRCM.esc(e.ref||'')+'</td></tr>';}).join('')+'</tbody></table>';
+}
+
+// ── AI Insights ──────────────────────────────────────────
+function renderInsights(){
+  var el=document.getElementById('insights-content');if(!el)return;
+  var ar=NexRCM.getArSummary();
+  var totalBilled=_claims.reduce(function(s,c){return s+(c.billedAmt||0);},0);
+  var totalPaid=_claims.reduce(function(s,c){return s+(c.insurancePaid||0);},0);
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var overdue=_claims.filter(function(c){return (c.status==='Pending'||c.status==='Submitted')&&daysSince(c.submittedDate)>30;});
+  var insights=[
+    {type:'risk',icon:'🚨',title:'High-risk denials',body:denied.length+' claims totaling '+NexRCM.fmt$(denied.reduce(function(s,c){return s+(c.billedAmt||0);},0))+' are in denied or under appeal status. '+(denied.length>2?'Consider bulk appeal submission to recover revenue.':'File individual appeals within 180 days.')},
+    {type:'opportunity',icon:'💡',title:'AR follow-up opportunity',body:overdue.length+' claims over 30 days with no response - totaling '+NexRCM.fmt$(overdue.reduce(function(s,c){return s+(c.balance||0);},0))+'. Proactive follow-up calls could recover this revenue. Consider automated payer follow-up.'},
+    {type:'trend',icon:'📊',title:'Collection rate trend',body:'Current collection rate is '+Math.round(totalPaid/totalBilled*100)+'%. '+((totalPaid/totalBilled)>=0.9?'Above industry average (85-90%). Maintain current billing practices.':'Below industry average. Focus on claim scrubbing and faster resubmission.')},
+    {type:'action',icon:'⚡',title:'Patient balance reminder',body:NexRCM.PATIENTS.filter(function(p){return(p.balance||0)>0;}).length+' patients with outstanding balances totaling '+NexRCM.fmt$(NexRCM.PATIENTS.reduce(function(s,p){return s+(p.balance||0);},0))+'. Sending automated statements could recover these balances.'},
+    {type:'positive',icon:'✅',title:'Clean claim performance',body:_claims.filter(function(c){return c.status==='Paid'&&daysSince(c.paidDate)<=14;}).length+' claims paid within 14 days - indicating strong clean claim submission rates. Continue current documentation standards.'},
+  ];
+  var ibg={risk:'#FEF2F2',opportunity:'#ECFDF5',trend:'#EFF6FF',action:'#F5F3FF',positive:'#ECFDF5'};
+  var ib={risk:'#FECACA',opportunity:'#A7F3D0',trend:'#BFDBFE',action:'#DDD6FE',positive:'#A7F3D0'};
+  var ic={risk:'#991B1B',opportunity:'#065F46',trend:'#1D4ED8',action:'#5B21B6',positive:'#065F46'};
+  var it={risk:'Risk',opportunity:'Opportunity',trend:'Trend',action:'Action Required',positive:'Positive'};
+
+  // Denial pattern analysis
+  var byCode={};var byPayer={};
+  _claims.filter(function(c){return c.denialCode;}).forEach(function(c){
+    if(!byCode[c.denialCode])byCode[c.denialCode]={code:c.denialCode,count:0,amt:0};
+    byCode[c.denialCode].count++;byCode[c.denialCode].amt+=(c.billedAmt||0);
+    if(!byPayer[c.insurance])byPayer[c.insurance]={name:c.insurance,denied:0,total:0};
+    byPayer[c.insurance].denied++;
+  });
+  _claims.forEach(function(c){if(!byPayer[c.insurance])byPayer[c.insurance]={name:c.insurance,denied:0,total:0};byPayer[c.insurance].total++;});
+  var topCodes=Object.values(byCode).sort(function(a,b){return b.count-a.count;}).slice(0,5);
+  var payerRows=Object.values(byPayer).sort(function(a,b){return b.denied-a.denied;});
+  var carc=NexRCM.CARC_CODES;
+
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:20px">'
+    +insights.map(function(i){return'<div style="border-radius:var(--r-lg);padding:16px 18px;border:1px solid '+ib[i.type]+';background:'+ibg[i.type]+';">'
+      +'<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:'+ic[i.type]+';margin-bottom:6px">'+i.icon+' '+it[i.type]+'</div>'
+      +'<div style="font-size:13.5px;font-weight:700;color:'+ic[i.type]+';margin-bottom:6px">'+NexRCM.esc(i.title)+'</div>'
+      +'<div style="font-size:12.5px;line-height:1.6;color:'+ic[i.type]+'">'+NexRCM.esc(i.body)+'</div>'
+    +'</div>';}).join('')
+  +'</div>'
+  +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">'
+    +'<div class="card"><div class="card-header"><div class="card-title">📊 Denial Pattern Analysis</div><span style="font-size:11px;color:var(--muted);background:var(--danger-bg);color:#991B1B;padding:2px 8px;border-radius:99px;border:1px solid var(--danger-border)">'+denied.length+' total denials</span></div>'
+      +(topCodes.length?topCodes.map(function(d){
+        var cd=carc.find(function(c){return c.code===d.code;})||{desc:'Unknown',action:'Review and appeal'};
+        var pct=_claims.length>0?Math.round(d.count/_claims.length*100):0;
+        return'<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
+          +'<div><span style="font-family:monospace;font-size:12px;font-weight:700;color:var(--danger);background:var(--danger-bg);padding:1px 6px;border-radius:4px">'+d.code+'</span><span style="font-size:12px;color:var(--muted);margin-left:6px">'+NexRCM.esc(cd.desc)+'</span></div>'
+          +'<span style="font-size:12.5px;font-weight:700">'+d.count+' ('+NexRCM.fmt$(d.amt)+')</span>'
+          +'</div>'
+          +'<div style="height:5px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--danger);border-radius:99px"></div></div>'
+          +'<div style="font-size:11px;color:var(--muted);margin-top:3px">Fix: '+NexRCM.esc(cd.action)+'</div>'
+        +'</div>';
+      }).join(''):'<div style="text-align:center;padding:24px;color:var(--muted)">No denial codes on file</div>')
+    +'</div>'
+    +'<div class="card"><div class="card-header"><div class="card-title">🏦 Payer Denial Rates</div></div>'
+      +payerRows.map(function(p){
+        var rate=p.total>0?Math.round(p.denied/p.total*100):0;
+        var pd=NexRCM.PAYERS.find(function(x){return x.name===p.name;})||{avgDays:18,cleanClaim:90};
+        return'<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border-light)">'
+          +'<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+NexRCM.esc(p.name)+'</div><div style="font-size:11px;color:var(--muted)">Avg pay: '+pd.avgDays+'d · Clean claim: '+pd.cleanClaim+'%</div></div>'
+          +'<div style="text-align:right"><div style="font-size:13px;font-weight:700;color:'+(rate>15?'#EF4444':rate>8?'#F59E0B':'#10B981')+'">'+rate+'% denials</div><div style="font-size:11px;color:var(--muted)">'+p.denied+' of '+p.total+' claims</div></div>'
+        +'</div>';
+      }).join('')
+    +'</div>'
+  +'</div>'
+  +'<div class="card"><div class="card-header"><div class="card-title">Weekly Performance Report</div><button class="btn btn-sm btn-outline" onclick="toast(\'Weekly summary emailed to practice owner\',\'success\')">📧 Email Report</button><button class="btn btn-sm btn-outline" onclick="toast(\'Report exported to PDF\',\'success\')">📄 Export PDF</button></div>'
+    +'<div style="font-size:13.5px;line-height:1.9;color:var(--text2);background:var(--bg);border-radius:var(--r);padding:16px;border:1px solid var(--border);white-space:pre-line;font-family:monospace">'
+      +'WEEKLY RCM PERFORMANCE SUMMARY\n'
+      +'Week of '+NexRCM.fmtDate(NexRCM.TODAY)+'\n'
+      +'======================================\n\n'
+      +'REVENUE:\n'
+      +'  Total billed this period:    '+NexRCM.fmt$(totalBilled)+'\n'
+      +'  Insurance collected:         '+NexRCM.fmt$(totalPaid)+'\n'
+      +'  Collection rate:             '+Math.round(totalPaid/totalBilled*100)+'%\n'
+      +'  Outstanding AR:              '+NexRCM.fmt$(ar.total)+'\n\n'
+      +'CLAIMS:\n'
+      +'  Total claims:                '+_claims.length+'\n'
+      +'  Paid:                        '+_claims.filter(function(c){return c.status==='Paid';}).length+'\n'
+      +'  Pending / Submitted:         '+_claims.filter(function(c){return c.status==='Pending'||c.status==='Submitted';}).length+'\n'
+      +'  Denied / Under Appeal:       '+denied.length+'\n'
+      +'  Partial:                     '+_claims.filter(function(c){return c.status==='Partial';}).length+'\n\n'
+      +'DENIAL ANALYSIS:\n'
+      +'  Denial rate:                 '+Math.round(denied.length/_claims.length*100)+'%\n'
+      +'  Top denial code:             '+(topCodes.length?topCodes[0].code+' ('+topCodes[0].count+' times)':'None')+'\n'
+      +'  Revenue at risk:             '+NexRCM.fmt$(denied.reduce(function(s,c){return s+(c.billedAmt||0);},0))+'\n\n'
+      +'TOP PRIORITY ACTIONS:\n'
+      +'  1. '+denied.length+' denied claims need appeals filed within 180 days\n'
+      +'  2. '+overdue.length+' claims past 30 days - follow up with payers\n'
+      +'  3. '+NexRCM.PATIENTS.filter(function(p){return(p.balance||0)>0;}).length+' patients with outstanding patient balances\n\n'
+      +'Generated by NexRCM AI · '+new Date().toLocaleString()
+    +'</div>'
+  +'</div>';
+}
+
+// ── Settings ─────────────────────────────────────────────
+function renderSettings(){
+  var el=document.getElementById('settings-content');if(!el)return;
+  var s=NexRCM.SETTINGS;
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">'
+    +'<div>'
+      +'<div class="card" style="margin-bottom:16px">'
+        +'<div class="card-header"><div class="card-title">Practice Information</div></div>'
+        +[['Practice Name',s.practice.name],['Address',s.practice.address],['Phone',s.practice.phone],['NPI',s.practice.npi],['Tax ID',s.practice.taxId]]
+        .map(function(r){return'<div style="margin-bottom:12px"><div style="font-size:11px;color:var(--muted);margin-bottom:3px">'+r[0]+'</div><div style="font-size:13.5px;font-weight:500;padding:8px 12px;background:var(--bg);border-radius:var(--r);border:1px solid var(--border)">'+NexRCM.esc(r[1])+'</div></div>';}).join('')
+        +'<button class="btn btn-outline" style="margin-top:8px" onclick="toast(\'Practice information updated\',\'success\')">Save Changes</button>'
+      +'</div>'
+      +'<div class="card">'
+        +'<div class="card-header"><div class="card-title">Notifications</div></div>'
+        +[['Email Alerts',s.notifications.emailAlerts],['SMS Alerts',s.notifications.smsAlerts],['Denial Alerts',s.notifications.denialAlert],['AR Alerts',s.notifications.arAlert]]
+        .map(function(r){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-light)"><div style="font-size:13.5px;font-weight:500">'+r[0]+'</div><div style="width:40px;height:22px;border-radius:11px;background:'+(r[1]?'var(--brand)':'var(--border)')+';cursor:pointer;position:relative" onclick="this.style.background=this.style.background===\'var(--brand)\'?\'var(--border)\':\' var(--brand)\';toast(\'Notification setting updated\',\'success\')"><div style="position:absolute;top:3px;left:'+(r[1]?'20':'3')+'px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s"></div></div></div>';}).join('')
+      +'</div>'
+    +'</div>'
+    +'<div>'
+      +'<div class="card" style="margin-bottom:16px">'
+        +'<div class="card-header"><div class="card-title">Integrations</div></div>'
+        +Object.entries(s.integrations).map(function(e){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border-light)"><div><div style="font-size:13px;font-weight:600;text-transform:capitalize">'+NexRCM.esc(e[0].replace(/([A-Z])/g,' $1').trim())+'</div><div style="font-size:12px;color:var(--muted);margin-top:1px">'+NexRCM.esc(e[1])+'</div></div><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--success-bg);color:#065F46;border:1px solid var(--success-border)">Connected</span></div>';}).join('')
+        +'<button class="btn btn-outline" style="margin-top:12px" onclick="toast(\'Integration settings saved\',\'success\')">Manage Integrations</button>'
+      +'</div>'
+      +'<div class="card">'
+        +'<div class="card-header"><div class="card-title">HIPAA Compliance</div></div>'
+        +[['BAA with Google/Firebase','Signed'],['Encryption at Rest','Enabled'],['Encryption in Transit','Enabled (TLS 1.3)'],['Audit Log Retention','7 years'],['Data Backup','Daily automated'],['Last Security Review','2026-01-15']]
+        .map(function(r){return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span style="color:var(--text2)">'+r[0]+'</span><span style="font-weight:600;color:#10B981">'+r[1]+'</span></div>';}).join('')
+      +'</div>'
+    +'</div>'
+  +'</div>';
+}
+
+// ── GLOBAL SEARCH ────────────────────────────────────────
+function globalSearch(q){
+  var dd=document.getElementById('search-results-dd');
+  if(!q||q.length<2){dd.classList.remove('open');return;}
+  q=q.toLowerCase();
+  var patients=NexRCM.PATIENTS.filter(function(p){return (p.first+' '+p.last).toLowerCase().includes(q)||p.memberId.toLowerCase().includes(q);}).slice(0,4);
+  var claims=_claims.filter(function(c){return c.patient.toLowerCase().includes(q)||c.id.toLowerCase().includes(q)||c.insurance.toLowerCase().includes(q);}).slice(0,4);
+  var providers=NexRCM.USERS.filter(function(u){return u.name.toLowerCase().includes(q)||(u.specialty||'').toLowerCase().includes(q);}).slice(0,3);
+  var html='';
+  if(patients.length){
+    html+='<div class="search-section-label">👤 Patients</div>';
+    html+=patients.map(function(p){return'<div class="search-item" onclick="toast(\'Patient: '+p.first+' '+p.last+'\',\'info\')"><div class="search-item-icon">👤</div><div><div class="search-item-name">'+p.first+' '+p.last+'</div><div class="search-item-sub">'+p.insurance+' · DOB '+p.dob+'</div></div></div>';}).join('');
+  }
+  if(claims.length){
+    html+='<div class="search-section-label">📋 Claims</div>';
+    html+=claims.map(function(c){return'<div class="search-item" onclick="toast(\'Claim '+c.id+': '+c.status+'\',\'info\')"><div class="search-item-icon">📋</div><div><div class="search-item-name">'+c.id+' – '+c.patient+'</div><div class="search-item-sub">'+c.insurance+' · '+NexRCM.fmt$(c.billedAmt)+' · '+c.status+'</div></div></div>';}).join('');
+  }
+  if(providers.length){
+    html+='<div class="search-section-label">🏥 Providers</div>';
+    html+=providers.map(function(u){return'<div class="search-item" onclick="go(\'staff\')"><div class="search-item-icon">🏥</div><div><div class="search-item-name">'+u.name+'</div><div class="search-item-sub">'+u.title+(u.specialty?' · '+u.specialty:'')+'</div></div></div>';}).join('');
+  }
+  if(!html)html='<div style="padding:16px;text-align:center;font-size:13px;color:var(--muted)">No results found</div>';
+  dd.innerHTML=html;
+  dd.classList.add('open');
+}
+
+// ── NOTIFICATIONS ────────────────────────────────────────
+var _notifications=[
+  {id:1,icon:'🚫',title:'Claim Denied',msg:'CLM003 – Maria Garcia denied by Aetna (CO-50)',time:'2 min ago',unread:true},
+  {id:2,icon:'⚠️',title:'Insurance Verification Missing',msg:'6 patients need eligibility verification before appointment',time:'15 min ago',unread:true},
+  {id:3,icon:'💰',title:'High Value Claim Unpaid',msg:'CLM008 – David Kim ($1,900) past 90 days – immediate action needed',time:'1 hr ago',unread:true},
+  {id:4,icon:'📊',title:'AR Threshold Alert',msg:'Total AR exceeded $12,000 threshold. Review outstanding claims.',time:'3 hr ago',unread:true},
+  {id:5,icon:'✅',title:'ERA Posted',msg:'CLM009 – Patricia Brown: $3,600 paid by United Healthcare',time:'Yesterday',unread:false},
+  {id:6,icon:'📋',title:'Prior Auth Expiring',msg:'PA001 – Sarah Johnson auth expires in 30 days',time:'Yesterday',unread:false},
+];
+function renderNotifications(){
+  var list=document.getElementById('notif-list');if(!list)return;
+  list.innerHTML=_notifications.map(function(n){
+    return'<div class="notif-item'+(n.unread?' unread':'')+'" onclick="markRead('+n.id+')">'
+      +'<div class="notif-icon">'+n.icon+'</div>'
+      +'<div style="flex:1"><div class="notif-title">'+n.title+'</div><div class="notif-msg">'+n.msg+'</div><div class="notif-time">'+n.time+'</div></div>'
+      +(n.unread?'<div style="width:7px;height:7px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:4px"></div>':'')
+    +'</div>';
+  }).join('')+'<div style="padding:10px 16px;text-align:center"><button class="btn btn-ghost btn-sm" onclick="toast(\'Viewing all notifications\',\'info\');toggleNotifications()">View All Notifications</button></div>';
+  var unread=_notifications.filter(function(n){return n.unread;}).length;
+  var ind=document.getElementById('notif-indicator');
+  if(ind)ind.style.display=unread>0?'block':'none';
+}
+function toggleNotifications(){
+  var dd=document.getElementById('notif-dropdown');
+  dd.classList.toggle('open');
+  renderNotifications();
+  document.addEventListener('click',function outsideClick(e){if(!dd.contains(e.target)&&e.target.id!=='notif-btn'){dd.classList.remove('open');document.removeEventListener('click',outsideClick);}});
+}
+function markRead(id){_notifications=_notifications.map(function(n){return n.id===id?Object.assign({},n,{unread:false}):n;});renderNotifications();}
+function markAllRead(){_notifications=_notifications.map(function(n){return Object.assign({},n,{unread:false});});renderNotifications();toast('All notifications marked as read','success');}
+
+// ── DEMO DATA GENERATOR ──────────────────────────────────
+var _demoGenerated=false;
+function generateDemoData(){
+  var btn=document.getElementById('gen-demo-btn');
+  if(btn){btn.innerHTML='<span class="spinner"></span> Generating...';btn.disabled=true;}
+  setTimeout(function(){
+    // Add 50 demo patients
+    var firstNames=['Alex','Jordan','Taylor','Morgan','Casey','Riley','Avery','Quinn','Blake','Dakota','Sage','River','Skyler','Cameron','Reese'];
+    var lastNames=['Williams','Martinez','Brown','Davis','Miller','Wilson','Moore','Anderson','Thomas','Jackson','White','Harris','Lewis','Clark','Robinson'];
+    var insurers=['Delta Dental','Cigna','Aetna','United Healthcare','BlueCross BlueShield','Humana','MetLife','Guardian'];
+    var baseId=NexRCM.PATIENTS.length+1;
+    for(var i=0;i<38;i++){
+      var fn=firstNames[i%firstNames.length];var ln=lastNames[Math.floor(i/firstNames.length)%lastNames.length];
+      NexRCM.PATIENTS.push({id:'DP'+(baseId+i),first:fn,last:ln,dob:'199'+(i%10)+'-0'+(1+(i%9))+'-'+(10+(i%15)),gender:i%2===0?'F':'M',phone:'(310) 555-'+String(1000+i),email:fn.toLowerCase()+'.'+ln.toLowerCase()+'@email.com',insurance:insurers[i%insurers.length],memberId:'GEN-'+(100000+i),balance:i%5===0?Math.round(Math.random()*500):0,totalBilled:Math.round(3000+Math.random()*8000),totalPaid:Math.round(2500+Math.random()*6000),status:'active',lastVisit:'2026-0'+(1+i%2)+'-'+(10+i%15),provider:'Dr. Martinez'});
+    }
+    // Add 108 demo claims
+    var statuses=['Paid','Paid','Paid','Paid','Pending','Submitted','Denied','Partial'];
+    var cdts=['D0120','D1110','D2740','D2391','D4341','D3330','D6010','D7240'];
+    for(var j=0;j<108;j++){
+      var pid='DP'+(baseId+(j%38));var billed=Math.round(300+Math.random()*2000);var ins=insurers[j%insurers.length];var st=statuses[j%statuses.length];var paid=st==='Paid'?Math.round(billed*0.8):st==='Partial'?Math.round(billed*0.4):0;
+      _claims.push({id:'DCLM'+(j+1),patientId:pid,patient:firstNames[(j%38)%firstNames.length]+' '+lastNames[Math.floor((j%38)/firstNames.length)%lastNames.length],provider:'Dr. Martinez',dos:'2026-0'+(1+j%2)+'-'+(10+j%15),insurance:ins,cdtCodes:cdts[j%cdts.length],procedures:'Demo Procedure',billedAmt:billed,allowedAmt:Math.round(billed*0.9),insurancePaid:paid,patientResp:st==='Paid'?Math.round(billed*0.1):0,postedAmt:paid,balance:billed-paid,status:st,submittedDate:'2026-0'+(1+j%2)+'-'+(1+j%9),paidDate:st==='Paid'?'2026-0'+(1+j%2)+'-'+(15+j%12):null,eraReceived:st==='Paid',denialCode:st==='Denied'?['CO-50','CO-4','CO-57','CO-29'][j%4]:'',appealStatus:'',auditLog:[]});
+    }
+    _demoGenerated=true;
+    if(btn){btn.innerHTML='✅ Demo Data Active';btn.style.background='var(--success)';btn.style.color='#fff';btn.style.borderColor='var(--success)';}
+    renderAdminDash();
+    toast('Demo data generated!','success','50 patients, 120 claims, 20 denials loaded');
+  },1800);
+}
+
+// ── REVENUE RECOVERY SECTION ─────────────────────────────
+function renderRecoverySection(){
+  var el=document.getElementById('recovery-section');if(!el)return;
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var partial=_claims.filter(function(c){return c.status==='Partial';});
+  var pending=_claims.filter(function(c){return c.status==='Pending'||c.status==='Submitted';});
+  var deniedAmt=denied.reduce(function(s,c){return s+(c.billedAmt||0);},0);
+  var underpaid=partial.reduce(function(s,c){return s+(c.balance||0);},0);
+  var pendingAmt=pending.filter(function(c){return daysSince(c.submittedDate)>45;}).reduce(function(s,c){return s+(c.balance||0);},0);
+  var total=deniedAmt+underpaid+pendingAmt;
+  el.innerHTML='<div class="recovery-card" style="margin-bottom:16px">'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px"><div style="font-size:20px">🤖</div><div><div style="font-size:14px;font-weight:700;color:#fff">AI Detected Recoverable Revenue</div><div style="font-size:11.5px;color:rgba(255,255,255,0.5)">Based on claim analysis and payer patterns</div></div><div style="margin-left:auto;background:rgba(255,255,255,0.1);padding:3px 10px;border-radius:99px;font-size:11px;color:rgba(255,255,255,0.6)">Live Analysis</div></div>'
+    +'<div class="recovery-row"><span style="font-size:13px;color:rgba(255,255,255,0.7)">🚫 Denied Claims</span><span style="font-size:15px;font-weight:700;color:#FCA5A5">'+NexRCM.fmt$(deniedAmt)+'</span></div>'
+    +'<div class="recovery-row"><span style="font-size:13px;color:rgba(255,255,255,0.7)">📉 Underpaid Claims</span><span style="font-size:15px;font-weight:700;color:#FDE68A">'+NexRCM.fmt$(underpaid)+'</span></div>'
+    +'<div class="recovery-row"><span style="font-size:13px;color:rgba(255,255,255,0.7)">⏳ Unsubmitted / Stale</span><span style="font-size:15px;font-weight:700;color:#93C5FD">'+NexRCM.fmt$(pendingAmt)+'</span></div>'
+    +'<div class="recovery-row"><span style="font-size:14px;font-weight:700;color:#fff">💎 Total Recoverable Revenue</span><span style="font-size:20px;font-weight:800;color:#6EE7B7">'+NexRCM.fmt$(total)+'</span></div>'
+    +'<div style="margin-top:14px;display:flex;gap:8px">'
+      +'<button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.2)" onclick="go(\'insights\')">View Full Analysis</button>'
+      +'<button class="btn btn-sm" style="background:#10B981;color:#fff;border-color:#10B981" onclick="toast(\'Recovery workflow started for '+denied.length+' denied claims\',\'success\')">Start Recovery Workflow</button>'
+    +'</div>'
+  +'</div>';
+}
+
+// ── RISK ALERTS BANNER ───────────────────────────────────
+function renderRiskAlerts(){
+  var el=document.getElementById('risk-alerts-banner');if(!el)return;
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var atRisk=_claims.filter(function(c){return c.status==='Pending'&&daysSince(c.submittedDate)>25;});
+  var missingElig=NexRCM.PATIENTS.filter(function(p){var e=NexRCM.getElig(p.id);return !e;}).length;
+  if(!denied.length&&!atRisk.length)return;
+  var alerts=[
+    {type:'danger',icon:'🚨',msg:denied.length+' claims likely to lapse - file appeals within 30 days'},
+    {type:'warning',icon:'💸',msg:NexRCM.fmt$(atRisk.reduce(function(s,c){return s+(c.balance||0);},0))+' revenue at risk from stale pending claims'},
+    {type:'info',icon:'🔍',msg:'Insurance verification missing for '+Math.max(missingElig,6)+' patients this week'},
+  ];
+  el.innerHTML='<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'
+    +alerts.map(function(a){var colors={danger:['#FEF2F2','#FECACA','#991B1B'],warning:['#FFFBEB','#FDE68A','#92400E'],info:['#EFF6FF','#BFDBFE','#1D4ED8']};var c=colors[a.type];return'<div class="risk-alert" style="flex:1;min-width:200px;background:'+c[0]+';border-color:'+c[1]+';"><span style="font-size:18px">'+a.icon+'</span><div style="flex:1"><div style="font-size:12.5px;font-weight:600;color:'+c[2]+'">'+a.msg+'</div></div><button class="btn btn-sm" style="background:'+c[0]+';color:'+c[2]+';border-color:'+c[1]+'" onclick="toast(\'Reviewing alert\',\'info\')">Review →</button></div>';}).join('')
+  +'</div>';
+}
+
+// ── REVENUE TREND CHART ──────────────────────────────────
+function renderRevenueChart(){
+  var el=document.getElementById('revenue-chart');if(!el)return;
+  var months=['Oct','Nov','Dec','Jan','Feb','Mar'];
+  var revenue=[84200,91500,88300,97800,103400,118200];
+  var successRate=[88,91,89,93,94,96];
+  var denialRate=[14,12,13,10,9,8];
+  var maxR=Math.max.apply(null,revenue);
+  el.innerHTML='<div style="display:flex;gap:24px;margin-bottom:16px">'
+    +'<div><div style="font-size:11px;color:var(--muted);margin-bottom:2px">Avg Monthly Revenue</div><div style="font-size:18px;font-weight:700;color:var(--brand)">'+NexRCM.fmt$(revenue.reduce(function(a,b){return a+b})/revenue.length)+'</div></div>'
+    +'<div><div style="font-size:11px;color:var(--muted);margin-bottom:2px">Claim Success Rate</div><div style="font-size:18px;font-weight:700;color:#10B981">'+successRate[successRate.length-1]+'%</div></div>'
+    +'<div><div style="font-size:11px;color:var(--muted);margin-bottom:2px">Current Denial Rate</div><div style="font-size:18px;font-weight:700;color:#F59E0B">'+denialRate[denialRate.length-1]+'%</div></div>'
+  +'</div>'
+  +'<div style="display:flex;align-items:flex-end;gap:8px;height:100px;padding-bottom:20px;position:relative">'
+    +months.map(function(m,i){
+      var h=Math.round(revenue[i]/maxR*90);
+      return'<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">'
+        +'<div style="font-size:9.5px;font-weight:700;color:var(--text2)">$'+(revenue[i]/1000).toFixed(0)+'K</div>'
+        +'<div style="width:100%;height:'+h+'px;background:'+(i===months.length-1?'var(--brand)':'#BFDBFE')+';border-radius:6px 6px 0 0;transition:height 0.5s ease;cursor:pointer" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" title="'+m+': $'+revenue[i].toLocaleString()+'"></div>'
+        +'<div style="font-size:10.5px;color:var(--muted)">'+m+'</div>'
+      +'</div>';
+    }).join('')
+  +'</div>';
+}
+
+// ── AR AGING VISUALIZATION ───────────────────────────────
+function renderArAging(){
+  var el=document.getElementById('ar-aging-visual');if(!el)return;
+  var aged={d30:0,d60:0,d90:0,d90p:0};
+  _claims.filter(function(c){return c.balance>0;}).forEach(function(c){
+    var d=daysSince(c.submittedDate);
+    if(d<=30)aged.d30+=(c.balance||0);
+    else if(d<=60)aged.d60+=(c.balance||0);
+    else if(d<=90)aged.d90+=(c.balance||0);
+    else aged.d90p+=(c.balance||0);
+  });
+  var total=aged.d30+aged.d60+aged.d90+aged.d90p||1;
+  var segs=[
+    {label:'0-30 days',val:aged.d30,color:'#10B981',pct:aged.d30/total*100},
+    {label:'31-60 days',val:aged.d60,color:'#F59E0B',pct:aged.d60/total*100},
+    {label:'61-90 days',val:aged.d90,color:'#F97316',pct:aged.d90/total*100},
+    {label:'90+ days',val:aged.d90p,color:'#EF4444',pct:aged.d90p/total*100},
+  ];
+  el.innerHTML='<div style="margin-bottom:12px;font-size:22px;font-weight:700;color:var(--text)">'+NexRCM.fmt$(total)+'<span style="font-size:13px;font-weight:500;color:var(--muted);margin-left:8px">Total AR</span></div>'
+    +'<div class="aging-bar-wrap">'
+      +segs.map(function(s){return'<div class="aging-segment" style="width:'+s.pct+'%;background:'+s.color+'" title="'+s.label+': '+NexRCM.fmt$(s.val)+'"></div>';}).join('')
+    +'</div>'
+    +'<div class="aging-legend">'
+      +segs.map(function(s){return'<div class="aging-legend-item"><div class="aging-dot" style="background:'+s.color+'"></div><span>'+s.label+' · '+NexRCM.fmt$(s.val)+'</span></div>';}).join('')
+    +'</div>'
+    +'<div style="margin-top:16px">'
+      +segs.map(function(s){return'<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span style="color:var(--text2)">'+s.label+'</span><div style="text-align:right"><span style="font-weight:700">'+NexRCM.fmt$(s.val)+'</span><span style="color:var(--muted);font-size:11.5px;margin-left:6px">'+s.pct.toFixed(0)+'%</span></div></div>';}).join('')
+    +'</div>';
+}
+
+// ── ACTIVITY TIMELINE ────────────────────────────────────
+function renderActivityTimeline(){
+  var el=document.getElementById('activity-timeline');if(!el)return;
+  var events=[];
+  _claims.forEach(function(c){(c.auditLog||[]).forEach(function(l){events.push({ts:l.ts,action:l.action,ref:c.id,patient:c.patient,type:l.action.includes('Paid')||l.action.includes('paid')?'success':l.action.includes('Denied')||l.action.includes('denied')?'danger':l.action.includes('Appeal')||l.action.includes('appeal')?'warning':'info'});});});
+  events.push({ts:'2026-03-17',action:'Patient Amanda Foster checked in',ref:'APT003',patient:'Amanda Foster',type:'info'});
+  events.push({ts:'2026-03-17',action:'Appointment completed – Sarah Johnson',ref:'APT001',patient:'Sarah Johnson',type:'success'});
+  events.push({ts:'2026-03-16',action:'AI flagged 3 claims for denial risk',ref:'AI',patient:'',type:'warning'});
+  events.sort(function(a,b){return b.ts.localeCompare(a.ts);});
+  var colors={success:'#10B981',danger:'#EF4444',warning:'#F59E0B',info:'#3B82F6'};
+  el.innerHTML=events.slice(0,10).map(function(e){
+    return'<div class="timeline-item">'
+      +'<div class="timeline-dot" style="background:'+colors[e.type]+'"></div>'
+      +'<div class="timeline-content"><div class="timeline-action">'+NexRCM.esc(e.action)+'</div>'
+      +'<div class="timeline-meta">'+NexRCM.esc(e.ts)+(e.patient?' · '+NexRCM.esc(e.patient):'')+(e.ref&&e.ref!=='AI'?' · <span style="font-family:monospace;color:var(--brand)">'+e.ref+'</span>':'')+'</div>'
+      +'</div></div>';
+  }).join('')+'<div style="padding:8px 0;text-align:center"><button class="btn btn-ghost btn-sm" onclick="go(\'audit-log\')" style="font-size:11.5px">View Full Audit Log →</button></div>';
+}
+
+// ── AI QUICK ANALYSIS CARD ───────────────────────────────
+function renderAiQuickAnalysis(){
+  var el=document.getElementById('ai-quick-analysis');if(!el)return;
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var paid=_claims.filter(function(c){return c.status==='Paid';});
+  var rate=_claims.length>0?Math.round(paid.length/_claims.length*100):0;
+  var tips=[
+    '🎯 Collection rate is '+rate+'%. '+(rate>=90?'Excellent – above industry average.':'Focus on denial prevention to improve.'),
+    '📋 '+denied.length+' claims in denied status. Bulk appeal submission recommended.',
+    '⚡ '+_claims.filter(function(c){return c.status==='Pending'&&daysSince(c.submittedDate)>20;}).length+' claims pending over 20 days – proactive follow-up can prevent timely filing issues.',
+    '💡 Top denial code: CO-50 (medical necessity) – ensure clinical notes attached to all major procedure claims.',
+    '✅ Preventive services show highest clean claim rate (98%). Consider protocol review for major procedures.',
+  ];
+  el.innerHTML=tips.map(function(t){return'<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-light);font-size:13px;color:var(--text2);line-height:1.5">'+t+'</div>';}).join('')
+    +'<div style="margin-top:12px"><button class="btn btn-outline btn-sm" onclick="go(\'insights\')">Full AI Report →</button></div>';
+}
+
+// ── AI FLOATING ASSISTANT ────────────────────────────────
+var _aiOpen=false;
+var _aiHistory=[];
+function toggleAI(){
+  _aiOpen=!_aiOpen;
+  var box=document.getElementById('ai-chat-box');
+  if(_aiOpen){box.classList.add('open');if(!_aiHistory.length)addAIMsg('bot','👋 Hi! I\'m your NexRCM AI assistant. I can help analyze claims, explain denials, identify revenue opportunities, and answer questions about your RCM performance. What would you like to know?');}
+  else{box.classList.remove('open');}
+}
+function addAIMsg(role,text){
+  _aiHistory.push({role:role,text:text});
+  var msgs=document.getElementById('ai-msgs');if(!msgs)return;
+  msgs.innerHTML=_aiHistory.map(function(m){
+    return'<div class="ai-msg '+m.role+'">'
+      +(m.role==='bot'?'<div class="ai-avatar-sm">🤖</div>':'')
+      +'<div class="ai-msg-bubble">'+m.text+'</div>'
+      +(m.role==='user'?'<div class="ai-avatar-sm" style="background:linear-gradient(135deg,#F59E0B,#EF4444)">A</div>':'')
+    +'</div>';
+  }).join('');
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function sendAI(){var inp=document.getElementById('ai-input');if(!inp||!inp.value.trim())return;askAI(inp.value);inp.value='';}
+function askAI(q){
+  if(!_aiOpen) toggleAI();
+  addAIMsg('user',q);
+  var msgs=document.getElementById('ai-msgs');
+  var typDiv=document.createElement('div');typDiv.className='ai-msg bot';typDiv.id='admin-typing';
+  typDiv.innerHTML='<div class="ai-avatar-sm">🤖</div><div class="ai-msg-bubble"><div style="display:flex;gap:4px;align-items:center"><span style="width:6px;height:6px;border-radius:50%;background:var(--brand);animation:pulse 1s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:var(--brand);animation:pulse 1s infinite 0.2s"></span><span style="width:6px;height:6px;border-radius:50%;background:var(--brand);animation:pulse 1s infinite 0.4s"></span></div></div>';
+  if(msgs){msgs.appendChild(typDiv);msgs.scrollTop=msgs.scrollHeight;}
+  var ctx=buildAdminContext();
+  callOpenRouter(ADMIN_SYSTEM_PROMPT+ctx, q, null).then(function(res){
+    if(typDiv.parentNode)typDiv.remove();
+    addAIMsg('bot', res ? formatAdminAI(res) : getAIResponse(q));
+  }).catch(function(){
+    if(typDiv.parentNode)typDiv.remove();
+    addAIMsg('bot', getAIResponse(q));
+  });
+}
+function getAIResponse(q){
+  q=q.toLowerCase();
+  var denied=_claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var ar=NexRCM.getArSummary();
+  if(q.includes('denied')||q.includes('denial')){
+    var topCode=denied.length>0?(denied[0].denialCode||'CO-50'):'CO-50';
+    var cd=NexRCM.CARC_CODES.find(function(c){return c.code===topCode;})||{desc:'Not medically necessary',action:'Appeal with clinical notes'};
+    return '🔍 <strong>Denial Analysis</strong><br><br>You have <strong>'+denied.length+' denied claims</strong> totaling <strong>'+NexRCM.fmt$(denied.reduce(function(s,c){return s+(c.billedAmt||0);},0))+'</strong>.<br><br>Top denial reason: <strong>'+topCode+'</strong> – '+cd.desc+'<br><br><strong>Recommended action:</strong> '+cd.action+'<br><br>File appeals within 180 days. I recommend prioritizing high-value claims first.';
+  }
+  if(q.includes('follow up')||q.includes('follow-up')){
+    var stale=_claims.filter(function(c){return (c.status==='Pending'||c.status==='Submitted')&&daysSince(c.submittedDate)>25;});
+    return '📋 <strong>Follow-up Required</strong><br><br><strong>'+stale.length+' claims</strong> need immediate follow-up:<br><br>'+stale.slice(0,4).map(function(c){return'• <strong>'+c.id+'</strong> – '+c.patient+' ('+daysSince(c.submittedDate)+' days, '+NexRCM.fmt$(c.balance)+')';}).join('<br>')+'<br><br>I recommend calling '+c.insurance+' using the payer call scripts in the Payer Directory.';
+  }
+  if(q.includes('ar risk')||q.includes('revenue risk')){
+    return '⚠️ <strong>AR Risk Assessment</strong><br><br>Total AR: <strong>'+NexRCM.fmt$(ar.total)+'</strong><br>• Pending: '+NexRCM.fmt$(ar.pending)+'<br>• Denied: '+NexRCM.fmt$(ar.denied)+'<br>• Partial: '+NexRCM.fmt$(ar.partial)+'<br><br>Risk score: <strong>'+(ar.denied/ar.total*100>15?'HIGH':'MEDIUM')+'</strong><br><br>Top risk: '+denied.length+' denied claims at risk of exceeding timely filing limits.';
+  }
+  if(q.includes('recover')||q.includes('opportunity')){
+    var total=denied.reduce(function(s,c){return s+(c.billedAmt||0);},0)+ar.partial;
+    return '💎 <strong>Recovery Opportunities</strong><br><br>Total recoverable: <strong>'+NexRCM.fmt$(total)+'</strong><br><br>1. Denied claims: '+NexRCM.fmt$(denied.reduce(function(s,c){return s+(c.billedAmt||0);},0))+'<br>2. Underpaid claims: '+NexRCM.fmt$(ar.partial)+'<br><br><strong>Quick wins:</strong><br>• Resubmit CO-50 denials with clinical notes<br>• Follow up on claims past 30 days<br>• Verify secondary insurance for COB denials';
+  }
+  return '🤖 <strong>AI Analysis</strong><br><br>Based on your current data:<br><br>• Collection rate: <strong>'+Math.round(_claims.filter(function(c){return c.status==='Paid';}).length/_claims.length*100)+'%</strong><br>• Open AR: <strong>'+NexRCM.fmt$(ar.total)+'</strong><br>• Denied claims: <strong>'+denied.length+'</strong><br><br>Ask me about specific claims, denial patterns, revenue recovery, or follow-up priorities!';
+}
+
+
+function closeModal(id){var m=document.getElementById(id);if(m)m.classList.remove('open');}
+document.addEventListener('click',function(e){if(e.target.classList.contains('modal-bg'))e.target.classList.remove('open');});
+function toast(msg,type,title){
+  var c=document.getElementById('toast-container');if(!c)return;
+  var t=document.createElement('div');t.className='toast '+(type||'info');
+  var icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+  var titles={success:'Success',error:'Error',warning:'Warning',info:'Info'};
+  t.innerHTML='<div class="toast-icon">'+icons[type||'info']+'</div><div class="toast-body"><div class="toast-title">'+(title||titles[type||'info'])+'</div><div class="toast-msg">'+NexRCM.esc(msg)+'</div></div><button class="toast-close" onclick="this.parentElement.remove()">x</button>';
+  c.appendChild(t);setTimeout(function(){if(t.parentNode)t.remove();},4500);
+}
+
+</script>
+</body>
+</html><script>
+/* ============================================================
+   OPENROUTER CONFIG + ADMIN AI MODULE
+============================================================ */
+var OPENROUTER_API_KEY = 'YOUR_OPENROUTER_KEY_HERE';
+var AI_MODEL = 'meta-llama/llama-3.3-70b-instruct';
+
+async function callOpenRouter(systemPrompt, userMessage, onChunk) {
+  if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_KEY_HERE') return null;
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENROUTER_API_KEY,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://nexrcm.demo',
+        'X-Title': 'NexRCM Admin AI'
+      },
+      body: JSON.stringify({
+        model: AI_MODEL, stream: true, max_tokens: 500,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
+    if (!res.ok) return null;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '));
+      for (const line of lines) {
+        const data = line.replace('data: ', '');
+        if (data === '[DONE]') continue;
+        try {
+          const delta = JSON.parse(data).choices[0].delta.content || '';
+          full += delta;
+          if (onChunk) onChunk(delta, full);
+        } catch(e) {}
+      }
+    }
+    return full;
+  } catch(e) { return null; }
+}
+
+var ADMIN_SYSTEM_PROMPT = `You are an expert dental practice management AI for NexRCM.
+You advise practice owners and administrators at Lux Dental Group on revenue, 
+claim performance, staff efficiency, denial patterns, and revenue forecasting.
+Be strategic and data-driven. Use bullet points. 3-5 bullets max.
+Provide dollar estimates and percentages where possible.
+Today: 2026-03-17. Practice: Lux Dental Group, Los Angeles CA.`;
+
+function buildAdminContext() {
+  var ar = NexRCM.getArSummary();
+  var denied = _claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var paid = _claims.filter(function(c){return c.status==='Paid';});
+  var billed = _claims.reduce(function(s,c){return s+(c.billedAmt||0);},0);
+  var collected = _claims.reduce(function(s,c){return s+(c.insurancePaid||0);},0);
+  var rate = billed>0 ? Math.round(collected/billed*100) : 0;
+  return '\n\nPractice data: Total claims: '+_claims.length
+    +'. Billed: $'+billed+'. Collected: $'+collected
+    +'. Collection rate: '+rate+'%'
+    +'. Total AR: $'+ar.total
+    +'. Denied: '+denied.length+' ($'+denied.reduce(function(s,c){return s+(c.billedAmt||0);},0)+')'
+    +'. Providers: Dr. Martinez, Dr. Patel, Dr. Thompson'
+    +'. Top payers: Delta Dental, Cigna, United Healthcare, BlueCross BlueShield.';
+}
+
+function formatAdminAI(t) {
+  return t.replace(/[*][*]([^*]+)[*][*]/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+}
+
+// ── AI Revenue Forecast Panel ─────────────────────────────
+function renderAIForecast() {
+  var el = document.getElementById('ai-forecast-panel');
+  if (!el) return;
+  var billed = _claims.reduce(function(s,c){return s+(c.billedAmt||0);},0);
+  var collected = _claims.reduce(function(s,c){return s+(c.insurancePaid||0);},0);
+  var denied = _claims.filter(function(c){return c.status==='Denied'||c.status==='Under Appeal';});
+  var ar = NexRCM.getArSummary();
+  var rate = billed>0 ? Math.round(collected/billed*100) : 0;
+
+  // Forecast simulation
+  var currentMonthly = Math.round(collected / 6); // avg over 6 months
+  var denialRecovery = Math.round(denied.reduce(function(s,c){return s+(c.billedAmt||0);},0) * 0.65);
+  var arRecovery = Math.round(ar.total * 0.72);
+  var predicted = Math.round(currentMonthly * 1.08 + denialRecovery * 0.1 + arRecovery * 0.08);
+  var trend = predicted > currentMonthly ? 'up' : 'down';
+
+  el.innerHTML = '<div style="background:linear-gradient(135deg,#0A0E1A,#0D2040);border-radius:var(--r-xl);padding:20px;margin-bottom:0">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">'
+      + '<span style="font-size:22px">🤖</span>'
+      + '<div><div style="font-size:14px;font-weight:700;color:#fff">AI Revenue Insights & Forecast</div>'
+        + '<div style="font-size:11px;color:rgba(255,255,255,0.4)">Based on 6-month trend + AR recovery model</div>'
+      + '</div>'
+      + '<div style="margin-left:auto">'
+        + '<button onclick="askAI(\'What revenue growth opportunities do you see in our data?\')" style="background:rgba(26,86,255,0.25);border:1px solid rgba(26,86,255,0.4);color:#93BBFF;padding:5px 12px;border-radius:99px;font-size:11.5px;font-weight:700;cursor:pointer">Ask AI →</button>'
+      + '</div>'
+    + '</div>'
+    // KPI grid
+    + '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">'
+    + [
+        {icon:'💰',label:'Current Revenue',val:NexRCM.fmt$(currentMonthly)+'/mo',sub:'Avg last 6 months',c:'#6EE7B7'},
+        {icon:'📈',label:'Predicted Revenue',val:NexRCM.fmt$(predicted)+'/mo',sub:'Next 30 days',c:trend==='up'?'#86EFAC':'#FCA5A5'},
+        {icon:'🎯',label:'Collection Rate',val:rate+'%',sub:rate>=90?'✅ Above benchmark':'⚠️ Below 95% target',c:rate>=90?'#6EE7B7':'#FDE68A'},
+        {icon:'💎',label:'Recoverable',val:NexRCM.fmt$(denialRecovery+arRecovery),sub:'Denials + AR recovery',c:'#C4B5FD'},
+      ].map(function(k) {
+        return '<div style="background:rgba(255,255,255,0.05);border-radius:var(--r);padding:12px;border:1px solid rgba(255,255,255,0.07)">'
+          + '<div style="font-size:16px;margin-bottom:6px">'+k.icon+'</div>'
+          + '<div style="font-size:16px;font-weight:700;color:'+k.c+'">'+k.val+'</div>'
+          + '<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px">'+k.label+'</div>'
+          + '<div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:1px">'+k.sub+'</div>'
+        + '</div>';
+      }).join('')
+    + '</div>'
+    // Revenue trend bar chart (inline)
+    + '<div style="margin-bottom:14px">'
+      + '<div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.08em">6-Month Revenue Trend</div>'
+      + '<div style="display:flex;align-items:flex-end;gap:6px;height:60px">'
+      + [84200,91500,88300,97800,103400,118200].map(function(v,i){
+          var pct = Math.round(v/118200*100);
+          var months = ['Oct','Nov','Dec','Jan','Feb','Mar'];
+          var isLast = i===5;
+          return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">'
+            + '<div style="font-size:9px;color:rgba(255,255,255,0.35)">$'+(v/1000).toFixed(0)+'k</div>'
+            + '<div style="width:100%;height:'+pct+'%;background:'+(isLast?'#6EE7B7':'rgba(255,255,255,0.15)')+';border-radius:3px 3px 0 0;min-height:4px;transition:height 0.6s ease"></div>'
+            + '<div style="font-size:9px;color:rgba(255,255,255,0.3)">'+months[i]+'</div>'
+          + '</div>';
+        }).join('')
+      // Forecast bar
+      + '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">'
+        + '<div style="font-size:9px;color:#86EFAC">$'+(predicted/1000).toFixed(0)+'k</div>'
+        + '<div style="width:100%;height:'+Math.round(predicted/118200*100)+'%;background:linear-gradient(180deg,#86EFAC,#4ADE80);border-radius:3px 3px 0 0;min-height:4px;border:1px dashed rgba(134,239,172,0.5)"></div>'
+        + '<div style="font-size:9px;color:#86EFAC">Apr*</div>'
+      + '</div>'
+    + '</div></div>'
+    // AI Insights bullets
+    + '<div style="border-top:1px solid rgba(255,255,255,0.07);padding-top:12px">'
+      + '<div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">AI Strategic Insights</div>'
+      + '<div style="display:flex;flex-direction:column;gap:6px">'
+      + generateAdminInsightBullets(collected, billed, denied, ar, rate, denialRecovery).map(function(b) {
+          return '<div style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:rgba(255,255,255,0.7)">'
+            + '<span style="flex-shrink:0;margin-top:1px">'+b.icon+'</span>'
+            + '<span>'+b.text+'</span>'
+          + '</div>';
+        }).join('')
+      + '</div>'
+    + '</div>'
+  + '</div>';
+}
+
+function generateAdminInsightBullets(collected, billed, denied, ar, rate, denialRecovery) {
+  var bullets = [];
+  if (rate < 90) {
+    bullets.push({icon:'⚠️', text:'Collection rate at <strong>'+rate+'%</strong> — below 95% benchmark. Focus: file '+denied.length+' pending appeals and follow up on 30+ day claims.'});
+  } else {
+    bullets.push({icon:'✅', text:'Collection rate <strong>'+rate+'%</strong> above industry benchmark. Maintain current claim submission quality.'});
+  }
+  bullets.push({icon:'💎', text:'AI detected <strong>$'+NexRCM.fmt$(denialRecovery)+'</strong> recoverable from denied claims — 65% recovery rate achievable with complete appeals documentation.'});
+  var topDenial = denied.length > 0 ? (denied[0].denialCode||'CO-50') : 'CO-50';
+  bullets.push({icon:'🔍', text:'Most common denial: <strong>'+topDenial+'</strong> — requires clinical notes and medical necessity documentation attached to all claims.'});
+  bullets.push({icon:'📈', text:'Revenue trending <strong>+8.3%</strong> vs prior 6-month period. April forecast: <strong>$'+NexRCM.fmt$(Math.round(collected/6*1.08))+'</strong> at current trajectory.'});
+  return bullets.slice(0, 4);
+}
+
+// ── Patch renderAdminDash to also show forecast ───────────
+var _origAdminDash = renderAdminDash;
+renderAdminDash = function() {
+  _origAdminDash();
+  setTimeout(renderAIForecast, 80);
+};
+
+// ── Patch go() to render forecast on dashboard ────────────
+var _origAdminGo = go;
+go = function(page) {
+  _origAdminGo(page);
+  if (page === 'dashboard') setTimeout(renderAIForecast, 120);
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(renderAIForecast, 400);
+});
+</script>

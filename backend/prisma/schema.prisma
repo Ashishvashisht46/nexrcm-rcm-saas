@@ -1,0 +1,1015 @@
+// ─── NexRCM — Complete Database Schema ────────────────────────
+// PostgreSQL via Prisma ORM
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MULTI-TENANCY & AUTH
+// ═══════════════════════════════════════════════════════════════
+
+model Organization {
+  id            String   @id @default(uuid())
+  name          String
+  npi           String?  @unique
+  taxId         String?
+  phone         String?
+  email         String?
+  address       String?
+  city          String?
+  state         String?
+  zip           String?
+  logoUrl       String?
+  timezone      String   @default("America/New_York")
+  settings      Json     @default("{}")  // org-wide settings
+  subscriptionTier String @default("professional") // basic, professional, enterprise
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  users         User[]
+  locations     Location[]
+  providers     Provider[]
+  patients      Patient[]
+  appointments  Appointment[]
+  claims        Claim[]
+  feeSchedules  FeeSchedule[]
+  payerContracts PayerContract[]
+  credentials   Credential[]
+  automationRules AutomationRule[]
+  auditLogs     AuditLog[]
+
+  @@map("organizations")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  orgId         String
+  email         String
+  passwordHash  String
+  firstName     String
+  lastName      String
+  role          UserRole @default(FRONT_DESK)
+  phone         String?
+  avatarUrl     String?
+  isActive      Boolean  @default(true)
+  lastLoginAt   DateTime?
+  mfaEnabled    Boolean  @default(false)
+  mfaSecret     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  org           Organization @relation(fields: [orgId], references: [id])
+  auditLogs     AuditLog[]
+  claimNotes    ClaimNote[]
+  assignedTasks WorkQueueItem[]
+
+  @@unique([email, orgId])
+  @@index([orgId])
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  BILLING_MANAGER
+  BILLER
+  CODER
+  FRONT_DESK
+  PROVIDER
+  AR_SPECIALIST
+  CREDENTIALING
+  PATIENT   // for patient portal
+}
+
+model Location {
+  id            String   @id @default(uuid())
+  orgId         String
+  name          String
+  address       String
+  city          String
+  state         String
+  zip           String
+  phone         String?
+  fax           String?
+  placeOfService String?  @default("11") // CMS POS code
+  npi           String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+
+  org           Organization @relation(fields: [orgId], references: [id])
+  appointments  Appointment[]
+  providers     ProviderLocation[]
+
+  @@index([orgId])
+  @@map("locations")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROVIDERS & CREDENTIALING
+// ═══════════════════════════════════════════════════════════════
+
+model Provider {
+  id            String   @id @default(uuid())
+  orgId         String
+  firstName     String
+  lastName      String
+  npi           String
+  taxonomy      String?  // taxonomy code
+  specialty     String?
+  licenseNumber String?
+  licenseState  String?
+  licenseExpiry DateTime?
+  deaNumber     String?
+  deaExpiry     DateTime?
+  ssn           String?  // encrypted
+  dateOfBirth   DateTime?
+  email         String?
+  phone         String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  org           Organization @relation(fields: [orgId], references: [id])
+  locations     ProviderLocation[]
+  appointments  Appointment[]
+  encounters    Encounter[]
+  claims        Claim[]
+  credentials   Credential[]
+
+  @@index([orgId])
+  @@index([npi])
+  @@map("providers")
+}
+
+model ProviderLocation {
+  id         String   @id @default(uuid())
+  providerId String
+  locationId String
+
+  provider   Provider @relation(fields: [providerId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id])
+
+  @@unique([providerId, locationId])
+  @@map("provider_locations")
+}
+
+model Credential {
+  id              String   @id @default(uuid())
+  orgId           String
+  providerId      String
+  payerName       String
+  payerId         String?
+  enrollmentType  String   @default("individual") // individual, group
+  status          CredentialStatus @default(PENDING)
+  applicationDate DateTime?
+  effectiveDate   DateTime?
+  expirationDate  DateTime?
+  caqhId          String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  org             Organization @relation(fields: [orgId], references: [id])
+  provider        Provider     @relation(fields: [providerId], references: [id])
+  documents       CredentialDocument[]
+
+  @@index([orgId, providerId])
+  @@index([expirationDate])
+  @@map("credentials")
+}
+
+enum CredentialStatus {
+  PENDING
+  IN_PROCESS
+  APPROVED
+  DENIED
+  EXPIRED
+  RENEWAL_NEEDED
+}
+
+model CredentialDocument {
+  id           String   @id @default(uuid())
+  credentialId String
+  name         String
+  fileUrl      String
+  fileType     String
+  uploadedAt   DateTime @default(now())
+
+  credential   Credential @relation(fields: [credentialId], references: [id])
+  @@map("credential_documents")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PATIENTS & INSURANCE
+// ═══════════════════════════════════════════════════════════════
+
+model Patient {
+  id             String   @id @default(uuid())
+  orgId          String
+  mrn            String?  // medical record number
+  firstName      String
+  lastName       String
+  middleName     String?
+  dateOfBirth    DateTime
+  gender         String?
+  ssn            String?  // encrypted
+  email          String?
+  phone          String?
+  address        String?
+  city           String?
+  state          String?
+  zip            String?
+  emergencyName  String?
+  emergencyPhone String?
+  preferredLanguage String? @default("en")
+  isActive       Boolean  @default(true)
+  portalUserId   String?  // link to User with PATIENT role
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  org            Organization @relation(fields: [orgId], references: [id])
+  insurancePolicies InsurancePolicy[]
+  appointments   Appointment[]
+  encounters     Encounter[]
+  claims         Claim[]
+  payments       PatientPayment[]
+  ledgerEntries  PatientLedger[]
+  documents      PatientDocument[]
+  eligibilityChecks EligibilityCheck[]
+  statements     PatientStatement[]
+
+  @@unique([orgId, mrn])
+  @@index([orgId])
+  @@index([lastName, firstName])
+  @@index([dateOfBirth])
+  @@map("patients")
+}
+
+model InsurancePolicy {
+  id              String   @id @default(uuid())
+  patientId       String
+  payerName       String
+  payerId         String?
+  planName        String?
+  memberId        String
+  groupNumber     String?
+  subscriberName  String?
+  subscriberDob   DateTime?
+  relationship    String   @default("self") // self, spouse, child, other
+  priority        Int      @default(1) // 1=primary, 2=secondary, 3=tertiary
+  effectiveDate   DateTime?
+  terminationDate DateTime?
+  copay           Decimal? @db.Decimal(10,2)
+  deductible      Decimal? @db.Decimal(10,2)
+  deductibleMet   Decimal? @db.Decimal(10,2)
+  oopMax          Decimal? @db.Decimal(10,2)
+  oopMet          Decimal? @db.Decimal(10,2)
+  coinsurance     Int?     // percentage
+  isActive        Boolean  @default(true)
+  verifiedAt      DateTime?
+  verificationData Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  patient         Patient @relation(fields: [patientId], references: [id])
+  claims          Claim[]
+  eligibilityChecks EligibilityCheck[]
+
+  @@index([patientId])
+  @@index([payerId])
+  @@map("insurance_policies")
+}
+
+model PatientDocument {
+  id          String   @id @default(uuid())
+  patientId   String
+  type        String   // insurance_card_front, insurance_card_back, id, consent, other
+  name        String
+  fileUrl     String
+  fileType    String
+  uploadedAt  DateTime @default(now())
+
+  patient     Patient @relation(fields: [patientId], references: [id])
+  @@map("patient_documents")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCHEDULING & CHECK-IN
+// ═══════════════════════════════════════════════════════════════
+
+model Appointment {
+  id            String   @id @default(uuid())
+  orgId         String
+  patientId     String
+  providerId    String
+  locationId    String
+  scheduledAt   DateTime
+  duration      Int      @default(30) // minutes
+  type          String   @default("office_visit") // office_visit, telehealth, procedure, follow_up
+  status        AppointmentStatus @default(SCHEDULED)
+  reason        String?
+  notes         String?
+  checkedInAt   DateTime?
+  checkedOutAt  DateTime?
+  eligibilityVerified Boolean @default(false)
+  copayCollected Decimal? @db.Decimal(10,2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  org           Organization @relation(fields: [orgId], references: [id])
+  patient       Patient      @relation(fields: [patientId], references: [id])
+  provider      Provider     @relation(fields: [providerId], references: [id])
+  location      Location     @relation(fields: [locationId], references: [id])
+  encounter     Encounter?
+
+  @@index([orgId, scheduledAt])
+  @@index([patientId])
+  @@index([providerId, scheduledAt])
+  @@map("appointments")
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CHECKED_IN
+  IN_PROGRESS
+  CHECKED_OUT
+  NO_SHOW
+  CANCELLED
+  RESCHEDULED
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENCOUNTERS & CODING
+// ═══════════════════════════════════════════════════════════════
+
+model Encounter {
+  id            String   @id @default(uuid())
+  appointmentId String?  @unique
+  patientId     String
+  providerId    String
+  dateOfService DateTime
+  placeOfService String @default("11")
+  clinicalNotes String?  @db.Text
+  status        EncounterStatus @default(OPEN)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  patient       Patient      @relation(fields: [patientId], references: [id])
+  provider      Provider     @relation(fields: [providerId], references: [id])
+  diagnoses     EncounterDiagnosis[]
+  procedures    EncounterProcedure[]
+  charges       Charge[]
+  claims        Claim[]
+
+  @@index([patientId])
+  @@index([dateOfService])
+  @@map("encounters")
+}
+
+enum EncounterStatus {
+  OPEN
+  CODED
+  CHARGE_CAPTURED
+  BILLED
+  CLOSED
+}
+
+model EncounterDiagnosis {
+  id          String   @id @default(uuid())
+  encounterId String
+  icdCode     String   // e.g., "M54.5"
+  description String?
+  sequence    Int      @default(1) // 1=primary, 2+= secondary
+  createdAt   DateTime @default(now())
+
+  encounter   Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+
+  @@index([encounterId])
+  @@index([icdCode])
+  @@map("encounter_diagnoses")
+}
+
+model EncounterProcedure {
+  id          String   @id @default(uuid())
+  encounterId String
+  cptCode     String   // e.g., "99213"
+  description String?
+  modifiers   String[] // e.g., ["25", "59"]
+  units       Int      @default(1)
+  fee         Decimal  @db.Decimal(10,2)
+  sequence    Int      @default(1)
+  diagnosisPointers Int[] @default([1]) // which dx codes link
+  createdAt   DateTime @default(now())
+
+  encounter   Encounter @relation(fields: [encounterId], references: [id], onDelete: Cascade)
+
+  @@index([encounterId])
+  @@index([cptCode])
+  @@map("encounter_procedures")
+}
+
+model Charge {
+  id           String   @id @default(uuid())
+  encounterId  String
+  cptCode      String
+  description  String?
+  modifiers    String[]
+  units        Int      @default(1)
+  chargeAmount Decimal  @db.Decimal(10,2)
+  allowedAmount Decimal? @db.Decimal(10,2)
+  status       ChargeStatus @default(PENDING)
+  postedAt     DateTime?
+  createdAt    DateTime @default(now())
+
+  encounter    Encounter @relation(fields: [encounterId], references: [id])
+  claimLines   ClaimLine[]
+
+  @@index([encounterId])
+  @@map("charges")
+}
+
+enum ChargeStatus {
+  PENDING
+  POSTED
+  BILLED
+  VOID
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLAIMS & SUBMISSION
+// ═══════════════════════════════════════════════════════════════
+
+model Claim {
+  id              String   @id @default(uuid())
+  orgId           String
+  claimNumber     String   @unique
+  patientId       String
+  providerId      String
+  encounterId     String?
+  insurancePolicyId String?
+  dateOfService   DateTime
+  filingDate      DateTime?
+  status          ClaimStatus @default(DRAFT)
+  claimType       String   @default("professional") // professional, institutional
+  totalCharged    Decimal  @db.Decimal(10,2) @default(0)
+  totalAllowed    Decimal? @db.Decimal(10,2)
+  totalPaid       Decimal  @db.Decimal(10,2) @default(0)
+  patientResponsibility Decimal @db.Decimal(10,2) @default(0)
+  adjustments     Decimal  @db.Decimal(10,2) @default(0)
+  balance         Decimal  @db.Decimal(10,2) @default(0)
+  payerName       String?
+  payerId         String?
+  placeOfService  String?
+  referringNpi    String?
+  priorAuthNumber String?
+  scrubPassed     Boolean  @default(false)
+  scrubResults    Json?    // array of warnings/errors
+  ediFileUrl      String?  // generated 837 file
+  clearinghouseId String?  // tracking ID from clearinghouse
+  daysInAR        Int      @default(0)
+  followUpDate    DateTime?
+  lastWorkedAt    DateTime?
+  lastWorkedBy    String?
+  aiPriority      Int?     // 1-100 AI-calculated priority
+  aiRecoveryEstimate Decimal? @db.Decimal(10,2)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  org             Organization    @relation(fields: [orgId], references: [id])
+  patient         Patient         @relation(fields: [patientId], references: [id])
+  provider        Provider        @relation(fields: [providerId], references: [id])
+  encounter       Encounter?      @relation(fields: [encounterId], references: [id])
+  insurancePolicy InsurancePolicy? @relation(fields: [insurancePolicyId], references: [id])
+  lines           ClaimLine[]
+  statusHistory   ClaimStatusHistory[]
+  notes           ClaimNote[]
+  denial          Denial?
+  insurancePayments InsurancePaymentAllocation[]
+  workQueueItems  WorkQueueItem[]
+
+  @@index([orgId, status])
+  @@index([patientId])
+  @@index([providerId])
+  @@index([dateOfService])
+  @@index([daysInAR])
+  @@index([status, daysInAR])
+  @@map("claims")
+}
+
+enum ClaimStatus {
+  DRAFT
+  SCRUBBING
+  SCRUB_FAILED
+  READY
+  SUBMITTED
+  ACKNOWLEDGED
+  PENDING
+  PAID
+  PARTIAL
+  DENIED
+  APPEALED
+  VOID
+  CLOSED
+}
+
+model ClaimLine {
+  id            String   @id @default(uuid())
+  claimId       String
+  chargeId      String?
+  lineNumber    Int
+  cptCode       String
+  modifiers     String[]
+  icdPointers   Int[]
+  units         Int      @default(1)
+  chargedAmount Decimal  @db.Decimal(10,2)
+  allowedAmount Decimal? @db.Decimal(10,2)
+  paidAmount    Decimal  @db.Decimal(10,2) @default(0)
+  adjustmentAmount Decimal @db.Decimal(10,2) @default(0)
+  denialCode    String?
+  createdAt     DateTime @default(now())
+
+  claim         Claim   @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  charge        Charge? @relation(fields: [chargeId], references: [id])
+
+  @@index([claimId])
+  @@map("claim_lines")
+}
+
+model ClaimStatusHistory {
+  id        String   @id @default(uuid())
+  claimId   String
+  fromStatus ClaimStatus?
+  toStatus  ClaimStatus
+  note      String?
+  changedBy String?
+  changedAt DateTime @default(now())
+
+  claim     Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  @@index([claimId])
+  @@map("claim_status_history")
+}
+
+model ClaimNote {
+  id        String   @id @default(uuid())
+  claimId   String
+  userId    String?
+  type      String   @default("manual") // manual, system, ai
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  claim     Claim @relation(fields: [claimId], references: [id], onDelete: Cascade)
+  user      User? @relation(fields: [userId], references: [id])
+  @@index([claimId])
+  @@map("claim_notes")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLAIM SCRUBBING RULES
+// ═══════════════════════════════════════════════════════════════
+
+model ScrubRule {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  category    String   // npi, modifier, diagnosis, bundling, payer, demographics
+  severity    String   @default("error") // error, warning, info
+  condition   Json     // rule logic as JSON
+  message     String   // error message template
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("scrub_rules")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DENIALS & APPEALS
+// ═══════════════════════════════════════════════════════════════
+
+model Denial {
+  id              String   @id @default(uuid())
+  claimId         String   @unique
+  denialDate      DateTime
+  carcCode        String?  // Claim Adjustment Reason Code
+  rarcCode        String?  // Remittance Advice Remark Code
+  denialReason    String?
+  denialCategory  String?  // coverage, coding, auth, timely_filing, medical_necessity, duplicate
+  aiCategory      String?  // AI-determined category
+  amountDenied    Decimal  @db.Decimal(10,2)
+  isAppealable    Boolean  @default(true)
+  appealDeadline  DateTime?
+  recoveryLikelihood Int?  // AI-predicted % chance of recovery
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  claim           Claim    @relation(fields: [claimId], references: [id])
+  appeals         Appeal[]
+
+  @@index([carcCode])
+  @@index([denialCategory])
+  @@map("denials")
+}
+
+model Appeal {
+  id           String   @id @default(uuid())
+  denialId     String
+  appealLevel  Int      @default(1) // 1=first, 2=second, 3=external review
+  status       AppealStatus @default(DRAFT)
+  filedDate    DateTime?
+  letterUrl    String?  // generated appeal letter
+  supportingDocs String[] // file URLs
+  aiGenerated  Boolean  @default(false)
+  resolution   String?
+  resolvedDate DateTime?
+  amountRecovered Decimal? @db.Decimal(10,2)
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  denial       Denial @relation(fields: [denialId], references: [id])
+
+  @@index([denialId])
+  @@map("appeals")
+}
+
+enum AppealStatus {
+  DRAFT
+  FILED
+  IN_REVIEW
+  WON
+  LOST
+  WITHDRAWN
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PAYMENTS & POSTING
+// ═══════════════════════════════════════════════════════════════
+
+model InsurancePayment {
+  id              String   @id @default(uuid())
+  eraFileUrl      String?  // 835 file
+  checkNumber     String?
+  eftNumber       String?
+  payerName       String
+  payerId         String?
+  paymentDate     DateTime
+  totalAmount     Decimal  @db.Decimal(10,2)
+  postedAmount    Decimal  @db.Decimal(10,2) @default(0)
+  status          String   @default("unposted") // unposted, partial, posted
+  autoPosted      Boolean  @default(false)
+  parsedData      Json?    // parsed 835 content
+  createdAt       DateTime @default(now())
+
+  allocations     InsurancePaymentAllocation[]
+
+  @@map("insurance_payments")
+}
+
+model InsurancePaymentAllocation {
+  id                  String   @id @default(uuid())
+  insurancePaymentId  String
+  claimId             String
+  lineNumber          Int?
+  paidAmount          Decimal  @db.Decimal(10,2)
+  allowedAmount       Decimal? @db.Decimal(10,2)
+  adjustmentAmount    Decimal  @db.Decimal(10,2) @default(0)
+  adjustmentReasonCode String?
+  patientResponsibility Decimal @db.Decimal(10,2) @default(0)
+  postedAt            DateTime @default(now())
+
+  insurancePayment    InsurancePayment @relation(fields: [insurancePaymentId], references: [id])
+  claim               Claim            @relation(fields: [claimId], references: [id])
+
+  @@index([claimId])
+  @@map("insurance_payment_allocations")
+}
+
+model PatientPayment {
+  id           String   @id @default(uuid())
+  patientId    String
+  amount       Decimal  @db.Decimal(10,2)
+  method       String   @default("card") // card, cash, check, ach
+  reference    String?  // Stripe payment ID, check number
+  status       String   @default("completed") // pending, completed, refunded, failed
+  description  String?
+  stripePaymentIntentId String?
+  postedAt     DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  patient      Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@map("patient_payments")
+}
+
+model PatientLedger {
+  id          String   @id @default(uuid())
+  patientId   String
+  type        String   // charge, insurance_payment, patient_payment, adjustment, refund
+  description String
+  amount      Decimal  @db.Decimal(10,2) // positive=debit, negative=credit
+  balance     Decimal  @db.Decimal(10,2) // running balance
+  referenceId String?  // claim/payment ID
+  postedAt    DateTime @default(now())
+
+  patient     Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId, postedAt])
+  @@map("patient_ledger")
+}
+
+model PatientStatement {
+  id          String   @id @default(uuid())
+  patientId   String
+  statementDate DateTime
+  dueDate     DateTime
+  totalDue    Decimal  @db.Decimal(10,2)
+  fileUrl     String?  // generated PDF
+  sentVia     String?  // email, mail, portal
+  sentAt      DateTime?
+  paidAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  patient     Patient @relation(fields: [patientId], references: [id])
+
+  @@index([patientId])
+  @@map("patient_statements")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ELIGIBILITY VERIFICATION
+// ═══════════════════════════════════════════════════════════════
+
+model EligibilityCheck {
+  id              String   @id @default(uuid())
+  patientId       String
+  insurancePolicyId String?
+  type            String   @default("real_time") // real_time, batch
+  status          String   @default("pending") // pending, verified, failed, expired
+  requestData     Json?
+  responseData    Json?    // full eligibility response
+  isEligible      Boolean?
+  copay           Decimal? @db.Decimal(10,2)
+  deductible      Decimal? @db.Decimal(10,2)
+  deductibleMet   Decimal? @db.Decimal(10,2)
+  oopMax          Decimal? @db.Decimal(10,2)
+  oopMet          Decimal? @db.Decimal(10,2)
+  coinsurance     Int?
+  coverageActive  Boolean?
+  warnings        String[]
+  checkedAt       DateTime @default(now())
+  expiresAt       DateTime?
+
+  patient         Patient         @relation(fields: [patientId], references: [id])
+  insurancePolicy InsurancePolicy? @relation(fields: [insurancePolicyId], references: [id])
+
+  @@index([patientId])
+  @@index([checkedAt])
+  @@map("eligibility_checks")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRIOR AUTHORIZATION
+// ═══════════════════════════════════════════════════════════════
+
+model PriorAuthorization {
+  id              String   @id @default(uuid())
+  patientId       String
+  payerName       String
+  authNumber      String?
+  cptCodes        String[]
+  icdCodes        String[]
+  requestedUnits  Int?
+  approvedUnits   Int?
+  usedUnits       Int      @default(0)
+  status          String   @default("pending") // pending, approved, denied, expired
+  requestDate     DateTime
+  effectiveDate   DateTime?
+  expirationDate  DateTime?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([patientId])
+  @@index([authNumber])
+  @@map("prior_authorizations")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FEE SCHEDULES & CONTRACTS
+// ═══════════════════════════════════════════════════════════════
+
+model FeeSchedule {
+  id        String   @id @default(uuid())
+  orgId     String
+  name      String   // e.g., "Medicare 2024", "Practice Standard"
+  type      String   @default("standard") // standard, medicare, medicaid, custom
+  isDefault Boolean  @default(false)
+  isActive  Boolean  @default(true)
+  effectiveDate DateTime
+  endDate   DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  org       Organization @relation(fields: [orgId], references: [id])
+  entries   FeeScheduleEntry[]
+
+  @@index([orgId])
+  @@map("fee_schedules")
+}
+
+model FeeScheduleEntry {
+  id            String   @id @default(uuid())
+  feeScheduleId String
+  cptCode       String
+  description   String?
+  fee           Decimal  @db.Decimal(10,2)
+  modifiers     String[]
+  effectiveDate DateTime?
+  endDate       DateTime?
+
+  feeSchedule   FeeSchedule @relation(fields: [feeScheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([feeScheduleId, cptCode])
+  @@index([cptCode])
+  @@map("fee_schedule_entries")
+}
+
+model PayerContract {
+  id              String   @id @default(uuid())
+  orgId           String
+  payerName       String
+  payerId         String?
+  contractNumber  String?
+  effectiveDate   DateTime
+  terminationDate DateTime?
+  autoRenew       Boolean  @default(false)
+  notes           String?
+  status          String   @default("active") // active, expired, terminated, pending
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  org             Organization @relation(fields: [orgId], references: [id])
+  rates           ContractRate[]
+
+  @@index([orgId])
+  @@map("payer_contracts")
+}
+
+model ContractRate {
+  id              String   @id @default(uuid())
+  contractId      String
+  cptCode         String
+  allowedAmount   Decimal  @db.Decimal(10,2)
+  percentOfMedicare Decimal? @db.Decimal(5,2)  // e.g., 110.00 = 110% of Medicare
+  effectiveDate   DateTime?
+
+  contract        PayerContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@unique([contractId, cptCode])
+  @@index([cptCode])
+  @@map("contract_rates")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WORK QUEUE & AUTOMATION
+// ═══════════════════════════════════════════════════════════════
+
+model WorkQueueItem {
+  id           String   @id @default(uuid())
+  claimId      String?
+  type         String   // follow_up, denial_review, appeal, payment_post, coding_review, auth_needed
+  priority     Int      @default(50) // 1-100, higher = more urgent
+  status       String   @default("open") // open, in_progress, completed, dismissed
+  assignedTo   String?
+  title        String
+  description  String?
+  dueDate      DateTime?
+  aiGenerated  Boolean  @default(false)
+  aiReason     String?
+  completedAt  DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  claim        Claim? @relation(fields: [claimId], references: [id])
+  assignee     User?  @relation(fields: [assignedTo], references: [id])
+
+  @@index([status, priority])
+  @@index([assignedTo])
+  @@index([type])
+  @@map("work_queue_items")
+}
+
+model AutomationRule {
+  id          String   @id @default(uuid())
+  orgId       String
+  name        String
+  description String?
+  trigger     String   // claim_submitted, claim_denied, payment_received, aging_threshold, schedule
+  conditions  Json     // rule conditions
+  actions     Json     // actions to take
+  isActive    Boolean  @default(true)
+  runCount    Int      @default(0)
+  lastRunAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  org         Organization @relation(fields: [orgId], references: [id])
+  executions  AutomationExecution[]
+
+  @@index([orgId, isActive])
+  @@map("automation_rules")
+}
+
+model AutomationExecution {
+  id        String   @id @default(uuid())
+  ruleId    String
+  status    String   @default("success") // success, failed, skipped
+  input     Json?
+  output    Json?
+  error     String?
+  duration  Int?     // milliseconds
+  executedAt DateTime @default(now())
+
+  rule      AutomationRule @relation(fields: [ruleId], references: [id])
+  @@index([ruleId, executedAt])
+  @@map("automation_executions")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CODE REFERENCE TABLES
+// ═══════════════════════════════════════════════════════════════
+
+model ICD10Code {
+  code        String @id
+  description String
+  category    String?
+  isCommon    Boolean @default(false)
+
+  @@index([description])
+  @@map("icd10_codes")
+}
+
+model CPTCode {
+  code        String @id
+  description String
+  category    String?  // E&M, Surgery, Radiology, etc.
+  rvuWork     Decimal? @db.Decimal(6,2)
+  rvuPractice Decimal? @db.Decimal(6,2)
+  rvuMalpractice Decimal? @db.Decimal(6,2)
+  medicareFee Decimal? @db.Decimal(10,2)
+  isCommon    Boolean  @default(false)
+
+  @@index([description])
+  @@index([category])
+  @@map("cpt_codes")
+}
+
+model CARCCode {
+  code        String @id
+  description String
+  category    String?
+  isCommon    Boolean @default(false)
+
+  @@map("carc_codes")
+}
+
+model RARCCode {
+  code        String @id
+  description String
+
+  @@map("rarc_codes")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUDIT & COMPLIANCE
+// ═══════════════════════════════════════════════════════════════
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  orgId      String
+  userId     String?
+  action     String   // create, update, delete, view, login, logout, export, submit
+  resource   String   // patient, claim, payment, etc.
+  resourceId String?
+  details    Json?    // what changed
+  ipAddress  String?
+  userAgent  String?
+  timestamp  DateTime @default(now())
+
+  org        Organization @relation(fields: [orgId], references: [id])
+  user       User?        @relation(fields: [userId], references: [id])
+
+  @@index([orgId, timestamp])
+  @@index([userId])
+  @@index([resource, resourceId])
+  @@map("audit_logs")
+}

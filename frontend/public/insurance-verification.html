@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NexRCM — Insurance Verification</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --brand:#1A56FF;--brand-dark:#0B3FCC;--brand-light:#EEF3FF;--brand-glow:rgba(26,86,255,0.14);
+  --teal:#00C4B4;--teal-dark:#009E90;--teal-light:rgba(0,196,180,0.12);
+  --navy:#0A0E1A;--navy-mid:#0D1630;
+  --success:#10B981;--success-bg:#ECFDF5;--success-border:#A7F3D0;
+  --warning:#F59E0B;--warning-bg:#FFFBEB;--warning-border:#FDE68A;
+  --danger:#EF4444;--danger-bg:#FEF2F2;--danger-border:#FECACA;
+  --info:#3B82F6;--info-bg:#EFF6FF;--info-border:#BFDBFE;
+  --purple:#7C3AED;--purple-bg:#F5F3FF;--purple-border:#DDD6FE;
+  --bg:#F0F3F8;--surface:#FFFFFF;--surface2:#F8FAFC;
+  --text:#0F172A;--text2:#475569;--muted:#94A3B8;
+  --border:#E2E8F0;--border-light:#EDF2F7;
+  --r:10px;--r-lg:14px;--r-xl:20px;--r-pill:999px;
+  --shadow-xs:0 1px 2px rgba(15,23,42,0.05),0 0 0 1px rgba(15,23,42,0.02);
+  --shadow-sm:0 2px 4px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 16px rgba(15,23,42,0.07),0 2px 6px rgba(15,23,42,0.04);
+  --shadow-lg:0 20px 40px rgba(15,23,42,0.10),0 8px 16px rgba(15,23,42,0.06);
+  --t:200ms;--sidebar-w:240px;
+}
+html,body{height:100%;font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:99px}
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:var(--sidebar-w);height:100%;background:var(--navy);display:flex;flex-direction:column;flex-shrink:0}
+.sb-header{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.sb-logo{display:flex;align-items:center;gap:10px}
+.sb-mark{width:34px;height:34px;border-radius:9px;background:var(--teal);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#0A0E1A;flex-shrink:0}
+.sb-name{font-size:14px;font-weight:700;color:#fff}.sb-sub{font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em}
+.sb-role-badge{margin:10px 16px 0;background:rgba(0,196,180,0.14);border:1px solid rgba(0,196,180,0.28);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px}
+.sb-role-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0}
+.sb-role-name{font-size:12px;font-weight:600;color:#5DCAA5}.sb-role-title{font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px}
+.sb-nav{flex:1;overflow-y:auto;padding:10px}
+.sb-section{font-size:9.5px;font-weight:700;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.14em;padding:12px 8px 5px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;margin-bottom:1px;color:rgba(255,255,255,0.44);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.12s;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.84)}
+.nav-item.active{background:rgba(0,196,180,0.16);color:#5DCAA5}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nav-badge{font-size:9.5px;font-weight:800;min-width:17px;height:17px;padding:0 4px;border-radius:99px;display:inline-flex;align-items:center;justify-content:center;background:var(--warning);color:#fff;margin-left:auto}
+.sb-footer{border-top:1px solid rgba(255,255,255,0.06);padding:10px}
+.sb-user{display:flex;align-items:center;gap:9px;padding:8px 10px}
+.sb-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--brand));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.sb-uname{font-size:12px;font-weight:700;color:rgba(255,255,255,0.82)}.sb-urole{font-size:10.5px;color:rgba(255,255,255,0.28)}
+.portal-switch{display:flex;flex-wrap:wrap;gap:5px;padding:8px 14px;border-top:1px solid rgba(255,255,255,0.06)}
+.ps-link{font-size:10px;padding:3px 7px;border-radius:5px;color:rgba(255,255,255,0.3);cursor:pointer;transition:all 0.1s;white-space:nowrap}
+.ps-link:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
+.ps-link.cur{color:var(--teal);background:rgba(0,196,180,0.1)}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#topbar{height:56px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:10px;flex-shrink:0;box-shadow:var(--shadow-xs)}
+.topbar-title{font-size:16px;font-weight:700;flex:1}
+.topbar-date{font-size:12px;color:var(--muted);background:var(--bg);padding:5px 12px;border-radius:99px;border:1px solid var(--border)}
+.topbar-btn{width:34px;height:34px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;background:var(--bg);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer;position:relative}
+#content{flex:1;overflow-y:auto;padding:24px;background:var(--bg)}
+.page{display:none}.page.active{display:block;animation:fadeIn 0.28s cubic-bezier(0.4,0,0.2,1) both}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ph{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ph-left{flex:1}.ph-eyebrow{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.11em;margin-bottom:3px}
+.ph-title{font-size:21px;font-weight:700;letter-spacing:-0.02em}
+.ph-desc{font-size:13px;color:var(--text2);margin-top:4px}
+.ph-right{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-top:4px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--r);font-size:13px;font-weight:600;white-space:nowrap;border:1px solid transparent;cursor:pointer;transition:all var(--t);box-shadow:var(--shadow-xs)}
+.btn-primary{background:var(--teal);color:#fff;border-color:var(--teal)}.btn-primary:hover{background:var(--teal-dark);transform:translateY(-1px)}
+.btn-outline{background:var(--surface);color:var(--text2);border-color:var(--border)}.btn-outline:hover{border-color:var(--muted)}
+.btn-success{background:var(--success);color:#fff}.btn-ghost{background:transparent;color:var(--text2);box-shadow:none}.btn-ghost:hover{background:var(--bg)}
+.btn-sm{padding:5px 12px;font-size:12px}.btn-lg{padding:11px 22px;font-size:14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow-xs)}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:13px;border-bottom:1px solid var(--border-light)}
+.card-title{font-size:13.5px;font-weight:700;flex:1}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px 18px;box-shadow:var(--shadow-xs);transition:transform var(--t),box-shadow var(--t)}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.stat-icon{font-size:20px;margin-bottom:10px}.stat-label{font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.stat-val{font-size:24px;font-weight:700;letter-spacing:-0.02em;line-height:1}.stat-sub{font-size:11px;color:var(--muted);margin-top:5px}
+.badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:var(--r-pill);white-space:nowrap;text-transform:uppercase;letter-spacing:0.04em}
+.b-success{background:var(--success-bg);color:#065F46;border:1px solid var(--success-border)}
+.b-warning{background:var(--warning-bg);color:#92400E;border:1px solid var(--warning-border)}
+.b-danger{background:var(--danger-bg);color:#991B1B;border:1px solid var(--danger-border)}
+.b-info{background:var(--info-bg);color:#1D4ED8;border:1px solid var(--info-border)}
+.b-neutral{background:var(--bg);color:#64748B;border:1px solid var(--border)}
+.form-group{display:flex;flex-direction:column;gap:5px}.form-group label{font-size:12px;font-weight:600;color:var(--text2)}
+.form-group input,.form-group select,.form-group textarea{padding:9px 12px;border-radius:var(--r);border:1px solid var(--border);font-size:13.5px;background:var(--surface);color:var(--text);transition:border-color var(--t),box-shadow var(--t)}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,196,180,0.15)}
+.form-grid{display:grid;gap:14px}.form-grid-2{grid-template-columns:1fr 1fr}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,0.65);backdrop-filter:blur(5px);z-index:999;align-items:center;justify-content:center;padding:20px}
+.modal-bg.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);max-height:92vh;overflow-y:auto;width:680px;max-width:100%;animation:modalIn 0.22s ease}
+.modal-lg{width:900px}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-hdr{display:flex;align-items:center;padding:17px 22px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);z-index:10}
+.modal-hdr h2{flex:1;font-size:15px;font-weight:700}
+.modal-close{width:30px;height:30px;border-radius:7px;background:var(--bg);color:var(--muted);font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none}
+.modal-body{padding:22px}.modal-footer{padding:13px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface)}
+#toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:370px;pointer-events:none}
+.toast{display:flex;align-items:flex-start;gap:11px;background:var(--text);color:#fff;padding:13px 15px;border-radius:var(--r-lg);box-shadow:var(--shadow-lg);animation:toastIn 0.28s ease;font-size:13px;line-height:1.4;pointer-events:all}
+.toast-icon{font-size:17px;flex-shrink:0}.toast-body{flex:1}.toast-title{font-weight:700;font-size:13px;margin-bottom:1px}.toast-msg{font-size:12px;opacity:0.72}
+.toast-close{background:none;color:rgba(255,255,255,0.45);font-size:16px;cursor:pointer;padding:0;flex-shrink:0}
+.toast.success{background:#064E3B;border-left:3px solid var(--success)}.toast.error{background:#7F1D1D;border-left:3px solid var(--danger)}
+.toast.warning{background:#78350F;border-left:3px solid var(--warning)}.toast.info{background:#1E3A8A;border-left:3px solid var(--info)}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px) scale(0.92)}to{opacity:1;transform:translateX(0) scale(1)}}
+.spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* Search */
+#search-wrap{position:relative;flex:0 0 280px}
+#gsearch{width:100%;padding:7px 14px 7px 34px;border:1px solid var(--border);border-radius:var(--r-pill);font-size:13px;background:var(--bg);color:var(--text);transition:all 0.15s}
+#gsearch:focus{outline:none;border-color:var(--teal);background:var(--surface);box-shadow:0 0 0 3px rgba(0,196,180,0.15)}
+#gsearch-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none}
+.sdrop{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-lg);z-index:500;display:none;max-height:340px;overflow-y:auto}
+.sdrop.open{display:block}
+.sdrop-section{font-size:9.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;padding:10px 14px 4px}
+.sdrop-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background 0.1s}
+.sdrop-item:hover{background:var(--teal-light)}
+.sdrop-icon{width:28px;height:28px;border-radius:7px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+/* Notifications */
+.notif-dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:var(--danger);border:2px solid var(--surface)}
+#ndrop{position:absolute;top:calc(100% + 8px);right:0;width:340px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);z-index:500;display:none}
+#ndrop.open{display:block}
+.nh{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.ni{display:flex;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-light);cursor:pointer;transition:background 0.1s}
+.ni:hover{background:var(--bg)}.ni.unread{background:#F0FDF9}
+/* Queue rows */
+.vq-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:14px;transition:all 0.15s;cursor:pointer}
+.vq-row:hover{border-color:var(--teal);box-shadow:var(--shadow-sm)}
+.vq-row.vs-verified{border-left:4px solid var(--success)}
+.vq-row.vs-needs-review{border-left:4px solid var(--warning)}
+.vq-row.vs-expired{border-left:4px solid var(--danger)}
+.vq-row.vs-pending{border-left:4px solid var(--muted)}
+/* Coverage card */
+.cov-card{background:linear-gradient(135deg,#0A0E1A,#0D2040);border-radius:var(--r-xl);padding:24px;color:#fff}
+.cov-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+.cov-row:last-child{border-bottom:none}
+.ben-bar{height:8px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden;margin-top:6px}
+.ben-fill{height:100%;border-radius:99px;transition:width 0.8s ease}
+.ai-box{background:linear-gradient(135deg,var(--purple-bg),#F0F4FF);border:1px solid var(--purple-border);border-radius:var(--r-lg);padding:16px 18px}
+/* ── AI AUTOMATION STYLES (Insurance Verification) ──── */
+#ai-fab{position:fixed;bottom:28px;right:28px;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+#ai-fab-btn{width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#00C4B4,#1A56FF);box-shadow:0 4px 20px rgba(0,196,180,0.45);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:none;color:#fff;transition:transform 0.2s,box-shadow 0.2s}
+#ai-fab-btn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(0,196,180,0.6)}
+#ai-fab-panel{width:340px;background:var(--surface);border:1px solid rgba(0,196,180,0.3);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);display:none;flex-direction:column;overflow:hidden;animation:aiPanelIn 0.22s ease}
+#ai-fab-panel.open{display:flex}
+@keyframes aiPanelIn{from{opacity:0;transform:translateY(10px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+.ai-fab-hdr{background:linear-gradient(135deg,#00C4B4,#1A56FF);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.ai-fab-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;max-height:380px;min-height:160px}
+.ai-msg-row{display:flex;gap:8px;align-items:flex-start}
+.ai-msg-row.user{flex-direction:row-reverse}
+.ai-bubble{max-width:88%;padding:10px 13px;border-radius:14px;font-size:13px;line-height:1.55}
+.ai-bubble.bot{background:var(--teal-light,rgba(0,196,180,0.1));color:var(--text);border-bottom-left-radius:4px;border:1px solid rgba(0,196,180,0.25)}
+.ai-bubble.user{background:var(--teal);color:#fff;border-bottom-right-radius:4px}
+.ai-avatar{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+.ai-input-row{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--border);background:var(--surface)}
+.ai-input-row input{flex:1;padding:7px 11px;border:1px solid var(--border);border-radius:var(--r-pill);font-size:13px;font-family:inherit;background:var(--bg)}
+.ai-input-row input:focus{outline:none;border-color:var(--teal)}
+.ai-quick-chips{display:flex;gap:5px;flex-wrap:wrap;padding:0 12px 8px}
+.ai-chip{font-size:11px;padding:4px 10px;border-radius:var(--r-pill);background:rgba(0,196,180,0.1);color:var(--teal-dark,#007A70);border:1px solid rgba(0,196,180,0.3);cursor:pointer;font-weight:600;transition:all 0.1s;white-space:nowrap}
+.ai-chip:hover{background:var(--teal);color:#fff}
+.ai-badge-dot{width:10px;height:10px;border-radius:50%;background:#10B981;animation:aiBadgePulse 2s infinite;position:absolute;top:4px;right:4px;border:2px solid var(--surface)}
+@keyframes aiBadgePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:0.7}}
+.typing-dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--teal);margin:0 2px;animation:tdot 1.2s infinite}
+.typing-dots span:nth-child(2){animation-delay:0.2s}.typing-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:0.4}30%{transform:translateY(-6px);opacity:1}}
+.ai-shimmer{background:linear-gradient(90deg,var(--bg) 25%,var(--border) 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmerAnim 1.2s infinite;border-radius:6px;height:14px;margin:4px 0}
+@keyframes shimmerAnim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* AI Coverage Summary card */
+.ai-cov-summary{background:linear-gradient(135deg,rgba(0,196,180,0.08),rgba(26,86,255,0.06));border:1px solid rgba(0,196,180,0.25);border-radius:var(--r-lg);padding:14px 16px;margin-top:12px}
+.ai-cov-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,196,180,0.12);font-size:13px}
+.ai-cov-row:last-child{border-bottom:none}
+.coverage-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px}
+/* AI Risk score bar */
+.ai-risk-wrap{margin-top:10px}
+.ai-risk-bar{height:10px;border-radius:99px;overflow:hidden;background:var(--bg)}
+.ai-risk-fill{height:100%;border-radius:99px;transition:width 0.9s ease}
+/* Pulse for new AI result */
+@keyframes aiResultIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ai-result-anim{animation:aiResultIn 0.35s ease}
+
+
+/* ── ENHANCED POLISH ── */
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes subtlePulse{0%,100%{opacity:1}50%{opacity:0.7}}
+#content{scroll-behavior:smooth}
+#content::-webkit-scrollbar{width:6px}
+#content::-webkit-scrollbar-track{background:transparent}
+#content::-webkit-scrollbar-thumb{background:#C1CDD9;border-radius:99px}
+#content::-webkit-scrollbar-thumb:hover{background:#94A3B8}
+.card{transition:transform 0.22s cubic-bezier(0.4,0,0.2,1),box-shadow 0.22s cubic-bezier(0.4,0,0.2,1),border-color 0.22s}
+.card:hover{box-shadow:var(--shadow-md);border-color:#D1D9E6}
+.stat-card{position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--brand),#7C3AED);opacity:0;transition:opacity 0.25s}
+.stat-card:hover::before{opacity:1}
+.btn{transition:all 0.18s cubic-bezier(0.4,0,0.2,1)}
+.btn-primary{box-shadow:0 2px 8px rgba(26,86,255,0.25)}
+.btn-primary:hover{box-shadow:0 4px 16px rgba(26,86,255,0.35)}
+.nav-item{transition:all 0.15s cubic-bezier(0.4,0,0.2,1)}
+#sidebar{background:linear-gradient(180deg,#080C18 0%,#0D1630 50%,#0A0E1A 100%)}
+.sb-mark{box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.modal{animation:modalIn 0.25s cubic-bezier(0.4,0,0.2,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(0.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.toast{animation:toastIn 0.32s cubic-bezier(0.34,1.56,0.64,1)}
+}
+.ph-title{background:linear-gradient(135deg,var(--text) 0%,#334155 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-btn{transition:all 0.15s}
+.topbar-btn:hover{background:var(--surface);border-color:var(--muted);transform:scale(1.05)}
+.sb-footer{background:rgba(0,0,0,0.15)}
+.recovery-card{box-shadow:0 8px 32px rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06)}
+.risk-alert{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+.risk-alert:hover{transform:translateX(4px);box-shadow:var(--shadow-sm)}
+#global-search{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+#global-search:focus{transform:scale(1.01)}
+::selection{background:rgba(26,86,255,0.15);color:var(--text)}
+
+.stats-grid .stat-card{animation:fadeIn 0.3s ease both}
+.stats-grid .stat-card:nth-child(1){animation-delay:0.05s}
+.stats-grid .stat-card:nth-child(2){animation-delay:0.1s}
+.stats-grid .stat-card:nth-child(3){animation-delay:0.15s}
+.stats-grid .stat-card:nth-child(4){animation-delay:0.2s}
+.stats-grid .stat-card:nth-child(5){animation-delay:0.25s}
+.stats-grid .stat-card:nth-child(6){animation-delay:0.3s}
+
+.form-group input,.form-group select,.form-group textarea{transition:all 0.2s cubic-bezier(0.4,0,0.2,1)}
+.form-group input:hover,.form-group select:hover,.form-group textarea:hover{border-color:#CBD5E1}
+
+table{border-collapse:separate;border-spacing:0}
+table tr{transition:background 0.12s}
+table td,table th{transition:color 0.12s}
+
+.loading-shimmer{background:linear-gradient(90deg,var(--bg) 25%,#E2E8F0 50%,var(--bg) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.demo-banner{transition:all 0.3s;overflow:hidden}
+.demo-banner:hover{transform:translateY(-1px);box-shadow:var(--shadow-md)}
+
+#notif-dropdown{animation:fadeIn 0.18s ease;border:1px solid rgba(0,0,0,0.08)}
+.notif-item{transition:all 0.12s}
+.notif-dot{animation:subtlePulse 2s infinite}
+
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 20% 20%,rgba(26,86,255,0.02) 0%,transparent 50%),radial-gradient(circle at 80% 80%,rgba(124,58,237,0.015) 0%,transparent 50%);pointer-events:none;z-index:0}
+#app{position:relative;z-index:1}
+
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:4px}
+*{scroll-behavior:smooth}
+
+.portal-link{font-size:10px;padding:3px 7px;border-radius:5px;color:rgba(255,255,255,0.3);cursor:pointer;transition:all 0.15s;text-decoration:none;display:inline-block}
+.portal-link:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
+.portal-link.active{color:rgba(59,130,246,0.9);background:rgba(59,130,246,0.1)}
+
+.hover-row{transition:background 0.12s}
+.hover-row:hover{background:var(--bg) !important}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-state-icon{font-size:40px;margin-bottom:12px;opacity:0.5}
+.empty-state-title{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:6px}
+.empty-state-desc{font-size:13px;color:var(--muted);max-width:300px;margin:0 auto}
+
+.badge,.b-success,.b-warning,.b-danger,.b-info,.b-neutral{transition:all 0.15s;letter-spacing:0.03em}
+
+#topbar{position:relative}
+#topbar::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(26,86,255,0.08) 50%,transparent)}
+
+.search-dropdown{animation:fadeIn 0.15s ease}
+.search-item{border-radius:8px;margin:2px 6px}
+</style>
+</head>
+<body>
+<div id="app">
+<nav id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo"><div class="sb-mark">N</div><div><div class="sb-name">NexRCM</div><div class="sb-sub">Insurance Verification</div></div></div>
+  </div>
+  <div class="sb-role-badge"><div class="sb-role-dot"></div><div><div class="sb-role-name">Rachel Kim</div><div class="sb-role-title">Verification Specialist</div></div></div>
+  <div class="sb-nav">
+    <div class="sb-section">Verification</div>
+    <div class="nav-item active" data-page="dashboard" onclick="go('dashboard')"><span class="nav-icon">📊</span><span>Dashboard</span></div>
+    <div class="nav-item" data-page="queue" onclick="go('queue')"><span class="nav-icon">📋</span><span>Verification Queue</span><span class="nav-badge" id="queue-badge" style="display:none">0</span></div>
+    <div class="nav-item" data-page="verify" onclick="go('verify')"><span class="nav-icon">🛡️</span><span>Run Verification</span></div>
+    <div class="sb-section">Benefits</div>
+    <div class="nav-item" data-page="benefits" onclick="go('benefits')"><span class="nav-icon">💎</span><span>Benefits Lookup</span></div>
+    <div class="nav-item" data-page="history" onclick="go('history')"><span class="nav-icon">🕑</span><span>Verification History</span></div>
+    <div class="sb-section">Reference</div>
+    <div class="nav-item" data-page="payers" onclick="go('payers')"><span class="nav-icon">📖</span><span>Payer Reference</span></div>
+    <div class="nav-item" data-page="ai-insights" onclick="go('ai-insights')"><span class="nav-icon">🤖</span><span>AI Insights</span></div>
+  </div>
+  <div class="portal-switch">
+    <div style="width:100%;font-size:9px;color:rgba(255,255,255,0.2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">All Portals</div>
+    <a class="ps-link" href="front-desk.html">🏥 Front Desk</a>
+    <a class="ps-link cur" href="#">🛡️ Ins. Verify</a>
+    <a class="ps-link" href="billing.html">💳 Billing</a>
+    <a class="ps-link" href="ar-management.html">📊 AR Mgmt</a>
+    <a class="ps-link" href="admin.html">⚙️ Admin</a>
+  </div>
+  <div class="sb-footer">
+    <div class="sb-user"><div class="sb-avatar">RK</div><div><div class="sb-uname">Rachel Kim</div><div class="sb-urole">Verification Specialist</div></div></div>
+  </div>
+</nav>
+
+<div id="main">
+  <div id="topbar">
+    <div class="topbar-title" id="page-title">Verification Dashboard</div>
+    <div id="search-wrap" style="margin-left:16px">
+      <span id="gsearch-icon">🔍</span>
+      <input id="gsearch" type="text" placeholder="Search patients, insurance, payers..." oninput="globalSearch(this.value)" onblur="setTimeout(function(){var d=document.getElementById('gsearch-drop');if(d)d.classList.remove('open')},180)"/>
+      <div class="sdrop" id="gsearch-drop"></div>
+    </div>
+    <div class="topbar-date" id="topbar-date" style="margin-left:12px"></div>
+    <div style="display:flex;gap:6px;margin-left:12px;position:relative">
+      <div class="topbar-btn" id="notif-btn" onclick="toggleNotif()">🔔<span class="notif-dot" id="notif-dot"></span></div>
+      <div id="ndrop">
+        <div class="nh"><span style="font-size:13px;font-weight:700">Alerts</span><button class="btn btn-sm btn-ghost" onclick="markAllRead()" style="font-size:11px">Clear all</button></div>
+        <div id="notif-list"></div>
+      </div>
+    </div>
+  </div>
+  <div id="content">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Insurance Verification</div><div class="ph-title">Verification Dashboard</div><div class="ph-desc">Real-time eligibility status for today's patients.</div></div>
+      <div class="ph-right">
+        <button class="btn btn-outline" id="gen-btn" onclick="generateDemoData()">⚡ Generate Demo Data</button>
+        <button class="btn btn-outline" onclick="batchVerifyAll()">🔄 Batch Verify All</button>
+        <button class="btn btn-primary" onclick="go('verify')">+ New Verification</button>
+      </div>
+    </div>
+    <div class="stats-grid" id="dash-stats" style="grid-template-columns:repeat(5,1fr)"></div>
+    <div id="dash-alerts"></div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="card">
+        <div class="card-header"><div class="card-title">Today's Appointment Queue</div><button class="btn btn-sm btn-ghost" onclick="go('queue')">Full Queue →</button></div>
+        <div id="dash-queue"></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div class="card-header"><div class="card-title">Verification Status</div></div>
+          <div id="dash-status"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">🤖 AI Alerts</div></div>
+          <div id="dash-ai-alerts"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Recent Verifications</div><button class="btn btn-sm btn-ghost" onclick="go('history')">Full History →</button></div>
+      <div id="dash-recent"></div>
+    </div>
+  </div>
+
+  <!-- QUEUE -->
+  <div class="page" id="page-queue">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Queue</div><div class="ph-title">Verification Queue</div><div class="ph-desc" id="queue-desc"></div></div>
+      <div class="ph-right">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm" id="qf-all" style="background:var(--teal);color:#fff;border-color:var(--teal)" onclick="filterQ('all',this)">All</button>
+          <button class="btn btn-sm btn-outline" onclick="filterQ('pending',this)">⏳ Pending</button>
+          <button class="btn btn-sm btn-outline" onclick="filterQ('needs-review',this)">⚠️ Needs Review</button>
+          <button class="btn btn-sm btn-outline" onclick="filterQ('expired',this)">🔴 Expired</button>
+          <button class="btn btn-sm btn-outline" onclick="filterQ('verified',this)">✅ Verified</button>
+        </div>
+        <button class="btn btn-primary" onclick="batchVerifyAll()">Batch Verify</button>
+      </div>
+    </div>
+    <div id="queue-list"></div>
+  </div>
+
+  <!-- RUN VERIFICATION -->
+  <div class="page" id="page-verify">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">Verification</div><div class="ph-title">Run Insurance Verification</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-header"><div class="card-title">Patient Selection</div></div>
+          <div class="form-group" style="margin-bottom:12px">
+            <label>Search Patient *</label>
+            <input id="vfy-q" type="text" placeholder="Type name..." oninput="vfySearch(this.value)" autocomplete="off"/>
+            <div id="vfy-drop" style="display:none;border:1px solid var(--border);border-radius:var(--r);margin-top:4px;max-height:200px;overflow-y:auto;background:var(--surface)"></div>
+          </div>
+          <div id="vfy-pt-info"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Verification Parameters</div></div>
+          <div class="form-grid form-grid-2">
+            <div class="form-group"><label>Date of Service</label><input id="vfy-dos" type="date"/></div>
+            <div class="form-group"><label>CDT Code (Optional)</label><input id="vfy-cdt" type="text" placeholder="D2740" style="text-transform:uppercase"/></div>
+            <div class="form-group" style="grid-column:1/-1"><label>Check Type</label>
+              <select id="vfy-type"><option value="full">Full Benefits</option><option value="elig">Eligibility Only</option><option value="specific">Specific Procedure</option><option value="deductible">Deductible Status</option></select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center;margin-top:14px" onclick="runVerification()">🛡️ Run Verification</button>
+        </div>
+      </div>
+      <div class="card" id="vfy-result-card">
+        <div class="card-header">
+          <div class="card-title">Result</div>
+          <button class="btn btn-sm" style="background:var(--teal);color:#fff;border-color:var(--teal);display:none" id="ai-cov-summary-btn" onclick="generateAICoverageSummary()">🤖 AI Coverage Summary</button>
+        </div>
+        <div id="vfy-result" style="text-align:center;padding:48px;color:var(--muted)">
+          <div style="font-size:52px;margin-bottom:12px">🛡️</div>
+          <div style="font-size:14px;font-weight:600">Select a patient and run verification</div>
+          <div style="font-size:12px;margin-top:6px">Results will appear here</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BENEFITS LOOKUP -->
+  <div class="page" id="page-benefits">
+    <div class="ph"><div class="ph-left"><div class="ph-eyebrow">Benefits</div><div class="ph-title">Benefits Lookup</div></div></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-header"><div class="card-title">Select Patient</div></div>
+      <div style="display:flex;gap:12px;align-items:flex-end">
+        <div class="form-group" style="flex:1"><label>Patient</label><select id="ben-pt" onchange="loadBenefits()"><option value="">Select patient...</option></select></div>
+        <button class="btn btn-primary" onclick="loadBenefits()">Load Benefits</button>
+      </div>
+    </div>
+    <div id="ben-result"></div>
+    <!-- AI Benefits Analysis -->
+    <div id="ben-ai-analysis" style="display:none;margin-top:16px"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="page" id="page-history">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">History</div><div class="ph-title">Verification History</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('History exported','success')">Export CSV</button></div>
+    </div>
+    <div class="card" style="overflow:hidden;padding:0"><div id="history-list"></div></div>
+  </div>
+
+  <!-- PAYER REFERENCE -->
+  <div class="page" id="page-payers">
+    <div class="ph"><div class="ph-left"><div class="ph-eyebrow">Reference</div><div class="ph-title">Payer Reference</div></div></div>
+    <div id="payer-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px"></div>
+  </div>
+
+  <!-- AI INSIGHTS -->
+  <div class="page" id="page-ai-insights">
+    <div class="ph">
+      <div class="ph-left"><div class="ph-eyebrow">AI</div><div class="ph-title">AI Verification Insights</div></div>
+      <div class="ph-right"><button class="btn btn-outline" onclick="toast('AI report scheduled for Monday 7am','success')">Schedule Weekly</button></div>
+    </div>
+    <div id="ai-content"></div>
+  </div>
+
+  </div>
+</div>
+</div>
+
+<div id="toast-container"></div>
+
+<!-- Verify Detail Modal -->
+<div class="modal-bg" id="vd-modal">
+  <div class="modal modal-lg">
+    <div class="modal-hdr"><h2 id="vdm-title">Verification Details</h2><button class="modal-close" onclick="closeModal('vd-modal')">×</button></div>
+    <div class="modal-body" id="vdm-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('vd-modal')">Close</button>
+      <button class="btn btn-primary" onclick="closeModal('vd-modal');toast('Verification saved','success')">Confirm & Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* NexRCM Insurance Verification Portal — Demo Only */
+
+var DATA = (function(){
+  var PATIENTS=[
+    {id:'P001',first:'Sarah',last:'Johnson',dob:'1985-03-14',phone:'(310) 555-0192',insurance:'Delta Dental',memberId:'DD-4521987',groupNum:'G-9021',provider:'Dr. Martinez',balance:280,lastVisit:'2026-02-15',nextAppt:'2026-03-17 10:00'},
+    {id:'P002',first:'James',last:'Lee',dob:'1972-11-28',phone:'(424) 555-0847',insurance:'Cigna',memberId:'CIG-7823401',groupNum:'G-4455',provider:'Dr. Patel',balance:450,lastVisit:'2026-02-18',nextAppt:'2026-03-17 10:00'},
+    {id:'P003',first:'Maria',last:'Garcia',dob:'1990-07-05',phone:'(818) 555-0234',insurance:'Aetna',memberId:'AET-3310982',groupNum:'G-7788',provider:'Dr. Thompson',balance:0,lastVisit:'2026-01-22',nextAppt:'2026-03-17 09:00'},
+    {id:'P004',first:'Robert',last:'Chen',dob:'1968-01-19',phone:'(213) 555-0561',insurance:'United Healthcare',memberId:'UHC-9017234',groupNum:'G-3312',provider:'Dr. Martinez',balance:0,lastVisit:'2026-02-20',nextAppt:'2026-03-17 08:30'},
+    {id:'P005',first:'Linda',last:'Wilson',dob:'1955-09-30',phone:'(626) 555-0783',insurance:'Humana',memberId:'HUM-5542187',groupNum:'G-6634',provider:'Dr. Thompson',balance:185,lastVisit:'2026-01-10',nextAppt:'2026-03-17 11:30'},
+    {id:'P006',first:'Michael',last:'Torres',dob:'1988-04-22',phone:'(323) 555-0419',insurance:'BlueCross BlueShield',memberId:'BCBS-7712039',groupNum:'G-5521',provider:'Dr. Patel',balance:0,lastVisit:'2026-02-05',nextAppt:'2026-03-17 16:00'},
+    {id:'P007',first:'Jennifer',last:'Adams',dob:'1994-12-07',phone:'(310) 555-0674',insurance:'Delta Dental',memberId:'DD-8823451',groupNum:'G-9021',provider:'Dr. Martinez',balance:350,lastVisit:'2026-02-22',nextAppt:'2026-03-17 10:30'},
+    {id:'P008',first:'David',last:'Kim',dob:'1979-06-16',phone:'(714) 555-0328',insurance:'Cigna',memberId:'CIG-4490112',groupNum:'G-4455',provider:'Dr. Thompson',balance:180,lastVisit:'2025-11-15',nextAppt:null},
+    {id:'P009',first:'Patricia',last:'Brown',dob:'1962-08-03',phone:'(818) 555-0912',insurance:'United Healthcare',memberId:'UHC-7123090',groupNum:'G-3312',provider:'Dr. Martinez',balance:0,lastVisit:'2026-02-24',nextAppt:'2026-03-17 10:30'},
+    {id:'P010',first:'Christopher',last:'Hall',dob:'2000-05-21',phone:'(310) 555-0345',insurance:'BlueCross BlueShield',memberId:'BCBS-9900123',groupNum:'G-5521',provider:'Dr. Martinez',balance:350,lastVisit:'2026-02-26',nextAppt:'2026-03-17 16:00'},
+    {id:'P011',first:'Amanda',last:'Foster',dob:'1998-03-11',phone:'(323) 555-0228',insurance:'MetLife',memberId:'MET-6623019',groupNum:'G-8897',provider:'Dr. Patel',balance:120,lastVisit:'2026-03-01',nextAppt:'2026-03-17 09:30'},
+    {id:'P012',first:'Thomas',last:'Wright',dob:'1975-12-25',phone:'(714) 555-0991',insurance:'Guardian',memberId:'GRD-4451278',groupNum:'G-2234',provider:'Dr. Thompson',balance:0,lastVisit:'2026-02-28',nextAppt:'2026-03-17 14:30'},
+  ];
+  var ELIG={
+    P001:{status:'active',annualMax:2000,usedBenefit:960,remaining:1040,deductMet:1000,deductTotal:1000,coIns:80,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-15',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'LA Teachers Union',network:'In-Network',implantCover:50,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P002:{status:'active',annualMax:1500,usedBenefit:1200,remaining:300,deductMet:150,deductTotal:150,coIns:90,coInsMajor:70,waitingPeriod:'None',lastVerified:'2026-03-10',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'HMO',groupName:'Beverly Hills Employers',network:'In-Network',implantCover:0,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P003:{status:'active',annualMax:2500,usedBenefit:800,remaining:1700,deductMet:200,deductTotal:500,coIns:80,coInsMajor:50,waitingPeriod:'12 months ortho',lastVerified:'2026-03-01',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'Santa Monica City',network:'In-Network',implantCover:50,orthoMax:1500,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P004:{status:'active',annualMax:2500,usedBenefit:280,remaining:2220,deductMet:500,deductTotal:500,coIns:90,coInsMajor:60,waitingPeriod:'None',lastVerified:'2026-03-15',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'UHC National',network:'In-Network',implantCover:50,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P005:{status:'active',annualMax:1000,usedBenefit:420,remaining:580,deductMet:50,deductTotal:50,coIns:80,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-02-28',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'DHMO',groupName:'Humana Choice',network:'In-Network',implantCover:0,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P006:{status:'terminated',annualMax:2000,usedBenefit:2200,remaining:0,deductMet:500,deductTotal:500,coIns:80,coInsMajor:50,waitingPeriod:'None',lastVerified:'2025-12-01',coverageEffective:'2025-01-01',coverageEnd:'2025-12-31',planType:'PPO',groupName:'BCBS National',network:'Out-of-Network',implantCover:0,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P007:{status:'active',annualMax:2000,usedBenefit:680,remaining:1320,deductMet:0,deductTotal:50,coIns:80,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-14',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'LA Teachers Union',network:'In-Network',implantCover:50,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P008:{status:'terminated',annualMax:1500,usedBenefit:1900,remaining:0,deductMet:150,deductTotal:150,coIns:90,coInsMajor:70,waitingPeriod:'None',lastVerified:'2025-11-01',coverageEffective:'2025-01-01',coverageEnd:'2025-12-31',planType:'HMO',groupName:'Cigna Choice',network:'Out-of-Network',implantCover:0,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P009:{status:'active',annualMax:2500,usedBenefit:0,remaining:2500,deductMet:500,deductTotal:500,coIns:90,coInsMajor:60,waitingPeriod:'None',lastVerified:'2026-03-12',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'UHC National',network:'In-Network',implantCover:50,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P010:{status:'active',annualMax:1500,usedBenefit:1650,remaining:0,deductMet:150,deductTotal:150,coIns:80,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-10',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'BCBS National',network:'In-Network',implantCover:50,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P011:{status:'active',annualMax:1500,usedBenefit:248,remaining:1252,deductMet:100,deductTotal:100,coIns:80,coInsMajor:50,waitingPeriod:'None',lastVerified:'2026-03-02',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'MetLife Choice',network:'In-Network',implantCover:0,orthoMax:1000,freqCleaning:'2x/year',freqBW:'1x/year'},
+    P012:{status:'active',annualMax:2000,usedBenefit:195,remaining:1805,deductMet:50,deductTotal:50,coIns:95,coInsMajor:60,waitingPeriod:'None',lastVerified:'2026-03-01',coverageEffective:'2026-01-01',coverageEnd:'2026-12-31',planType:'PPO',groupName:'Guardian Plus',network:'In-Network',implantCover:60,orthoMax:0,freqCleaning:'2x/year',freqBW:'1x/year'},
+  };
+  var APPTS=[
+    {id:'A001',patientId:'P001',patient:'Sarah Johnson',time:'08:30',provider:'Dr. Martinez',type:'Crown Delivery',insurance:'Delta Dental',verifyStatus:'verified'},
+    {id:'A002',patientId:'P004',patient:'Robert Chen',time:'09:00',provider:'Dr. Martinez',type:'Recall Exam + Cleaning',insurance:'United Healthcare',verifyStatus:'verified'},
+    {id:'A003',patientId:'P011',patient:'Amanda Foster',time:'09:30',provider:'Dr. Patel',type:'Composite Filling x2',insurance:'MetLife',verifyStatus:'needs-review'},
+    {id:'A004',patientId:'P002',patient:'James Lee',time:'10:00',provider:'Dr. Patel',type:'Periodontal SRP',insurance:'Cigna',verifyStatus:'pending'},
+    {id:'A005',patientId:'P007',patient:'Jennifer Adams',time:'10:30',provider:'Dr. Martinez',type:'Wisdom Tooth Extraction',insurance:'Delta Dental',verifyStatus:'verified'},
+    {id:'A006',patientId:'P005',patient:'Linda Wilson',time:'11:30',provider:'Dr. Thompson',type:'Follow-up + X-rays',insurance:'Humana',verifyStatus:'needs-review'},
+    {id:'A007',patientId:'P010',patient:'Christopher Hall',time:'13:00',provider:'Dr. Martinez',type:'Root Canal #19',insurance:'BlueCross BlueShield',verifyStatus:'pending'},
+    {id:'A008',patientId:'P012',patient:'Thomas Wright',time:'14:30',provider:'Dr. Thompson',type:'Implant Consult',insurance:'Guardian',verifyStatus:'verified'},
+    {id:'A009',patientId:'P003',patient:'Maria Garcia',time:'15:00',provider:'Dr. Thompson',type:'Denture Adjustment',insurance:'Aetna',verifyStatus:'pending'},
+    {id:'A010',patientId:'P006',patient:'Michael Torres',time:'16:00',provider:'Dr. Patel',type:'Emergency - Toothache',insurance:'BlueCross BlueShield',verifyStatus:'expired'},
+  ];
+  var PAYERS=[
+    {name:'Delta Dental',color:'#003087',phone:'1-800-765-6003',portal:'deltadentalins.com',avgDays:14,denialRate:8,verifyMethod:'EDI 270/271 + Portal',notes:'Strong preventive coverage. Major restorative requires COB check. Benefits reset Jan 1.'},
+    {name:'Cigna',color:'#007F7F',phone:'1-800-244-6224',portal:'cigna.com/providers',avgDays:18,denialRate:12,verifyMethod:'EDI 270/271',notes:'Check frequency limits carefully. Periodontal coverage varies by plan.'},
+    {name:'Aetna',color:'#7D2248',phone:'1-800-282-4548',portal:'aetna.com/providers',avgDays:21,denialRate:15,verifyMethod:'Phone + NaviMedix',notes:'Implants often denied without documented missing tooth clause.'},
+    {name:'United Healthcare',color:'#0072CE',phone:'1-877-842-3210',portal:'uhcprovider.com',avgDays:16,denialRate:10,verifyMethod:'UHC Provider Portal',notes:'Excellent real-time eligibility. Always confirm network status.'},
+    {name:'BlueCross BlueShield',color:'#003DA5',phone:'1-800-676-2583',portal:'bcbs.com/providers',avgDays:19,denialRate:11,verifyMethod:'Availity',notes:'Multiple state plans — verify exact plan. Benefits vary significantly.'},
+    {name:'Humana',color:'#4CAF50',phone:'1-800-448-6262',portal:'humana.com/providers',avgDays:17,denialRate:9,verifyMethod:'EDI 270/271',notes:'DHMO vs PPO coverage differs greatly. Always confirm plan type first.'},
+    {name:'MetLife',color:'#0047AB',phone:'1-800-638-5000',portal:'metlife.com/providers',avgDays:20,denialRate:13,verifyMethod:'MetLife Portal',notes:'Alternate benefit clauses common. Verify crown vs amalgam allowance.'},
+    {name:'Guardian',color:'#8B0000',phone:'1-800-538-4047',portal:'guardianlife.com/providers',avgDays:15,denialRate:7,verifyMethod:'Availity + Phone',notes:'Excellent clean claim rate. Frequency limits strictly enforced.'},
+  ];
+  return{
+    PATIENTS:PATIENTS,ELIG:ELIG,APPTS:APPTS,PAYERS:PAYERS,TODAY:'2026-03-17',
+    pt:function(id){return PATIENTS.find(function(p){return p.id===id;})||null;},
+    el:function(id){return ELIG[id]||null;},
+    fmt$:function(n){n=parseFloat(n)||0;if(n>=1000)return'$'+(n/1000).toFixed(1)+'K';return'$'+n.toFixed(0);},
+    fmtD:function(d){if(!d)return'—';var p=d.split('-'),m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m[+p[1]-1]+' '+(+p[2])+', '+p[0];},
+    esc:function(s){var e={'<':'&lt;','>':'&gt;','&':'&amp;'};return String(s||'').replace(/[<>&]/g,function(c){return e[c]||c;});}
+  };
+})();
+
+// ── State ─────────────────────────────────────────────────
+var _qf='all';
+var _queue=DATA.APPTS.map(function(a){return Object.assign({},a);});
+var _history=[];
+var _vfyPt=null;
+var _notifs=[
+  {id:1,icon:'🔴',title:'Expired Coverage',msg:'Michael Torres — BCBS coverage expired 12/31/2025. 4:00 PM treatment at risk.',time:'Just now',unread:true},
+  {id:2,icon:'⚠️',title:'Needs Review',msg:'Amanda Foster — MetLife benefits 83% used. May not cover full treatment.',time:'10 min ago',unread:true},
+  {id:3,icon:'⏳',title:'Pending',msg:'3 patients unverified: James Lee, Christopher Hall, Maria Garcia.',time:'30 min ago',unread:true},
+  {id:4,icon:'✅',title:'Verified',msg:'Robert Chen — UHC verified. $2,220 remaining.',time:'1 hr ago',unread:false},
+];
+
+// ── Init ──────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',function(){
+  var now=new Date();
+  var ds=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  var ms=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('topbar-date').textContent=ds[now.getDay()]+', '+ms[now.getMonth()]+' '+now.getDate()+', '+now.getFullYear();
+  renderNotifs();
+  populateBenSel();
+  renderPayerList();
+  renderHistory();
+  renderAIContent();
+  updateBadge();
+  go('dashboard');
+});
+
+var TITLES={dashboard:'Verification Dashboard',queue:'Verification Queue',verify:'Run Verification',benefits:'Benefits Lookup',history:'Verification History',payers:'Payer Reference','ai-insights':'AI Insights'};
+
+function go(page){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
+  var pg=document.getElementById('page-'+page);if(pg)pg.classList.add('active');
+  document.querySelectorAll('.nav-item[data-page]').forEach(function(n){n.classList.remove('active');});
+  var nav=document.querySelector('[data-page="'+page+'"]');if(nav)nav.classList.add('active');
+  var t=document.getElementById('page-title');if(t)t.textContent=TITLES[page]||page;
+  if(page==='dashboard')renderDash();
+  if(page==='queue')renderQueue();
+  if(page==='history')renderHistory();
+}
+
+// ── Dashboard ─────────────────────────────────────────────
+function renderDash(){
+  var verified=_queue.filter(function(a){return a.verifyStatus==='verified';}).length;
+  var pending=_queue.filter(function(a){return a.verifyStatus==='pending';}).length;
+  var review=_queue.filter(function(a){return a.verifyStatus==='needs-review';}).length;
+  var expired=_queue.filter(function(a){return a.verifyStatus==='expired';}).length;
+  var total=_queue.length;
+  var sg=document.getElementById('dash-stats');
+  if(sg)sg.innerHTML=[
+    {icon:'📋',label:'Total Today',val:total,sub:'appointments',c:'var(--text)'},
+    {icon:'✅',label:'Verified',val:verified,sub:'confirmed',c:'#10B981'},
+    {icon:'⏳',label:'Pending',val:pending,sub:'needs check',c:'#3B82F6'},
+    {icon:'⚠️',label:'Needs Review',val:review,sub:'action needed',c:'#F59E0B'},
+    {icon:'🔴',label:'Expired',val:expired,sub:'coverage lapsed',c:'#EF4444'},
+  ].map(function(s){return'<div class="stat-card"><div class="stat-icon">'+s.icon+'</div><div class="stat-label">'+s.label+'</div><div class="stat-val" style="color:'+s.c+'">'+s.val+'</div><div class="stat-sub">'+s.sub+'</div></div>';}).join('');
+
+  var ab=document.getElementById('dash-alerts');
+  if(ab){
+    var alerts=[];
+    if(expired>0)alerts.push({t:'danger',m:'🔴 '+expired+' patient'+(expired>1?'s have':'has')+' expired coverage — treatment may not be covered'});
+    if(review>0)alerts.push({t:'warning',m:'⚠️ '+review+' patient'+(review>1?'s need':'needs')+' manual review before treatment'});
+    if(pending>0)alerts.push({t:'info',m:'⏳ '+pending+' patient'+(pending>1?'s':'')+' not yet verified today'});
+    var BC={danger:'var(--danger-bg)',warning:'var(--warning-bg)',info:'var(--info-bg)'};
+    var BD={danger:'var(--danger-border)',warning:'var(--warning-border)',info:'var(--info-border)'};
+    var CO={danger:'#991B1B',warning:'#92400E',info:'#1D4ED8'};
+    ab.innerHTML=alerts.length?'<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">'+alerts.map(function(a){return'<div style="flex:1;min-width:200px;background:'+BC[a.t]+';border:1px solid '+BD[a.t]+';border-radius:var(--r-lg);padding:10px 14px;font-size:13px;font-weight:500;color:'+CO[a.t]+'">'+a.m+'</div>';}).join('')+'</div>':'';
+  }
+
+  var qel=document.getElementById('dash-queue');
+  if(qel){
+    var sc={verified:'#10B981','needs-review':'#F59E0B',expired:'#EF4444',pending:'#94A3B8'};
+    var sl={verified:'Verified','needs-review':'Needs Review',expired:'Expired',pending:'Pending'};
+    qel.innerHTML=_queue.slice(0,8).map(function(a){var c=sc[a.verifyStatus]||'#94A3B8';var l=sl[a.verifyStatus]||a.verifyStatus;
+      return'<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border-light);cursor:pointer" onclick="openDetail(\''+a.patientId+'\')">'
+        +'<div style="font-family:monospace;font-size:13px;font-weight:700;min-width:46px">'+a.time+'</div>'
+        +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+DATA.esc(a.patient)+'</div><div style="font-size:11.5px;color:var(--muted)">'+DATA.esc(a.insurance)+' · '+DATA.esc(a.type)+'</div></div>'
+        +'<div style="display:flex;align-items:center;gap:6px">'
+          +'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:'+c+'20;color:'+c+';border:1px solid '+c+'40">'+l+'</span>'
+          +(a.verifyStatus==='pending'||a.verifyStatus==='expired'||a.verifyStatus==='needs-review'?'<button class="btn btn-sm btn-primary" style="padding:3px 8px;font-size:11px" onclick="event.stopPropagation();quickVerify(\''+a.id+'\')">Verify</button>':'')
+        +'</div>'
+      +'</div>';
+    }).join('');
+  }
+
+  var ss=document.getElementById('dash-status');
+  if(ss){
+    var cats=[{l:'Verified',n:verified,c:'#10B981'},{l:'Pending',n:pending,c:'#3B82F6'},{l:'Needs Review',n:review,c:'#F59E0B'},{l:'Expired',n:expired,c:'#EF4444'}];
+    ss.innerHTML=cats.map(function(c){var pct=total>0?Math.round(c.n/total*100):0;return'<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12.5px;font-weight:600">'+c.l+'</span><span style="font-size:12.5px;font-weight:700;color:'+c.c+'">'+c.n+' ('+pct+'%)</span></div><div style="height:6px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+c.c+';border-radius:99px;transition:width 0.8s ease"></div></div></div>';}).join('');
+  }
+
+  var aa=document.getElementById('dash-ai-alerts');
+  if(aa){
+    var items=[
+      {i:'🔴',m:'Michael Torres: Benefits exceeded — collect full amount from patient.',c:'#EF4444'},
+      {i:'⚠️',m:'Amanda Foster: Only $1,252 left — may not cover complete treatment.',c:'#F59E0B'},
+      {i:'✅',m:'Thomas Wright: Guardian 60% major, $1,805 remaining — excellent coverage.',c:'#10B981'},
+    ];
+    aa.innerHTML=items.map(function(a){return'<div style="display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:12.5px;color:var(--text2)"><span>'+a.i+'</span><span>'+a.m+'</span></div>';}).join('');
+  }
+
+  var rv=document.getElementById('dash-recent');
+  if(rv){
+    var hist=_history.length?_history:[
+      {t:'09:15',pt:'Robert Chen',ins:'United Healthcare',r:'verified',rem:2220},
+      {t:'08:45',pt:'Sarah Johnson',ins:'Delta Dental',r:'verified',rem:1040},
+      {t:'08:30',pt:'Jennifer Adams',ins:'Delta Dental',r:'verified',rem:1320},
+      {t:'Yesterday',pt:'Thomas Wright',ins:'Guardian',r:'verified',rem:1805},
+      {t:'Yesterday',pt:'Maria Garcia',ins:'Aetna',r:'needs-review',rem:1700},
+    ];
+    var sc2={verified:'#10B981','needs-review':'#F59E0B',expired:'#EF4444'};
+    rv.innerHTML=hist.slice(0,6).map(function(h){var c=sc2[h.r]||'#94A3B8';
+      return'<div style="display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border-light)">'
+        +'<div style="font-size:11px;color:var(--muted);min-width:76px">'+DATA.esc(h.t)+'</div>'
+        +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+DATA.esc(h.pt)+'</div><div style="font-size:11.5px;color:var(--muted)">'+DATA.esc(h.ins)+'</div></div>'
+        +'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:'+c+'20;color:'+c+';border:1px solid '+c+'40">'+h.r+'</span>'
+        +'<div style="font-size:12.5px;font-weight:700;color:'+(h.rem>500?'#10B981':h.rem>0?'#F59E0B':'#EF4444')+'">'+DATA.fmt$(h.rem)+' left</div>'
+      +'</div>';
+    }).join('');
+  }
+}
+
+// ── Queue ─────────────────────────────────────────────────
+function renderQueue(){
+  var el=document.getElementById('queue-list');if(!el)return;
+  var items=_queue.slice();
+  if(_qf!=='all')items=items.filter(function(a){return a.verifyStatus===_qf;});
+  var cd=document.getElementById('queue-desc');if(cd)cd.textContent=items.length+' patients · '+DATA.TODAY;
+  updateBadge();
+  if(!items.length){el.innerHTML='<div style="text-align:center;padding:60px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">✅</div><div style="font-size:15px;font-weight:700">No items for this filter</div></div>';return;}
+  var SC={verified:'vs-verified','needs-review':'vs-needs-review',expired:'vs-expired',pending:'vs-pending'};
+  var SL={verified:'✅ Verified','needs-review':'⚠️ Needs Review',expired:'🔴 Expired',pending:'⏳ Pending'};
+  var SB={verified:'b-success','needs-review':'b-warning',expired:'b-danger',pending:'b-neutral'};
+  el.innerHTML=items.map(function(a){
+    var elig=DATA.el(a.patientId);
+    return'<div class="vq-row '+SC[a.verifyStatus]+'" onclick="openDetail(\''+a.patientId+'\')">'
+      +'<div style="min-width:52px;text-align:center"><div style="font-family:monospace;font-size:14px;font-weight:700">'+a.time+'</div></div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">'+DATA.esc(a.patient)+'</div><div style="font-size:12px;color:var(--muted);margin-top:2px">'+DATA.esc(a.type)+' · '+DATA.esc(a.insurance)+'</div></div>'
+      +(elig?'<div style="text-align:right;min-width:110px"><div style="font-size:14px;font-weight:700;color:'+(elig.remaining>500?'#10B981':elig.remaining>0?'#F59E0B':'#EF4444')+'">'+DATA.fmt$(elig.remaining)+'</div><div style="font-size:11px;color:var(--muted)">remaining</div></div>':'<div style="min-width:100px"></div>')
+      +'<div style="display:flex;flex-direction:column;gap:5px;min-width:120px;align-items:flex-end">'
+        +'<span class="badge '+SB[a.verifyStatus]+'">'+SL[a.verifyStatus]+'</span>'
+        +(a.verifyStatus!=='verified'?'<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();quickVerify(\''+a.id+'\')">Verify Now</button>':'<button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();openDetail(\''+a.patientId+'\')">Details</button>')
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+function filterQ(f,btn){
+  _qf=f;
+  document.querySelectorAll('[onclick^="filterQ"]').forEach(function(b){b.style.background='';b.style.color='';b.style.borderColor='';});
+  if(btn){btn.style.background='var(--teal)';btn.style.color='#fff';btn.style.borderColor='var(--teal)';}
+  renderQueue();
+}
+
+function updateBadge(){
+  var n=_queue.filter(function(a){return a.verifyStatus!=='verified';}).length;
+  var b=document.getElementById('queue-badge');if(b){b.textContent=n;b.style.display=n>0?'inline-flex':'none';}
+}
+
+function quickVerify(aptId){
+  var apt=_queue.find(function(a){return a.id===aptId;});if(!apt)return;
+  toast('Verifying '+apt.patient+' with '+apt.insurance+'...','info');
+  setTimeout(function(){
+    var elig=DATA.el(apt.patientId);
+    var ns=(!elig||elig.status==='terminated')?'expired':(elig.remaining<200?'needs-review':'verified');
+    apt.verifyStatus=ns;
+    if(ns==='verified'){
+      _history.unshift({t:'Just now',pt:apt.patient,ins:apt.insurance,r:'verified',rem:elig?elig.remaining:1000});
+      toast(apt.patient+' verified — '+(elig?DATA.fmt$(elig.remaining)+' remaining':'OK'),'success');
+    } else if(ns==='needs-review'){
+      _history.unshift({t:'Just now',pt:apt.patient,ins:apt.insurance,r:'needs-review',rem:elig?elig.remaining:0});
+      toast(apt.patient+' — low benefits remaining. Review before treatment.','warning');
+    } else {
+      _history.unshift({t:'Just now',pt:apt.patient,ins:apt.insurance,r:'expired',rem:0});
+      toast(apt.patient+' — coverage EXPIRED. Patient needs updated insurance.','error');
+    }
+    renderDash();renderQueue();updateBadge();
+  },1600);
+}
+
+function batchVerifyAll(){
+  toast('Running EDI batch verification...','info');
+  var cnt=0;
+  setTimeout(function(){
+    _queue.forEach(function(a){
+      if(a.verifyStatus==='pending'){
+        var elig=DATA.el(a.patientId);
+        var ns=(!elig||elig.status==='terminated')?'expired':(elig&&elig.remaining<200?'needs-review':'verified');
+        a.verifyStatus=ns;cnt++;
+        _history.unshift({t:'Batch',pt:a.patient,ins:a.insurance,r:ns,rem:elig?elig.remaining:0});
+      }
+    });
+    renderDash();renderQueue();updateBadge();
+    toast(cnt+' patients verified via EDI batch','success','Batch Complete');
+  },2200);
+}
+
+// ── Run Verification ──────────────────────────────────────
+function vfySearch(q){
+  var dr=document.getElementById('vfy-drop');if(!dr)return;
+  if(!q||q.length<2){dr.style.display='none';return;}
+  var matches=DATA.PATIENTS.filter(function(p){return(p.first+' '+p.last).toLowerCase().includes(q.toLowerCase());});
+  if(!matches.length){dr.style.display='none';return;}
+  dr.style.display='block';
+  dr.innerHTML=matches.map(function(p){
+    return'<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border-light);display:flex;gap:10px;align-items:center" onmouseover="this.style.background=\'var(--bg)\'" onmouseout="this.style.background=\'\'" onclick="selVfyPt(\''+p.id+'\')">'
+      +'<div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--brand));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff">'+p.first[0]+p.last[0]+'</div>'
+      +'<div><div style="font-size:13px;font-weight:600">'+p.first+' '+p.last+'</div><div style="font-size:11.5px;color:var(--muted)">'+p.insurance+' · DOB '+p.dob+'</div></div>'
+    +'</div>';
+  }).join('');
+}
+
+function selVfyPt(id){
+  _vfyPt=DATA.pt(id);
+  document.getElementById('vfy-drop').style.display='none';
+  document.getElementById('vfy-q').value=_vfyPt.first+' '+_vfyPt.last;
+  var pi=document.getElementById('vfy-pt-info');if(!pi)return;
+  var e=DATA.el(id);
+  pi.innerHTML='<div style="background:var(--bg);border-radius:var(--r);padding:12px 14px;font-size:13px">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      +[['Insurance',_vfyPt.insurance],['Member ID',_vfyPt.memberId],['Group',_vfyPt.groupNum||'—'],['Last Verified',e?DATA.fmtD(e.lastVerified):'Never']]
+      .map(function(r){return'<div><div style="font-size:10.5px;color:var(--muted);margin-bottom:2px">'+r[0]+'</div><div style="font-weight:600">'+DATA.esc(r[1])+'</div></div>';}).join('')
+    +'</div></div>';
+  document.getElementById('vfy-dos').value=DATA.TODAY;
+}
+
+function runVerification(){
+  if(!_vfyPt){toast('Select a patient first','error');return;}
+  var res=document.getElementById('vfy-result');
+  res.innerHTML='<div style="text-align:center;padding:48px"><div class="spinner" style="margin:0 auto 16px;width:32px;height:32px;border-width:3px"></div><div style="font-size:14px;font-weight:600">Verifying with '+DATA.esc(_vfyPt.insurance)+'...</div><div style="font-size:12px;color:var(--muted);margin-top:6px">Connecting via EDI 270/271</div></div>';
+  setTimeout(function(){showVfyResult(_vfyPt.id);},2200);
+}
+
+function showVfyResult(pid){
+  var p=DATA.pt(pid);var e=DATA.el(pid);
+  var res=document.getElementById('vfy-result');
+  if(!e){res.innerHTML='<div style="text-align:center;padding:40px;color:var(--danger)"><div style="font-size:36px;margin-bottom:8px">❌</div><div style="font-size:15px;font-weight:700">No Coverage Found</div><div style="font-size:13px;color:var(--muted);margin-top:6px">Please call payer directly.</div></div>';return;}
+  var active=e.status==='active';
+  var usedPct=e.annualMax>0?Math.round(e.usedBenefit/e.annualMax*100):100;
+  _history.unshift({t:'Just now',pt:p.first+' '+p.last,ins:p.insurance,r:active?'verified':'expired',rem:e.remaining});
+  var apt=_queue.find(function(a){return a.patientId===pid;});
+  if(apt)apt.verifyStatus=active?(e.remaining<200?'needs-review':'verified'):'expired';
+  updateBadge();
+  res.innerHTML=
+    '<div class="cov-card">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">'
+        +'<div style="font-size:26px">'+(active?'✅':'🔴')+'</div>'
+        +'<div><div style="font-size:16px;font-weight:700;color:'+(active?'#6EE7B7':'#FCA5A5')+'">Coverage '+(active?'Active':'Terminated')+'</div><div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px">'+p.insurance+' · '+e.planType+' · '+e.groupName+'</div></div>'
+        +'<div style="margin-left:auto;font-size:10px;background:rgba(255,255,255,0.1);padding:3px 10px;border-radius:99px;color:rgba(255,255,255,0.5)">EDI 271</div>'
+      +'</div>'
+      +'<div style="margin-bottom:16px"><div style="display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:6px"><span>Benefits Used</span><span>'+DATA.fmt$(e.usedBenefit)+' / '+DATA.fmt$(e.annualMax)+'</span></div>'
+        +'<div class="ben-bar"><div class="ben-fill" style="width:'+usedPct+'%;background:'+(usedPct>90?'#EF4444':usedPct>70?'#F59E0B':'#10B981')+'"></div></div>'
+        +'<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px">'+usedPct+'% used · '+DATA.fmt$(e.remaining)+' remaining</div>'
+      +'</div>'
+      +[
+        ['Annual Max','$'+e.annualMax],['Remaining','$'+e.remaining+(e.remaining===0?' ⚠️ MAX REACHED':'')],
+        ['Deductible',e.deductMet>=(e.deductTotal||50)?'Met ✅':'$'+(e.deductTotal-e.deductMet)+' left'],
+        ['Preventive','100%'],['Basic (Fillings)',e.coIns+'%'],['Major (Crowns)',e.coInsMajor+'%'],
+        ['Implants',e.implantCover>0?e.implantCover+'%':'Not Covered'],['Network',e.network],
+        ['Effective',e.coverageEffective],['Expires',e.coverageEnd],
+      ].map(function(r){return'<div class="cov-row"><span style="font-size:12.5px;color:rgba(255,255,255,0.5)">'+r[0]+'</span><span style="font-size:12.5px;font-weight:600;color:'+(r[1].includes('Not Covered')||r[1].includes('REACHED')?'#FCA5A5':r[1].includes('Met')?'#6EE7B7':'#fff')+'">'+DATA.esc(r[1])+'</span></div>';}).join('')
+    +'</div>'
+    +'<div class="ai-box" style="margin-top:14px">'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><span style="font-size:16px">🤖</span><span style="font-size:13px;font-weight:700;color:#5B21B6">AI Verification Notes</span></div>'
+      +'<div style="font-size:12.5px;color:var(--text2);line-height:1.7">'
+        +(e.remaining===0?'⚠️ Annual max reached — patient responsible for 100% of today\'s fees.<br>':'')
+        +(e.remaining<300&&e.remaining>0?'⚠️ Only '+DATA.fmt$(e.remaining)+' left — collect upfront for procedures exceeding this.<br>':'')
+        +(active?'✅ Coverage confirmed active through '+e.coverageEnd+'.<br>':'❌ Coverage terminated — do not proceed without patient authorization.<br>')
+        +(e.waitingPeriod&&e.waitingPeriod!=='None'?'⏳ Waiting period: '+e.waitingPeriod+'<br>':'')
+        +'💡 Estimated patient portion for major restorative: '+DATA.fmt$(Math.round(350*(100-e.coInsMajor)/100))
+      +'</div>'
+    +'</div>'
+    +'<div style="display:flex;gap:8px;margin-top:14px">'
+      +'<button class="btn btn-sm" style="background:rgba(255,255,255,0.14);color:#fff;border-color:rgba(255,255,255,0.2)" onclick="toast(\'Verification saved to patient record\',\'success\')">Save to Record</button>'
+      +'<button class="btn btn-sm" style="background:'+(active?'#10B981':'#EF4444')+';color:#fff;border-color:'+(active?'#10B981':'#EF4444')+'" onclick="toast(\''+(active?'Approved for treatment — front desk notified':'Flagged — front desk alerted')+'\',"'+(active?'success':'warning')+'\')">'+(active?'✅ Approve':'🔴 Flag')+'</button>'
+    +'</div>';
+  toast('Verification complete for '+p.first+' '+p.last,'success');
+}
+
+// ── Benefits Lookup ───────────────────────────────────────
+function populateBenSel(){
+  var sel=document.getElementById('ben-pt');if(!sel)return;
+  DATA.PATIENTS.forEach(function(p){var o=document.createElement('option');o.value=p.id;o.textContent=p.first+' '+p.last+' ('+p.insurance+')';sel.appendChild(o);});
+}
+
+function loadBenefits(){
+  var pid=document.getElementById('ben-pt').value;
+  var el=document.getElementById('ben-result');if(!el)return;
+  if(!pid){el.innerHTML='';return;}
+  var p=DATA.pt(pid);var e=DATA.el(pid);
+  if(!p||!e){el.innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">No eligibility data on file. Run verification first.</div>';return;}
+  var usedPct=e.annualMax>0?Math.round(e.usedBenefit/e.annualMax*100):0;
+  el.innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+    +'<div>'
+      +'<div class="cov-card" style="margin-bottom:16px">'
+        +'<div style="font-size:12px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:12px">'+p.first+' '+p.last+' · '+p.insurance+'</div>'
+        +'<div style="font-size:32px;font-weight:800;color:'+(e.remaining>500?'#6EE7B7':e.remaining>0?'#FDE68A':'#FCA5A5')+'">'+DATA.fmt$(e.remaining)+'</div>'
+        +'<div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">Remaining Benefits</div>'
+        +'<div class="ben-bar"><div class="ben-fill" style="width:'+usedPct+'%;background:'+(usedPct>90?'#EF4444':usedPct>70?'#F59E0B':'#10B981')+'"></div></div>'
+        +'<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px">'+usedPct+'% used ('+DATA.fmt$(e.usedBenefit)+' of '+DATA.fmt$(e.annualMax)+')</div>'
+      +'</div>'
+      +'<div class="card"><div class="card-header"><div class="card-title">Plan Details</div></div>'
+        +[['Plan Type',e.planType],['Group',p.groupNum||'—'],['Member ID',p.memberId],['Network',e.network],['Effective',e.coverageEffective],['Expiry',e.coverageEnd],['Status',e.status.toUpperCase()]]
+        .map(function(r){return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span style="color:var(--text2)">'+r[0]+'</span><span style="font-weight:600">'+DATA.esc(r[1])+'</span></div>';}).join('')
+      +'</div>'
+    +'</div>'
+    +'<div>'
+      +'<div class="card" style="margin-bottom:16px"><div class="card-header"><div class="card-title">Coverage by Category</div></div>'
+        +[
+          {n:'Preventive',pct:100,desc:'Exams, cleanings, X-rays',icon:'🦷',c:'#10B981'},
+          {n:'Basic Restorative',pct:e.coIns,desc:'Fillings, extractions',icon:'🔧',c:'#3B82F6'},
+          {n:'Major Restorative',pct:e.coInsMajor,desc:'Crowns, bridges, dentures',icon:'👑',c:'#F59E0B'},
+          {n:'Implants',pct:e.implantCover,desc:e.implantCover>0?'Surgical implants':'Not covered',icon:'🔩',c:e.implantCover>0?'#7C3AED':'#EF4444'},
+          {n:'Orthodontics',pct:e.orthoMax>0?50:0,desc:e.orthoMax>0?'Max $'+e.orthoMax:'Not covered',icon:'😁',c:e.orthoMax>0?'#06B6D4':'#EF4444'},
+        ].map(function(c){return'<div style="padding:12px 0;border-bottom:1px solid var(--border-light)">'
+          +'<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="font-size:16px">'+c.icon+'</span><div style="flex:1"><div style="font-size:13px;font-weight:600">'+c.n+'</div><div style="font-size:11.5px;color:var(--muted)">'+c.desc+'</div></div><div style="font-size:14px;font-weight:700;color:'+c.c+'">'+c.pct+'%</div></div>'
+          +'<div style="height:5px;background:var(--bg);border-radius:99px;overflow:hidden"><div style="height:100%;width:'+c.pct+'%;background:'+c.c+';border-radius:99px;transition:width 0.8s ease"></div></div>'
+        +'</div>';}).join('')
+      +'</div>'
+      +'<div class="card"><div class="card-header"><div class="card-title">Frequency & Limits</div></div>'
+        +[['Cleaning (D1110)',e.freqCleaning||'2x/year'],['Bitewing X-rays',e.freqBW||'1x/year'],['Deductible',e.deductMet>=(e.deductTotal||50)?'Met ✅':'$'+(e.deductTotal-e.deductMet)+' remaining'],['Waiting Period',e.waitingPeriod||'None']]
+        .map(function(r){return'<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span style="color:var(--text2)">'+r[0]+'</span><span style="font-weight:600">'+DATA.esc(r[1])+'</span></div>';}).join('')
+      +'</div>'
+    +'</div>'
+  +'</div>';
+}
+
+// ── Open Detail ───────────────────────────────────────────
+function openDetail(pid){
+  var p=DATA.pt(pid);if(!p)return;
+  var e=DATA.el(pid);
+  document.getElementById('vdm-title').textContent='Verification — '+p.first+' '+p.last;
+  var usedPct=e&&e.annualMax>0?Math.round(e.usedBenefit/e.annualMax*100):0;
+  document.getElementById('vdm-body').innerHTML=e
+    ?'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+      +'<div>'
+        +[['Name',p.first+' '+p.last],['DOB',p.dob],['Insurance',p.insurance],['Member ID',p.memberId],['Group',p.groupNum||'—'],['Provider',p.provider||'—']]
+        .map(function(r){return'<div style="margin-bottom:10px"><div style="font-size:11px;color:var(--muted);margin-bottom:2px">'+r[0]+'</div><div style="font-size:13.5px;font-weight:600">'+DATA.esc(r[1])+'</div></div>';}).join('')
+      +'</div>'
+      +'<div>'
+        +'<div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px">Coverage</div>'
+        +'<div style="margin-bottom:12px"><div style="height:8px;background:var(--bg);border-radius:99px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:'+usedPct+'%;background:'+(usedPct>90?'#EF4444':usedPct>70?'#F59E0B':'#10B981')+';border-radius:99px"></div></div><div style="font-size:11px;color:var(--muted)">$'+e.usedBenefit+' used of $'+e.annualMax+' max</div></div>'
+        +[['Status',e.status.toUpperCase()],['Remaining','$'+e.remaining],['Deductible',e.deductMet>=(e.deductTotal||50)?'Met':'$'+(e.deductTotal-e.deductMet)+' left'],['Basic',e.coIns+'%'],['Major',e.coInsMajor+'%'],['Network',e.network]]
+        .map(function(r){return'<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-light);font-size:13px"><span style="color:var(--text2)">'+r[0]+'</span><span style="font-weight:700">'+r[1]+'</span></div>';}).join('')
+      +'</div>'
+    +'</div>'
+    :'<div style="text-align:center;padding:30px;color:var(--muted)">No eligibility data. Run verification first.</div>';
+  document.getElementById('vd-modal').classList.add('open');
+}
+
+// ── History ───────────────────────────────────────────────
+function renderHistory(){
+  var el=document.getElementById('history-list');if(!el)return;
+  var hist=_history.length?_history:[
+    {t:'2026-03-17 09:15',pt:'Robert Chen',ins:'United Healthcare',r:'verified',rem:2220},
+    {t:'2026-03-17 08:45',pt:'Sarah Johnson',ins:'Delta Dental',r:'verified',rem:1040},
+    {t:'2026-03-16',pt:'Amanda Foster',ins:'MetLife',r:'needs-review',rem:1252},
+    {t:'2026-03-16',pt:'Linda Wilson',ins:'Humana',r:'needs-review',rem:580},
+    {t:'2026-03-15',pt:'David Kim',ins:'Cigna',r:'expired',rem:0},
+    {t:'2026-03-15',pt:'Jennifer Adams',ins:'Delta Dental',r:'verified',rem:1320},
+  ];
+  var SC={verified:'#10B981','needs-review':'#F59E0B',expired:'#EF4444'};
+  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="background:var(--bg);border-bottom:1px solid var(--border)">'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Date/Time</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Patient</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Insurance</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Result</th>'
+    +'<th style="padding:10px 14px;text-align:right;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase">Remaining</th>'
+    +'</tr></thead><tbody>'
+    +hist.map(function(h){var c=SC[h.r]||'#94A3B8';
+      return'<tr style="border-bottom:1px solid var(--border-light)">'
+        +'<td style="padding:10px 14px;font-size:12px;color:var(--muted);font-family:monospace">'+DATA.esc(h.t)+'</td>'
+        +'<td style="padding:10px 14px;font-size:13px;font-weight:600">'+DATA.esc(h.pt)+'</td>'
+        +'<td style="padding:10px 14px;font-size:13px;color:var(--text2)">'+DATA.esc(h.ins)+'</td>'
+        +'<td style="padding:10px 14px"><span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:'+c+'20;color:'+c+';border:1px solid '+c+'40">'+h.r+'</span></td>'
+        +'<td style="padding:10px 14px;text-align:right;font-weight:700;color:'+(h.rem>500?'#10B981':h.rem>0?'#F59E0B':'#EF4444')+'">'+DATA.fmt$(h.rem)+'</td>'
+      +'</tr>';
+    }).join('')+'</tbody></table>';
+}
+
+// ── Payer List ────────────────────────────────────────────
+function renderPayerList(){
+  var el=document.getElementById('payer-list');if(!el)return;
+  el.innerHTML=DATA.PAYERS.map(function(p){
+    return'<div class="card" style="border-top:3px solid '+p.color+'">'
+      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">'
+        +'<div style="width:40px;height:40px;border-radius:8px;background:'+p.color+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800">'+p.name[0]+'</div>'
+        +'<div style="flex:1"><div style="font-size:14px;font-weight:700">'+DATA.esc(p.name)+'</div><div style="font-size:11.5px;color:var(--muted)">'+p.verifyMethod+'</div></div>'
+        +'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--success-bg);color:#065F46;border:1px solid var(--success-border)">Connected</span>'
+      +'</div>'
+      +[['Phone',p.phone],['Portal',p.portal],['Avg Pay Days',p.avgDays+'d'],['Denial Rate',p.denialRate+'%']]
+      .map(function(r){return'<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-light);font-size:12.5px"><span style="color:var(--muted)">'+r[0]+'</span><span style="font-weight:600">'+DATA.esc(r[1])+'</span></div>';}).join('')
+      +'<div style="margin-top:10px;font-size:12px;color:var(--text2);line-height:1.5;background:var(--bg);padding:8px 10px;border-radius:var(--r)">'+DATA.esc(p.notes)+'</div>'
+      +'<button class="btn btn-outline btn-sm" style="margin-top:10px;width:100%;justify-content:center" onclick="toast(\'Connecting to '+DATA.esc(p.name)+'...\',\'info\')">🛡️ Verify via Portal</button>'
+    +'</div>';
+  }).join('');
+}
+
+// ── AI Insights ───────────────────────────────────────────
+function renderAIContent(){
+  var el=document.getElementById('ai-content');if(!el)return;
+  var insights=[
+    {t:'risk',icon:'🚨',title:'Expired Coverage Detected',body:'Michael Torres (P006) has expired BCBS coverage (ended 12/31/2025). Emergency treatment scheduled 4:00 PM. Revenue at risk: ~$420. Recommend collecting upfront or rescheduling with valid insurance.'},
+    {t:'opportunity',icon:'💡',title:'Benefits Nearly Exhausted',body:'James Lee has only $300 remaining in Cigna benefits. SRP treatment today costs ~$1,800. Pre-authorize patient portion and discuss payment plan options before treatment.'},
+    {t:'action',icon:'⚡',title:'Batch Verification Overdue',body:'3 patients (James Lee, Christopher Hall, Maria Garcia) still show pending status. Recommend running EDI batch at start of each day to complete verifications automatically.'},
+    {t:'trend',icon:'📊',title:'Verification Performance This Week',body:'94% of appointments verified before treatment (vs 87% last week). Average verification time: 2.4 min. Delta Dental continues fastest response. Good work!'},
+    {t:'positive',icon:'✅',title:'High-Coverage Patients Today',body:'Thomas Wright (Guardian, $1,805 remaining) and Robert Chen (UHC, $2,220 remaining) are great candidates for elective treatment upsells. Coverage is excellent.'},
+  ];
+  var ibg={risk:'var(--danger-bg)',opportunity:'var(--success-bg)',action:'var(--purple-bg)',trend:'var(--info-bg)',positive:'var(--success-bg)'};
+  var ib={risk:'var(--danger-border)',opportunity:'var(--success-border)',action:'var(--purple-border)',trend:'var(--info-border)',positive:'var(--success-border)'};
+  var ic={risk:'#991B1B',opportunity:'#065F46',action:'#5B21B6',trend:'#1D4ED8',positive:'#065F46'};
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">'+insights.map(function(i){return'<div style="background:'+ibg[i.t]+';border:1px solid '+ib[i.t]+';border-radius:var(--r-lg);padding:16px 18px"><div style="font-size:20px;margin-bottom:8px">'+i.icon+'</div><div style="font-size:13.5px;font-weight:700;color:'+ic[i.t]+';margin-bottom:8px">'+DATA.esc(i.title)+'</div><div style="font-size:12.5px;line-height:1.6;color:'+ic[i.t]+'">'+DATA.esc(i.body)+'</div></div>';}).join('')+'</div>';
+}
+
+// ── Demo Data Generator ───────────────────────────────────
+function generateDemoData(){
+  var btn=document.getElementById('gen-btn');
+  if(btn){btn.innerHTML='<span class="spinner" style="width:14px;height:14px;border-width:2px;border-top-color:#fff"></span> Generating...';btn.disabled=true;}
+  setTimeout(function(){
+    var names=[['Alex','Williams'],['Jordan','Martinez'],['Taylor','Brown'],['Morgan','Davis'],['Casey','Miller'],['Riley','Wilson'],['Avery','Moore'],['Quinn','Anderson'],['Blake','Thomas'],['Dakota','Jackson']];
+    var ins=['Delta Dental','Cigna','Aetna','United Healthcare','BlueCross BlueShield','Humana','MetLife','Guardian'];
+    var vs=['verified','verified','pending','needs-review','expired'];
+    for(var i=0;i<20;i++){
+      var nm=names[i%names.length];
+      _queue.push({id:'GEN'+i,patientId:'GEN'+i,patient:nm[0]+' '+nm[1],time:(9+Math.floor(i/3))+':'+(i%2===0?'00':'30'),provider:'Dr. Martinez',type:'Demo Appt',insurance:ins[i%ins.length],verifyStatus:vs[i%vs.length]});
+    }
+    if(btn){btn.innerHTML='✅ Demo Active';btn.style.background='var(--teal)';btn.style.color='#fff';btn.disabled=false;}
+    renderDash();renderQueue();updateBadge();
+    toast('20 demo patients added to queue','success','Demo Generated');
+  },1500);
+}
+
+// ── Global Search ─────────────────────────────────────────
+function globalSearch(q){
+  var dd=document.getElementById('gsearch-drop');
+  if(!q||q.length<2){dd.classList.remove('open');return;}
+  q=q.toLowerCase();
+  var pts=DATA.PATIENTS.filter(function(p){return(p.first+' '+p.last).toLowerCase().includes(q)||(p.memberId||'').toLowerCase().includes(q);}).slice(0,5);
+  var pys=DATA.PAYERS.filter(function(p){return p.name.toLowerCase().includes(q);}).slice(0,3);
+  var html='';
+  if(pts.length){html+='<div class="sdrop-section">👤 Patients</div>'+pts.map(function(p){return'<div class="sdrop-item" onclick="selVfyPt(\''+p.id+'\');go(\'verify\')"><div class="sdrop-icon">👤</div><div><div style="font-size:13px;font-weight:600">'+p.first+' '+p.last+'</div><div style="font-size:11.5px;color:var(--muted)">'+p.insurance+'</div></div></div>';}).join('');}
+  if(pys.length){html+='<div class="sdrop-section">🏦 Payers</div>'+pys.map(function(p){return'<div class="sdrop-item" onclick="go(\'payers\')"><div class="sdrop-icon">🏦</div><div><div style="font-size:13px;font-weight:600">'+p.name+'</div><div style="font-size:11.5px;color:var(--muted)">'+p.phone+'</div></div></div>';}).join('');}
+  if(!html)html='<div style="padding:16px;text-align:center;font-size:13px;color:var(--muted)">No results</div>';
+  dd.innerHTML=html;dd.classList.add('open');
+}
+
+// ── Notifications ─────────────────────────────────────────
+function renderNotifs(){
+  var list=document.getElementById('notif-list');if(!list)return;
+  list.innerHTML=_notifs.map(function(n){return'<div class="ni'+(n.unread?' unread':'')+'" onclick="markRead('+n.id+')" style="align-items:flex-start">'+'<div style="font-size:18px;flex-shrink:0;margin-top:1px">'+n.icon+'</div><div style="flex:1;margin-left:12px"><div style="font-size:13px;font-weight:600">'+n.title+'</div><div style="font-size:12px;color:var(--text2);line-height:1.4">'+n.msg+'</div><div style="font-size:11px;color:var(--muted);margin-top:3px">'+n.time+'</div></div>'+(n.unread?'<div style="width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px"></div>':'')+'</div>';}).join('')+'<div style="padding:10px;text-align:center"><button class="btn btn-ghost btn-sm" onclick="toggleNotif()" style="font-size:12px">View All</button></div>';
+  var unread=_notifs.filter(function(n){return n.unread;}).length;
+  var d=document.getElementById('notif-dot');if(d)d.style.display=unread>0?'block':'none';
+}
+function toggleNotif(){var d=document.getElementById('ndrop');d.classList.toggle('open');renderNotifs();document.addEventListener('click',function h(e){if(!d.contains(e.target)&&e.target.id!=='notif-btn'){d.classList.remove('open');document.removeEventListener('click',h);}});}
+function markRead(id){_notifs=_notifs.map(function(n){return n.id===id?Object.assign({},n,{unread:false}):n;});renderNotifs();}
+function markAllRead(){_notifs=_notifs.map(function(n){return Object.assign({},n,{unread:false});});renderNotifs();toast('All alerts cleared','success');}
+
+// ── Utilities ─────────────────────────────────────────────
+function closeModal(id){var m=document.getElementById(id);if(m)m.classList.remove('open');}
+document.addEventListener('click',function(e){if(e.target.classList.contains('modal-bg'))e.target.classList.remove('open');});
+function toast(msg,type,title){
+  var c=document.getElementById('toast-container');if(!c)return;
+  var t=document.createElement('div');t.className='toast '+(type||'info');
+  var icons={success:'✅',error:'❌',warning:'⚠️',info:'ℹ️'};
+  var titles={success:'Success',error:'Error',warning:'Warning',info:'Info'};
+  t.innerHTML='<div class="toast-icon">'+icons[type||'info']+'</div><div class="toast-body"><div class="toast-title">'+(title||titles[type||'info'])+'</div><div class="toast-msg">'+DATA.esc(msg)+'</div></div><button class="toast-close" onclick="this.parentElement.remove()">×</button>';
+  c.appendChild(t);setTimeout(function(){if(t.parentNode)t.remove();},4500);
+}
+</script>
+
+<!-- ── OPENROUTER CONFIG ───────────────────────────────── -->
+<script>
+var OPENROUTER_API_KEY = 'YOUR_OPENROUTER_KEY_HERE';
+var AI_MODEL = 'meta-llama/llama-3.3-70b-instruct';
+
+async function callOpenRouter(systemPrompt, userMessage, onChunk) {
+  if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'YOUR_OPENROUTER_KEY_HERE') return null;
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENROUTER_API_KEY,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://nexrcm.demo',
+        'X-Title': 'NexRCM Insurance Verification AI'
+      },
+      body: JSON.stringify({
+        model: AI_MODEL, stream: true, max_tokens: 400,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage }
+        ]
+      })
+    });
+    if (!res.ok) return null;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const lines = decoder.decode(value).split('\n').filter(l => l.startsWith('data: '));
+      for (const line of lines) {
+        const data = line.replace('data: ', '');
+        if (data === '[DONE]') continue;
+        try {
+          const delta = JSON.parse(data).choices[0].delta.content || '';
+          full += delta;
+          if (onChunk) onChunk(delta, full);
+        } catch(e) {}
+      }
+    }
+    return full;
+  } catch(e) { return null; }
+}
+</script>
+
+<!-- ── FLOATING AI ASSISTANT ─────────────────────────── -->
+<div id="ai-fab">
+  <div id="ai-fab-panel">
+    <div class="ai-fab-hdr">
+      <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:16px">🛡️</div>
+      <div style="flex:1;margin-left:8px">
+        <div style="font-size:13px;font-weight:700;color:#fff">NexRCM Verification AI</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.6)">Insurance Intelligence · OpenRouter</div>
+      </div>
+      <button onclick="closeFabPanel()" style="background:rgba(255,255,255,0.15);border:none;color:#fff;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div class="ai-fab-msgs" id="ai-fab-msgs"></div>
+    <div class="ai-quick-chips">
+      <div class="ai-chip" onclick="fabAsk('Which patients need verification today?')">Today's queue</div>
+      <div class="ai-chip" onclick="fabAsk('Which patients have expired coverage?')">Expired coverage</div>
+      <div class="ai-chip" onclick="fabAsk('What is Delta Dental coverage for crowns?')">Crown coverage</div>
+      <div class="ai-chip" onclick="fabAsk('Summarize coverage risks for today')">Risk summary</div>
+    </div>
+    <div class="ai-input-row">
+      <input id="ai-fab-input" type="text" placeholder="Ask about coverage, benefits, payers..." onkeydown="if(event.key==='Enter')fabSend()"/>
+      <button onclick="fabSend()" style="width:34px;height:34px;border-radius:var(--r);background:var(--teal);color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">↑</button>
+    </div>
+  </div>
+  <button id="ai-fab-btn" onclick="toggleFabPanel()" title="AI Insurance Assistant" style="position:relative">
+    🛡️
+    <span class="ai-badge-dot" id="ai-fab-dot"></span>
+  </button>
+</div>
+
+</body>
+</html>
+<script>
+/* ============================================================
+   INSURANCE VERIFICATION AI AUTOMATION MODULE
+   OpenRouter-powered with smart mock fallback
+============================================================ */
+
+var IV_SYSTEM_PROMPT = `You are an AI assistant specializing in dental insurance verification for NexRCM.
+You help Insurance Verification Specialists at Lux Dental Group understand patient coverage,
+identify risks, and take action on verification queues.
+Be concise and specific. Use bullet points. Max 4 sentences or 5 bullet points.
+Today: 2026-03-17. Practice: Lux Dental Group, Los Angeles CA.
+Key payers: Delta Dental, Cigna, Aetna, United Healthcare, BlueCross, Humana, MetLife, Guardian.`;
+
+// ── Floating Panel ────────────────────────────────────────
+var _fabOpen = false;
+var _fabInit = false;
+
+function toggleFabPanel() {
+  _fabOpen = !_fabOpen;
+  var panel = document.getElementById('ai-fab-panel');
+  if (_fabOpen) {
+    panel.classList.add('open');
+    if (!_fabInit) {
+      _fabInit = true;
+      var expired = _queue.filter(function(a){return a.verifyStatus==='expired';}).length;
+      var pending = _queue.filter(function(a){return a.verifyStatus==='pending';}).length;
+      var review  = _queue.filter(function(a){return a.verifyStatus==='needs-review';}).length;
+      fabAddMsg('bot',
+        '🛡️ **Verification Intelligence Ready**\n\n'
+        +'• **'+expired+'** patient'+(expired!==1?'s have':' has')+' expired coverage — treatment at risk\n'
+        +'• **'+pending+'** patient'+(pending!==1?'s':'')+' still need verification\n'
+        +'• **'+review+'** patient'+(review!==1?'s need':' needs')+' manual review\n\n'
+        +'Ask me about any patient\'s coverage, payer rules, or today\'s risks.'
+      );
+    }
+    setTimeout(function(){ var i=document.getElementById('ai-fab-input'); if(i) i.focus(); }, 100);
+  } else {
+    panel.classList.remove('open');
+  }
+}
+
+function closeFabPanel() {
+  _fabOpen = false;
+  document.getElementById('ai-fab-panel').classList.remove('open');
+}
+
+function fabSend() {
+  var inp = document.getElementById('ai-fab-input');
+  var q = (inp.value||'').trim();
+  if (!q) return;
+  inp.value = '';
+  fabAsk(q);
+}
+
+function fabAsk(question) {
+  if (!_fabOpen) toggleFabPanel();
+  fabAddMsg('user', question);
+  var typingId = 'typing_' + Date.now();
+  fabAddMsg('bot', '<div class="typing-dots"><span></span><span></span><span></span></div>', typingId);
+
+  var context = buildIVContext();
+  var fullPrompt = IV_SYSTEM_PROMPT + '\n\nCurrent verification data:\n' + context;
+
+  callOpenRouter(fullPrompt, question, null).then(function(result) {
+    removeFabMsg(typingId);
+    fabAddMsg('bot', result || getIVMockResponse(question));
+  }).catch(function() {
+    removeFabMsg(typingId);
+    fabAddMsg('bot', getIVMockResponse(question));
+  });
+}
+
+function buildIVContext() {
+  var verified  = _queue.filter(function(a){return a.verifyStatus==='verified';});
+  var pending   = _queue.filter(function(a){return a.verifyStatus==='pending';});
+  var expired   = _queue.filter(function(a){return a.verifyStatus==='expired';});
+  var review    = _queue.filter(function(a){return a.verifyStatus==='needs-review';});
+  return 'Total queue: ' + _queue.length + '. '
+    + 'Verified: ' + verified.map(function(a){return a.patient+'('+a.insurance+')';}).join(', ') + '. '
+    + 'Expired: ' + expired.map(function(a){return a.patient+'('+a.insurance+')';}).join(', ') + '. '
+    + 'Pending: ' + pending.map(function(a){return a.patient+'('+a.insurance+')';}).join(', ') + '. '
+    + 'Needs review: ' + review.map(function(a){return a.patient+'('+a.insurance+')';}).join(', ') + '.';
+}
+
+function getIVMockResponse(q) {
+  q = q.toLowerCase();
+  var expired = _queue.filter(function(a){return a.verifyStatus==='expired';});
+  var pending = _queue.filter(function(a){return a.verifyStatus==='pending';});
+
+  if (q.includes('expired') || q.includes('terminated')) {
+    return '🔴 **Expired Coverage Alert:**\n'
+      + expired.map(function(a){return '• **'+a.patient+'** ('+a.insurance+') — coverage lapsed. Do not proceed without updated insurance or upfront payment.';}).join('\n')
+      + (expired.length?'':'\n• No expired coverage found today ✅');
+  }
+  if (q.includes('queue') || q.includes('today') || q.includes('need verification') || q.includes('pending')) {
+    return '📋 **Today\'s Verification Queue:**\n'
+      + '• **'+pending.length+'** patients still need verification\n'
+      + pending.slice(0,3).map(function(a){return '• '+a.time+' – '+a.patient+' ('+a.insurance+')';}).join('\n')
+      + (pending.length>3?'\n• ...and '+(pending.length-3)+' more':'');
+  }
+  if (q.includes('crown') || q.includes('major')) {
+    return '👑 **Crown Coverage (Major Restorative):**\n• Delta Dental: **50%** after deductible\n• Cigna: **60-70%** varies by plan\n• United Healthcare: **50-60%**\n• Guardian: **60%** — best major coverage\n\n💡 Always confirm exact % via EDI 270 before treatment.';
+  }
+  if (q.includes('delta dental')) {
+    return '🦷 **Delta Dental Coverage Rules:**\n• Preventive: **100%** (exams, cleanings, X-rays)\n• Basic: **80%** (fillings, extractions)\n• Major: **50%** (crowns, bridges)\n• Annual max: typically **$1,500–$2,000**\n• Clean claim rate: 94% — fastest payer in network';
+  }
+  if (q.includes('risk') || q.includes('alert')) {
+    var total = _queue.length;
+    var atRisk = expired.length + _queue.filter(function(a){return a.verifyStatus==='needs-review';}).length;
+    return '⚠️ **Today\'s Risk Summary:**\n'
+      + '• '+atRisk+' of '+total+' patients have coverage issues\n'
+      + '• Revenue at risk: ~$'+Math.round(atRisk*650)+' if treated without verification\n'
+      + '• Action: verify '+pending.length+' pending patients before their appointments\n'
+      + '• Recommend: batch EDI run to clear queue in <3 minutes';
+  }
+  if (q.includes('implant')) {
+    return '🔩 **Implant Coverage:**\n• Most plans cover **50%** if no missing tooth clause applies\n• Cigna/Aetna: often require 12-month waiting period\n• Delta Dental: requires prior authorization\n• Document: missing tooth date, periodontal health, X-rays\n\n💡 Always obtain prior auth before implant procedures.';
+  }
+  return '🛡️ I can help with coverage verification, payer-specific rules, benefit limits, and today\'s risk summary. What patient or payer would you like to know about?';
+}
+
+function fabAddMsg(role, html, id) {
+  var msgs = document.getElementById('ai-fab-msgs');
+  if (!msgs) return;
+  var div = document.createElement('div');
+  div.className = 'ai-msg-row ' + role;
+  if (id) div.id = id;
+  div.innerHTML = '<div class="ai-avatar" style="background:' + (role==='bot'?'linear-gradient(135deg,var(--teal),var(--brand))':'linear-gradient(135deg,#F59E0B,#EF4444)') + ';color:#fff">'
+    + (role==='bot'?'🛡️':'👤') + '</div>'
+    + '<div class="ai-bubble ' + role + '">' + formatIVText(html) + '</div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeFabMsg(id) { var el=document.getElementById(id); if(el) el.remove(); }
+
+function formatIVText(t) {
+  return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+}
+
+// ── AI Dashboard Intelligence Banner ─────────────────────
+function renderIVAIIntelligence() {
+  var el = document.getElementById('iv-ai-intelligence');
+  if (!el) return;
+  var expired  = _queue.filter(function(a){return a.verifyStatus==='expired';});
+  var pending  = _queue.filter(function(a){return a.verifyStatus==='pending';});
+  var review   = _queue.filter(function(a){return a.verifyStatus==='needs-review';});
+  if (!expired.length && !pending.length && !review.length) { el.innerHTML=''; return; }
+
+  var items = [];
+  expired.forEach(function(a){
+    var p = DATA.pt(a.patientId);
+    var e = p ? DATA.el(a.patientId) : null;
+    items.push({
+      priority:'CRITICAL', icon:'🔴', color:'#991B1B', bg:'var(--danger-bg)', bd:'var(--danger-border)',
+      title: a.patient + ' — Expired Coverage',
+      body: a.insurance + ' terminated ' + (e?e.coverageEnd:'12/31/2025') + '. Treatment at risk: ~$'+Math.round((Math.random()*400+200).toFixed(0))+'. Collect upfront or reschedule.',
+      action: 'openDetail(\'' + a.patientId + '\')'
+    });
+  });
+  review.forEach(function(a){
+    var p = DATA.pt(a.patientId);
+    var e = p ? DATA.el(a.patientId) : null;
+    items.push({
+      priority:'HIGH', icon:'⚠️', color:'#92400E', bg:'var(--warning-bg)', bd:'var(--warning-border)',
+      title: a.patient + ' — Needs Manual Review',
+      body: a.insurance + (e?' — only '+DATA.fmt$(e.remaining)+' remaining benefits.':'.') + ' Verify procedure coverage before treatment.',
+      action: 'openDetail(\'' + a.patientId + '\')'
+    });
+  });
+  if (pending.length) {
+    items.push({
+      priority:'MEDIUM', icon:'⏳', color:'#1D4ED8', bg:'var(--info-bg)', bd:'var(--info-border)',
+      title: pending.length + ' Patients Pending Verification',
+      body: pending.slice(0,3).map(function(a){return a.patient+' ('+a.time+')';}).join(', ')+(pending.length>3?' +' +(pending.length-3)+' more':'') + '. Run batch EDI to complete quickly.',
+      action: 'batchVerifyAll()'
+    });
+  }
+
+  el.innerHTML = '<div style="background:linear-gradient(135deg,#0A0E1A,#0D2040);border-radius:var(--r-xl);padding:16px 20px;margin-bottom:0">'
+    + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+      + '<span style="font-size:20px">🤖</span>'
+      + '<div><div style="font-size:13px;font-weight:700;color:#fff">AI Verification Intelligence</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">'+items.length+' issue'+(items.length!==1?'s':'')+' detected · Click any alert to take action</div></div>'
+      + '<button onclick="fabAsk(\'Summarize today\'s coverage risks\')" style="margin-left:auto;background:rgba(0,196,180,0.2);border:1px solid rgba(0,196,180,0.3);color:var(--teal);padding:5px 12px;border-radius:var(--r-pill);font-size:11.5px;font-weight:700;cursor:pointer">Ask AI →</button>'
+    + '</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px">'
+    + items.map(function(it) {
+      return '<div onclick="'+it.action+'" style="display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background=\'rgba(255,255,255,0.08)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.04)\'">'
+        + '<span style="font-size:18px;flex-shrink:0;margin-top:1px">'+it.icon+'</span>'
+        + '<div style="flex:1;min-width:0">'
+          + '<div style="font-size:12.5px;font-weight:700;color:#fff;margin-bottom:2px">'+it.title+'</div>'
+          + '<div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4">'+it.body+'</div>'
+        + '</div>'
+        + '<span style="font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:99px;background:rgba(239,68,68,0.2);color:#FCA5A5;flex-shrink:0;margin-top:2px">'+it.priority+'</span>'
+      + '</div>';
+    }).join('')
+    + '</div></div>';
+}
+
+// ── AI Coverage Summary (after verification result) ──────
+function generateAICoverageSummary() {
+  if (!_vfyPt) { toast('Run a verification first','error'); return; }
+  var p = DATA.pt(_vfyPt.id);
+  var e = DATA.el(_vfyPt.id);
+  if (!p||!e) { toast('No eligibility data','error'); return; }
+
+  // Show shimmer in result card
+  var res = document.getElementById('vfy-result');
+  var existing = res ? res.innerHTML : '';
+
+  // Build a mini panel at bottom of vfy-result
+  var summaryEl = document.getElementById('ai-coverage-summary-panel');
+  if (!summaryEl) {
+    summaryEl = document.createElement('div');
+    summaryEl.id = 'ai-coverage-summary-panel';
+    summaryEl.className = 'ai-result-anim';
+    res.appendChild(summaryEl);
+  }
+
+  summaryEl.innerHTML = '<div style="margin-top:14px;padding:14px 16px;background:rgba(255,255,255,0.04);border:1px solid rgba(0,196,180,0.2);border-radius:var(--r-lg)">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="ai-shimmer" style="width:24px;height:24px;border-radius:50%;flex-shrink:0"></span><span class="ai-shimmer" style="width:180px"></span></div>'
+    + '<div class="ai-shimmer" style="width:90%"></div><div class="ai-shimmer" style="width:75%"></div><div class="ai-shimmer" style="width:85%"></div>'
+    + '</div>';
+
+  var userMsg = 'Generate an AI Coverage Summary for '+p.first+' '+p.last
+    +' with '+p.insurance+'. Annual max: $'+e.annualMax
+    +', remaining: $'+e.remaining+', used: $'+e.usedBenefit
+    +', deductible: '+(e.deductMet>=(e.deductTotal||50)?'met':'$'+(e.deductTotal-e.deductMet)+' remaining')
+    +', preventive: 100%, basic: '+e.coIns+'%, major: '+e.coInsMajor+'%, implants: '+(e.implantCover>0?e.implantCover+'%':'not covered')
+    +', network: '+e.network+', status: '+e.status
+    +'. Provide a 5-bullet coverage summary a front desk coordinator would need before the patient arrives.';
+
+  callOpenRouter(IV_SYSTEM_PROMPT, userMsg, null).then(function(result) {
+    renderCoverageSummaryCard(summaryEl, p, e, result);
+  }).catch(function() {
+    renderCoverageSummaryCard(summaryEl, p, e, null);
+  });
+
+  toast('Generating AI coverage summary...','info');
+}
+
+function renderCoverageSummaryCard(el, p, e, aiText) {
+  var usedPct = e.annualMax > 0 ? Math.round(e.usedBenefit/e.annualMax*100) : 0;
+
+  // Coverage rules grid
+  var rules = [
+    { label:'Cleaning (D1110)', pct:100, color:'#10B981', covered:true },
+    { label:'Exam (D0120)',      pct:100, color:'#10B981', covered:true },
+    { label:'X-rays (D0274)',   pct:100, color:'#10B981', covered:true },
+    { label:'Fillings (D2391)', pct:e.coIns,  color:e.coIns>=80?'#10B981':'#F59E0B', covered:true },
+    { label:'Crown (D2740)',    pct:e.coInsMajor, color:e.coInsMajor>=60?'#F59E0B':'#EF4444', covered:true },
+    { label:'Implant (D6010)',  pct:e.implantCover, color:e.implantCover>0?'#F59E0B':'#EF4444', covered:e.implantCover>0 },
+  ];
+
+  el.innerHTML = '<div class="ai-cov-summary ai-result-anim" style="margin-top:14px">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">'
+      + '<span style="font-size:18px">🤖</span>'
+      + '<span style="font-size:13px;font-weight:700;color:var(--teal,#00C4B4)">AI Coverage Summary</span>'
+      + '<span style="margin-left:auto;font-size:10px;color:var(--muted)">' + p.insurance + ' · '+e.planType+'</span>'
+    + '</div>'
+    // Benefits bar
+    + '<div style="margin-bottom:12px">'
+      + '<div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text2);margin-bottom:5px"><span>Annual Benefits Used</span><span>$'+e.usedBenefit+' / $'+e.annualMax+'</span></div>'
+      + '<div class="ai-risk-bar"><div class="ai-risk-fill" style="width:'+usedPct+'%;background:'+(usedPct>90?'#EF4444':usedPct>70?'#F59E0B':'#10B981')+'"></div></div>'
+      + '<div style="font-size:11px;color:var(--muted);margin-top:3px">$'+e.remaining+' remaining ('+usedPct+'% used)</div>'
+    + '</div>'
+    // Coverage rules grid
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">'
+    + rules.map(function(r) {
+      return '<div class="ai-cov-row" style="background:var(--bg);border-radius:6px;padding:6px 9px;border:none">'
+        + '<span style="font-size:12px;color:var(--text2)">'+r.label+'</span>'
+        + '<span class="coverage-pill" style="background:'+r.color+'20;color:'+r.color+';border:1px solid '+r.color+'40">'
+          + (r.covered ? r.pct+'%' : '❌ Not Covered')
+        + '</span>'
+      + '</div>';
+    }).join('')
+    + '</div>'
+    // Key flags
+    + '<div style="font-size:12.5px;line-height:1.7;color:var(--text2)">'
+      + (e.remaining===0 ? '<div style="color:#EF4444;margin-bottom:4px">⚠️ <strong>Annual max reached</strong> — patient pays 100% today</div>' : '')
+      + (e.remaining<300&&e.remaining>0 ? '<div style="color:#F59E0B;margin-bottom:4px">⚠️ Only <strong>$'+e.remaining+'</strong> left — collect upfront for major work</div>' : '')
+      + (e.deductMet>=(e.deductTotal||50) ? '<div style="color:#10B981;margin-bottom:4px">✅ Deductible fully met</div>' : '<div style="color:#F59E0B;margin-bottom:4px">💡 $'+(e.deductTotal-e.deductMet)+' deductible remaining</div>')
+      + (e.waitingPeriod&&e.waitingPeriod!=='None' ? '<div style="color:#F59E0B;margin-bottom:4px">⏳ Waiting period: '+e.waitingPeriod+'</div>' : '')
+      + (e.network==='In-Network' ? '<div style="color:#10B981">✅ Provider is In-Network</div>' : '<div style="color:#EF4444">🔴 Out-of-Network — higher patient cost</div>')
+    + '</div>'
+    // AI narrative (from OpenRouter or fallback)
+    + (aiText ? '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,196,180,0.15);font-size:12.5px;color:var(--text2);line-height:1.6">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--teal,#00C4B4);margin-bottom:6px">🤖 AI CLINICAL NOTE</div>'
+        + formatIVText(aiText)
+        + '</div>'
+      : '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,196,180,0.15);font-size:12.5px;color:var(--text2)">'
+        + '<div style="font-size:11px;font-weight:700;color:var(--teal,#00C4B4);margin-bottom:6px">🤖 AI RECOMMENDATION</div>'
+        + '💡 Collect <strong>$'+Math.round(350*(100-e.coInsMajor)/100)+'</strong> estimated patient portion for major restorative today. Verify procedure-specific coverage if billing multiple codes.'
+        + '</div>'
+    )
+    + '</div>';
+}
+
+// ── AI Benefits Analysis (Benefits Lookup page) ──────────
+function renderBenAIAnalysis(pid) {
+  var el = document.getElementById('ben-ai-analysis');
+  if (!el) return;
+  var p = DATA.pt(pid);
+  var e = DATA.el(pid);
+  if (!p||!e) { el.style.display='none'; return; }
+
+  el.style.display='block';
+  el.innerHTML = '<div style="background:linear-gradient(135deg,rgba(0,196,180,0.06),rgba(26,86,255,0.04));border:1px solid rgba(0,196,180,0.2);border-radius:var(--r-xl);padding:18px 20px;">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">'
+      + '<span style="font-size:20px">🤖</span>'
+      + '<div><div style="font-size:13.5px;font-weight:700">AI Benefits Analysis</div><div style="font-size:11.5px;color:var(--muted)">Treatment recommendations based on current coverage</div></div>'
+    + '</div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">'
+    + buildBenRecommendations(p, e).map(function(rec) {
+      return '<div style="background:var(--surface);border-radius:var(--r-lg);padding:14px 16px;border:1px solid '+(rec.urgent?'var(--warning-border)':'var(--border)')+'">'
+        + '<div style="font-size:18px;margin-bottom:6px">'+rec.icon+'</div>'
+        + '<div style="font-size:13px;font-weight:700;margin-bottom:4px">'+rec.title+'</div>'
+        + '<div style="font-size:12px;color:var(--text2);line-height:1.5">'+rec.body+'</div>'
+        + (rec.action?'<button class="btn btn-sm" style="margin-top:8px;'+(rec.urgent?'background:var(--warning);color:#fff':'')+';" onclick="toast(\''+rec.actionMsg+'\',\'success\')">' + rec.action+'</button>':'')
+      + '</div>';
+    }).join('')
+    + '</div></div>';
+}
+
+function buildBenRecommendations(p, e) {
+  var recs = [];
+  if (e.remaining < 200) {
+    recs.push({icon:'⚠️',urgent:true,title:'Benefits Nearly Exhausted',body:'Only $'+e.remaining+' left for '+p.first+'. Schedule essential treatments before plan resets.',action:'Schedule Now',actionMsg:'Opening scheduler for '+p.first+' '+p.last});
+  } else if (e.remaining > 800) {
+    recs.push({icon:'💎',urgent:false,title:'High Remaining Benefits',body:'$'+e.remaining+' available. Ideal time for elective procedures or deferred treatment.',action:'View Treatment Plan',actionMsg:'Treatment plan opened'});
+  }
+  if (e.deductMet < (e.deductTotal||50)) {
+    recs.push({icon:'💰',urgent:false,title:'Deductible Not Yet Met',body:'$'+(e.deductTotal-e.deductMet)+' remaining. Stack preventive visits to meet deductible faster.',action:null});
+  } else {
+    recs.push({icon:'✅',urgent:false,title:'Deductible Met',body:'Patient pays only co-insurance. Best time for major restorative work.',action:null});
+  }
+  if (e.implantCover > 0) {
+    recs.push({icon:'🔩',urgent:false,title:'Implant Coverage Available',body:e.implantCover+'% implant coverage. Requires prior auth. Document missing tooth date.',action:'Request Prior Auth',actionMsg:'Prior auth request initiated'});
+  }
+  recs.push({icon:'📅',urgent:false,title:'Benefits Reset',body:'Plan year ends '+e.coverageEnd+'. Use remaining $'+e.remaining+' before reset.',action:null});
+  return recs.slice(0,4);
+}
+
+// ── Patch existing functions to trigger AI ────────────────
+// After verification completes, show the AI summary button
+var _origShowVfyResult = showVfyResult;
+showVfyResult = function(pid) {
+  _origShowVfyResult(pid);
+  _vfyPt = DATA.pt(pid) ? {id:pid} : _vfyPt;
+  var btn = document.getElementById('ai-cov-summary-btn');
+  if (btn) btn.style.display = 'inline-flex';
+};
+
+// After benefits load, show AI analysis
+var _origLoadBenefits = loadBenefits;
+loadBenefits = function() {
+  _origLoadBenefits();
+  var pid = document.getElementById('ben-pt') ? document.getElementById('ben-pt').value : '';
+  if (pid) setTimeout(function(){ renderBenAIAnalysis(pid); }, 100);
+};
+
+// Patch go() to show intelligence banner on dashboard
+var _origGo = go;
+go = function(page) {
+  _origGo(page);
+  if (page === 'dashboard') setTimeout(renderIVAIIntelligence, 60);
+};
+
+// Init on load
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(renderIVAIIntelligence, 300);
+});
+</script>
